@@ -1,6 +1,10 @@
 # KnowHub
 
-プロジェクトの概要をここに記述します（例：ナレッジ共有・管理プラットフォーム）。
+KnowHubは、社内で発生する「わからない」を気軽に投稿・共有できるナレッジ共有アプリです。
+
+新入社員や若手社員が質問しやすい環境を作り、回答内容を組織のナレッジとして蓄積することで、同じ質問の繰り返しや知識の属人化を防ぐことを目的としています。
+
+AIによる質問文整理サポートを行い、質問者が内容を言語化しやすくすることも特徴です。
 
 ---
 
@@ -61,7 +65,7 @@ npm install
 `frontend/.env.local` を作成し、以下の内容を設定してください：
 
 ```env
-VITE_API_URL=http://localhost:5000
+VITE_API_URL=http://localhost:3001
 VITE_SUPABASE_URL=あなたのURL
 VITE_SUPABASE_ANON_KEY=あなたのキー
 ```
@@ -72,7 +76,7 @@ VITE_SUPABASE_ANON_KEY=あなたのキー
 
 2つのターミナルを開き、それぞれで以下のコマンドを実行します。
 
-**バックエンドサーバー** (`http://localhost:5000`)
+**バックエンドサーバー** (`http://localhost:3002`)
 
 ```bash
 cd backend
