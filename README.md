@@ -118,7 +118,9 @@ npm run dev
 
 コミットルールは以下に記載しておきます。
 https://docs.google.com/document/d/1mQy6IiI2UByMe5AmadCfLNA82lBCFqY8CAU3LbkwRho/edit?usp=drive_link
----
+
+ブランチルールは以下に記載しておきます。
+https://docs.google.com/document/d/1BCXtBRpnQ15rQ_1hAPNzaiaglfdXCtYtIZgf2f8GAdo/edit?usp=drive_link
 
 ## 🎨 デザイン
 
