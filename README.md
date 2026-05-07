@@ -116,6 +116,8 @@ npm run dev
 - **プルリクエスト**: 必ず1人以上のレビューを経てから `main` ブランチへマージします
 - **コード整形**: 保存時に Prettier が自動適用されるよう、VS Code の設定を推奨します
 
+コミットルールは以下に記載しておきます。
+https://docs.google.com/document/d/1mQy6IiI2UByMe5AmadCfLNA82lBCFqY8CAU3LbkwRho/edit?usp=drive_link
 ---
 
 ## 🎨 デザイン
