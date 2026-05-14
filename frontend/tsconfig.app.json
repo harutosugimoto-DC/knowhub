@@ -7,6 +7,8 @@
     "types": ["vite/client"],
     "skipLibCheck": true,
 
+    "rootDirs": [".", "./.react-router/types"],
+    
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
@@ -21,5 +23,5 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"]
+  "include": ["app", ".react-router/types"]
 }
