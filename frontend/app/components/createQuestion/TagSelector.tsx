@@ -36,7 +36,7 @@ export default function TagSelector({ id }: TagSelectorProps) {
         <div className="border border-[var(--light-gray)] rounded-[var(--radius-small)] bg-white w-full">
 
             {/* 上部：選択済みのタグを表示するエリア */}
-            <div className={`p-[var(--spacing-8)] flex flex-wrap gap-[10px] ${selectedTags.length === 0 ? 'h-[48px] items-center' : ''}`}>
+            <div className={`p-[var(--spacing-8)] flex flex-wrap gap-[var(--spacing-8)] ${selectedTags.length === 0 ? 'h-[48px] items-center' : ''}`}>
                 {selectedTags.map(tag => (
                     <TagChip
                         key={tag}
