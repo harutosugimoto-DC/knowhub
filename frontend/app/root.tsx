@@ -1,5 +1,10 @@
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 
+import "@fontsource/noto-sans-jp/400.css";
+import "@fontsource/noto-sans-jp/500.css";
+
+import "@fontsource/lora/400.css";
+
 export default function App() {
     return (
         <html lang="ja">
