@@ -1,0 +1,61 @@
+:root {
+    --base-color: #FAF9F6;
+    --main-color: #019A66;
+    --accent-color: #016644;
+    --gradation-green: linear-gradient(0, #019A66 0%, #016644 100%);
+    --dark-gray: #999999;
+    --light-gray: #D8D7D2;
+    --like-color: #E66B7A;
+    --danger-color: #FF7070;
+    --text-color-white: #FFFFFF;
+    --text-color-black: #333333;
+    --status-color-resolved: #676767;
+    --status-color-organize: #488671;
+    --status-color-taking: #00A87B;
+    --ai-color: linear-gradient(0, #FF9500 0%, #FF4800 100%);
+
+    --font-size-big: 22px;
+    --font-size-medium: 18px;
+    --font-size-normal: 16px;
+
+    --radius-big: 16px;
+    --radius-small: 4px;
+    --radius-full: 9999px;
+
+    --box-shadow: 2px 4px 4px rgba(0, 0, 0, 0.25);
+
+    --spacing-4: 4px;
+    --spacing-8: 8px;
+    --spacing-12: 12px;
+    --spacing-16: 16px;
+    --spacing-24: 24px;
+    --spacing-32: 32px;
+    --spacing-48: 48px;
+    --spacing-64: 64px;
+    --spacing-128: 128px;
+
+    --z-header: 100;
+    --z-modal: 200;
+    --z-toast: 300;
+
+    --transition-base: 0.2s ease;
+
+}
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+}
+
+body {
+    font-family: "Noto Sans JP", sans-serif;
+    color: var(--text-color-black);
+    background-color: var(--base-color);
+}
