@@ -4,7 +4,7 @@
     --base-color: #FAF9F6;
     --main-color: #019A66;
     --accent-color: #016644;
-    --gradation-green: linear-gradient(0, #019A66 0%, #016644 100%);
+    --gradation-green: linear-gradient(90deg, #019A66 0%, #016644 100%);
     --dark-gray: #999999;
     --light-gray: #D8D7D2;
     --like-color: #E66B7A;
@@ -44,16 +44,9 @@
 
 }
 
-*,
-*::before,
-*::after {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
 html {
     font-size: 16px;
+    line-height: 1.6;
 }
 
 body {
