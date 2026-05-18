@@ -1,5 +1,6 @@
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 
+import "@/index.css";
 import "@fontsource/noto-sans-jp/400.css";
 import "@fontsource/noto-sans-jp/500.css";
 
