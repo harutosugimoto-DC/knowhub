@@ -1,16 +1,44 @@
+import Card from "./Card";
+import type { NotificationItemProps } from "./NotificationItem";
+import NotificationItem from "./NotificationItem";
+import ScrollBar from "./ScrollBar";
 
 
 
 type NotificationProps = {
-    linkUrl: string;
-    type: string;
-    createdAt: Date;
-    isRead: boolean;
+    notifications: NotificationItemProps[];
 };
-export default function Notification({ name }: NotificationProps) {
+const calculateUnreadCount = (notifications: NotificationItemProps[]) => {
+    let count = 0;
+    notifications.forEach(notification => {
+        if (notification.isRead) {
+            count++;
+        }
+    });
+    return count;
+}
+export default function Notification({ notifications }: NotificationProps) {
 
     return (
-        <div >
-        </div>
+        <Card className="w-[400px] max-h-[400px] flex flex-col gap-2">
+            <div className="flex justify-between border-b border-[var(--light-gray)] py-[var(--spacing-8)]">
+                <h2 className="text-[length:var(--font-size-big))]">通知</h2>
+                <p className="text-[var(--dark-gray)] flex items-center">
+                    {calculateUnreadCount(notifications)}件の未読
+                </p>
+            </div>
+            <ScrollBar>
+                {notifications.map((notification, i) => (
+                    <NotificationItem
+                        key={i}
+                        linkUrl={notification.linkUrl}
+                        type={notification.type}
+                        createdAt={notification.createdAt}
+                        isRead={notification.isRead}
+                    />
+                ))}
+            </ScrollBar>
+
+        </Card>
     );
 }

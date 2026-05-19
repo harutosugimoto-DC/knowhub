@@ -13,8 +13,8 @@ export default function ScrollBar({ children, className = "" }: ScrollBarProps) 
                 "overflow-auto",
 
                 // スクロールバー全体の幅と高さ
-                "[&::-webkit-scrollbar]:w-2",
-                "[&::-webkit-scrollbar]:h-2",
+                "[&::-webkit-scrollbar]:w-1",
+                "[&::-webkit-scrollbar]:h-1",
 
                 // スクロールバーの軌道（トラック）の背景色
                 "[&::-webkit-scrollbar-track]:bg-[var(--light-gray)]",
