@@ -64,7 +64,7 @@ export default function Header() {
     }
     const navigate = useNavigate()
     return (
-        <div className="flex justify-between items-center h-[64px] border-b border-[var(--light-gray)] pl-[var(--spacing-16)]">
+        <div className="flex justify-between items-center h-[64px] w-[100vw] border-b border-[var(--light-gray)] pl-[var(--spacing-16)] z-[var(--z-header)] fixed top-0 left-0 bg-white">
             <div className="flex items-center gap-2 px-[var(--spacing-8)] cursor-pointer" onClick={() => navigate("/top")}>
                 <img src={logoImage} alt="Logo" className="w-auto h-[48px]" />
                 <p className="text-[length:var(--font-size-big)] font-['Lora'] bg-[image:var(--gradation-green)] bg-clip-text text-transparent">
