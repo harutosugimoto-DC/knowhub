@@ -1,14 +1,21 @@
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 type BookmarkProps = {
-    isChecked: boolean;
+    isBookmarked: boolean;
     count: number;
 };
 
-export default function Bookmark({ isChecked, count }: BookmarkProps) {
+export default function Bookmark({ isBookmarked, count }: BookmarkProps) {
+
+    const handleClick = () => {
+        
+    }
 
     return (
         <div className='inline-flex items-center gap-1'>
-            <BookmarkIcon className={`${isChecked ? 'text-[var(--main-color)]' : 'text-[var(--light-gray)]'}`} />
+            <BookmarkIcon
+                className={`${isBookmarked ? 'text-[var(--main-color)]' : 'text-[var(--light-gray)]'}`}
+                onClick={handleClick}
+            />
             <span>{count}</span>
         </div>
     );

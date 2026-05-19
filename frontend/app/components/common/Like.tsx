@@ -1,14 +1,20 @@
 import FavoriteIcon from '@mui/icons-material/Favorite';
 type LikeProps = {
-    isChecked: boolean;
+    isLiked: boolean;
     count: number;
 };
 
-export default function Like({ isChecked, count }: LikeProps) {
+export default function Like({ isLiked, count }: LikeProps) {
 
+    const handleClick = () => {
+
+    }
     return (
         <div className='inline-flex items-center gap-1'>
-            <FavoriteIcon className={`${isChecked ? 'text-[var(--like-color)]' : 'text-[var(--light-gray)]'}`} />
+            <FavoriteIcon
+                className={`${isLiked ? 'text-[var(--like-color)]' : 'text-[var(--light-gray)]'}`}
+                onClick={handleClick}
+            />
             <span>{count}</span>
         </div>
     );
