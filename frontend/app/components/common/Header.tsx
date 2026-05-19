@@ -5,6 +5,8 @@ import Avatar from "@/components/common/Avatar";
 import Notification from "@/components/common/Notification";
 
 import logoImage from "@/assets/logo.webp";
+import avatarImage from "@/assets/avatar.png";
+
 import HomeIcon from '@mui/icons-material/Home';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -89,7 +91,7 @@ export default function Header() {
                     </div>
                 </div>
                 <div className=" w-[60px] h-full flex justify-center items-center cursor-pointer transition-all hover:bg-[var(--hover-color)] hover:border-b-[3px] hover:border-[var(--main-color)]" onClick={() => navigate("/profile")}>
-                    <Avatar />
+                    <Avatar src={"https://pbs.twimg.com/media/HIXLkfsaoAA9T7b.jpg"} alt="User Avatar" className="w-[40px] h-[40px]" />
                 </div>
                 <div className=" w-[60px] h-full flex justify-center items-center cursor-pointer transition-all hover:bg-[var(--hover-color)] hover:border-b-[3px] hover:border-[var(--main-color)]" onClick={() => handleLogout()}>
                     <LogoutIcon />
