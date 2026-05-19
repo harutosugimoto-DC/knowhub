@@ -44,6 +44,9 @@ jspm_packages/
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
 
+# React Routerの自動生成ファイルを無視
+frontend/.react-router/
+
 # TypeScript cache
 *.tsbuildinfo
 
