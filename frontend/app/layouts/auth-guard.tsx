@@ -18,32 +18,13 @@ export default function AuthGuard() {
     // ログアウトボタンが押された時の処理
     const handleLogout = () => {
         localStorage.removeItem("userId");
-        
+
         navigate("/", { replace: true });
     };
 
     return (
-        <div>
-            {/* 認証済みユーザー向けの共通ヘッダー */}
-            <header style={{ 
-                display: "flex", 
-                justifyContent: "space-between", 
-                padding: "1rem", 
-                backgroundColor: "#f3f4f6",
-                borderBottom: "1px solid #e5e7eb"
-            }}>
-                <div style={{ fontWeight: "bold" }}>マイアプリ</div>
-                <button 
-                    onClick={handleLogout} 
-                    style={{ padding: "0.25rem 0.75rem", cursor: "pointer" }}
-                >
-                    ログアウト
-                </button>
-            </header>
-
-            <main>
-                <Outlet />
-            </main>
-        </div>
+        <main>
+            <Outlet />
+        </main>
     );
 }
