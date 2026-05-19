@@ -7,8 +7,9 @@ import Bookmark from "@/components/common/Bookmark";
 import Like from "@/components/common/Like";
 import Comment from "@/components/common/Comment";
 import Time from '../common/Time';
+import Avatar from '../common/Avatar';
 
-type QuestionCardProps = {
+export type QuestionType = {
     title: string;
     statusId: number;
     isLiked?: boolean;
@@ -19,21 +20,27 @@ type QuestionCardProps = {
     bookmarkCount: number;
     replyCount: number;
     tagNames: string[];
+    userAvatarUrl?: string;
 };
 
-export default function QuestionCard({
-    title,
-    statusId,
-    isLiked = false,
-    isBookmarked = false,
-    userName,
-    postingTime,
-    likeCount,
-    bookmarkCount,
-    replyCount,
-    tagNames
-}: QuestionCardProps) {
+type QuestionCardProps = {
+    question: QuestionType; 
+};
 
+export default function QuestionCard({ question }: QuestionCardProps) {
+    const {
+        title,
+        statusId,
+        isLiked = false,
+        isBookmarked = false,
+        userName,
+        postingTime,
+        likeCount,
+        bookmarkCount,
+        replyCount,
+        tagNames,
+        userAvatarUrl = "https://pbs.twimg.com/media/HIXLkfsaoAA9T7b.jpg",
+    } = question;
     return (
         <Card className="flex justify-between">
             <div className='flex flex-col justify-space-around gap-[var(--spacing-16)]'>
@@ -50,7 +57,7 @@ export default function QuestionCard({
                 {/* 三段目 */}
                 <div className="flex items-center gap-[var(--spacing-16)]">
                     <div className="flex items-center gap-[var(--spacing-4)]">
-                        <AccountCircleIcon className="!text-[var(--font-size-normal)] text-[var(--text-color-black)]" />
+                        <Avatar src={"https://pbs.twimg.com/media/HIXLkfsaoAA9T7b.jpg"} alt="User Avatar" className="w-[24px] h-[24px]" />
                         <span className="text-[var(--text-color-black)]">{userName}</span>
                     </div>
                     <Time postingTime={postingTime} />
