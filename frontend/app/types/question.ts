@@ -9,5 +9,4 @@ export type QuestionType = {
     bookmarkCount: number;
     replyCount: number;
     tagNames: string[];
-    userAvatarUrl?: string;
 };

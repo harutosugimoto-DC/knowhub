@@ -27,7 +27,6 @@ export default function QuestionDetailCard({ question }: QuestionDetailCardProps
         bookmarkCount,
         replyCount,
         tagNames,
-        userAvatarUrl = "https://pbs.twimg.com/media/HIXLkfsaoAA9T7b.jpg", 
         content = "現在、AWS ECS (Fargate) を利用して新規プロジェクトのコンテナ基盤を構築していますが、デプロイしたタスクが正常に実行されず、数秒から数十秒で「STOPPED」状態になってしまう現象に悩まされています。ああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ",
     } = question;
 

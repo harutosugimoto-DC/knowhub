@@ -27,7 +27,6 @@ export default function QuestionCard({ question }: QuestionCardProps) {
         bookmarkCount,
         replyCount,
         tagNames,
-        userAvatarUrl = "https://pbs.twimg.com/media/HIXLkfsaoAA9T7b.jpg",
     } = question;
     return (
         <Card className="flex justify-between">
