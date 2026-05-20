@@ -12,7 +12,7 @@ export default function Like({ isLiked, count }: LikeProps) {
     return (
         <div className='inline-flex items-center gap-1'>
             <FavoriteIcon
-                className={`${isLiked ? 'text-[var(--like-color)]' : 'text-[var(--light-gray)]'}`}
+                className={`cursor-pointer ${isLiked ? 'text-[var(--like-color)]' : 'text-[var(--light-gray)]'}`}
                 onClick={handleClick}
             />
             <span>{count}</span>
