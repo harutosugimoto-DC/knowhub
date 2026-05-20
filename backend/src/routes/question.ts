@@ -11,7 +11,7 @@ router.get('/', async (req, res) => {
   const order = req.query.order === 'likes' ? 'likes' : 'new';
   const limit = 20;
   const offset = (page - 1) * limit;
-  const userId = req.user?.id ?? 'c0df35c7-2f4d-4d73-bcb7-119ec96ab474'; // 仮のUUID
+  const userId = req.user?.id;
 
   let query = supabase
     .from('questions')
@@ -71,7 +71,7 @@ router.get('/', async (req, res) => {
 // GET /api/v1/questions/:questionId
 router.get('/:questionId', async (req, res) => {
   const { questionId } = req.params;
-  const userId = req.user?.id ?? 'c0df35c7-2f4d-4d73-bcb7-119ec96ab474'; // 仮のUUID
+  const userId = req.user?.id;
 
   const { data: rawData, error } = await supabase
     .from('questions')
