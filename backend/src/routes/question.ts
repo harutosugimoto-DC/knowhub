@@ -11,7 +11,7 @@ router.get('/', async (req, res) => {
   const order = req.query.order === 'likes' ? 'likes' : 'new';
   const limit = 20;
   const offset = (page - 1) * limit;
-  const userId = req.user?.id ?? 'c0df35c7-2f4d-4d73-bcb7-119ec96ab474'; // 仮のUUID
+  const userId = req.user?.id;
 
   let query = supabase
     .from('questions')
@@ -71,7 +71,7 @@ router.get('/', async (req, res) => {
 // GET /api/v1/questions/:questionId
 router.get('/:questionId', async (req, res) => {
   const { questionId } = req.params;
-  const userId = req.user?.id ?? 'c0df35c7-2f4d-4d73-bcb7-119ec96ab474'; // 仮のUUID
+  const userId = req.user?.id;
 
   const { data: rawData, error } = await supabase
     .from('questions')
@@ -117,6 +117,55 @@ router.get('/:questionId', async (req, res) => {
   };
 
   return res.json(formatted);
+});
+
+// ブックマーク追加
+// POST /api/v1/questions/:questionId/bookmark
+router.post('/:questionId/bookmark', async (req, res) => {
+  const userId = req.user?.id;
+  const { questionId } = req.params;
+
+  const { data: existing } = await supabase
+    .from('bookmarks')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('question_id', questionId)
+    .maybeSingle();
+
+  if (existing) {
+    return res.status(409).json({ error: '既にブックマーク済みです' });
+  }
+
+  const { error } = await supabase
+    .from('bookmarks')
+    .insert({ user_id: userId, question_id: questionId });
+
+  if (error) {
+    console.error('Supabase error adding bookmark:', error);
+    return res.status(500).json({ error: 'ブックマークの追加に失敗しました' });
+  }
+
+  return res.status(201).json({ message: 'ブックマークに追加しました' });
+});
+
+// ブックマーク解除
+// DELETE /api/v1/questions/:questionId/bookmark
+router.delete('/:questionId/bookmark', async (req, res) => {
+  const userId = req.user?.id;
+  const { questionId } = req.params;
+
+  const { error } = await supabase
+    .from('bookmarks')
+    .delete()
+    .eq('user_id', userId)
+    .eq('question_id', questionId);
+
+  if (error) {
+    console.error('Supabase error removing bookmark:', error);
+    return res.status(500).json({ error: 'ブックマークの解除に失敗しました' });
+  }
+
+  return res.status(200).json({ message: 'ブックマークを解除しました' });
 });
 
 export default router;
