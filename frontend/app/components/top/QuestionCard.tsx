@@ -8,20 +8,8 @@ import Like from "@/components/common/Like";
 import Comment from "@/components/common/Comment";
 import Time from '../common/Time';
 import Avatar from '../common/Avatar';
+import { type QuestionType } from "@/types/question";
 
-export type QuestionType = {
-    title: string;
-    statusId: number;
-    isLiked?: boolean;
-    isBookmarked?: boolean;
-    userName: string;
-    postingTime: Date;
-    likeCount: number;
-    bookmarkCount: number;
-    replyCount: number;
-    tagNames: string[];
-    userAvatarUrl?: string;
-};
 
 type QuestionCardProps = {
     question: QuestionType; 
@@ -57,7 +45,7 @@ export default function QuestionCard({ question }: QuestionCardProps) {
                 {/* 三段目 */}
                 <div className="flex items-center gap-[var(--spacing-16)]">
                     <div className="flex items-center gap-[var(--spacing-4)]">
-                        <Avatar src={"https://pbs.twimg.com/media/HIXLkfsaoAA9T7b.jpg"} alt="User Avatar" className="w-[24px] h-[24px]" />
+                        <Avatar src={userAvatarUrl} alt="User Avatar" className="w-[24px] h-[24px]" />
                         <span className="text-[var(--text-color-black)]">{userName}</span>
                     </div>
                     <Time postingTime={postingTime} />
