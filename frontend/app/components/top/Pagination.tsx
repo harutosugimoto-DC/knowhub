@@ -26,17 +26,16 @@ export default function Pagination({ max, current, onPageChange }: PaginationPro
     return (
         <div className="flex items-center justify-center gap-[var(--spacing-32)] p-[var(--spacing-8)]">
             <div className='w-[50px] h-[50px] p-[4px] '>
-                <KeyboardArrowLeftOutlinedIcon className='cursor-pointer !text-[42px] text-[var(--main-color)] border border-[var(--main-color)] rounded-full'/>
+                <KeyboardArrowLeftOutlinedIcon className={`${current === 1 ? "!text-[var(--dark-gray)] !border-[var(--dark-gray)] !cursor-auto" : ""} cursor-pointer !text-[42px] text-[var(--main-color)] border border-[var(--main-color)] rounded-full`} />
             </div>
             <div className='flex'>
                 {pages.map((page, index) => (
                     <button
                         key={index}
-                        className={`${typeof page === 'number' ? 'cursor-pointer' : ''} w-[50px] h-[50px] flex items-center justify-center rounded-full ${
-                            page === current
-                                ? "bg-[var(--main-color)] text-white"
-                                : ""
-                        }`}
+                        className={`${typeof page === 'number' ? 'cursor-pointer' : ''} w-[50px] h-[50px] flex items-center justify-center rounded-full ${page === current
+                            ? "bg-[var(--main-color)] text-white"
+                            : ""
+                            }`}
                         onClick={() => typeof page === 'number' && onPageChange(page)}
                     >
                         {page}
@@ -44,7 +43,7 @@ export default function Pagination({ max, current, onPageChange }: PaginationPro
                 ))}
             </div>
             <div className='w-[50px] h-[50px] p-[4px]'>
-                <KeyboardArrowRightOutlinedIcon className='cursor-pointer !text-[42px] text-[var(--main-color)] border border-[var(--main-color)] rounded-full'/>
+                <KeyboardArrowRightOutlinedIcon className={`${current === 1 ? "!text-[var(--dark-gray)] !border-[var(--dark-gray)] !cursor-auto" : ""}cursor-pointer !text-[42px] text-[var(--main-color)] border border-[var(--main-color)] rounded-full`} />
             </div>
         </div>
     );
