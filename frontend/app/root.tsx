@@ -1,9 +1,10 @@
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 
+import Header from "./components/common/Header";
+
 import "@/index.css";
 import "@fontsource/noto-sans-jp/400.css";
 import "@fontsource/noto-sans-jp/500.css";
-
 import "@fontsource/lora/400.css";
 
 export default function App() {
@@ -16,7 +17,11 @@ export default function App() {
                 <Links />
             </head>
             <body>
-                <Outlet />
+                <Header />
+                {/* Headerの高さだけpadding-topを付与（Headerに隠れないようにするってこと） */}
+                <div className="pt-[60px]">
+                    <Outlet />
+                </div>
                 <ScrollRestoration />
                 <Scripts />
             </body>
