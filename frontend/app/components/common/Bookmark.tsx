@@ -13,7 +13,7 @@ export default function Bookmark({ isBookmarked, count }: BookmarkProps) {
     return (
         <div className='inline-flex items-center gap-1'>
             <BookmarkIcon
-                className={`${isBookmarked ? 'text-[var(--main-color)]' : 'text-[var(--light-gray)]'}`}
+                className={`cursor-pointer ${isBookmarked ? 'text-[var(--main-color)]' : 'text-[var(--light-gray)]'}`}
                 onClick={handleClick}
             />
             <span>{count}</span>
