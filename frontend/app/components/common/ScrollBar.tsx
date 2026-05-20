@@ -10,6 +10,7 @@ export default function ScrollBar({ children, className = "" }: ScrollBarProps) 
         <div 
             // 配列でクラスを並べて、最後に .join(" ") で半角スペース繋ぎの1つの文字列にします
             className={[
+                "pr-[var(--spacing-8)]",
                 "overflow-auto",
 
                 // スクロールバー全体の幅と高さ
