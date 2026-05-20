@@ -32,6 +32,7 @@ export default function QuestionDetailCard({ question }: QuestionDetailCardProps
 
     // 開閉状態を管理するState（メニューと本文の両方に渡す）
     const [isContentOpen, setIsContentOpen] = useState(false);
+    const [isOverflowing, setIsOverflowing] = useState(false);
     
     const handleRemove = () => {
         // 削除処理の実装
@@ -52,6 +53,7 @@ export default function QuestionDetailCard({ question }: QuestionDetailCardProps
                     isContentOpen={isContentOpen}
                     setIsContentOpen={setIsContentOpen}
                     onRemove={handleRemove}
+                    isOverflowing={isOverflowing}
                 />
             </div>
 
@@ -60,6 +62,7 @@ export default function QuestionDetailCard({ question }: QuestionDetailCardProps
                 content={content} 
                 isContentOpen={isContentOpen} 
                 setIsContentOpen={setIsContentOpen} 
+                setIsOverflowing={setIsOverflowing}
             />
 
             {/* 下部：タグリスト、各種アクション */}

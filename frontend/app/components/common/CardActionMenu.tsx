@@ -8,12 +8,14 @@ type CardActionMenuProps = {
     isContentOpen: boolean;
     setIsContentOpen: (isOpen: boolean) => void;
     onRemove: () => void;
+    isOverflowing: boolean;
 };
 
-export default function CardActionMenu({ 
-    isContentOpen, 
-    setIsContentOpen, 
-    onRemove 
+export default function CardActionMenu({
+    isContentOpen,
+    setIsContentOpen,
+    onRemove,
+    isOverflowing
 }: CardActionMenuProps) {
     // ドロップダウンの開閉状態は、このコンポーネント内に閉じた状態(Local State)として管理します
     const [isDropDownOpen, setIsDropdownOpen] = useState(false);
@@ -28,14 +30,14 @@ export default function CardActionMenu({
         <div className="flex items-center text-[var(--dark-gray)] gap-4">
             {/* メニュー（3点リーダー） */}
             <div className="relative">
-                <MoreVertOutlinedIcon 
-                    className="cursor-pointer" 
-                    onClick={() => setIsDropdownOpen(!isDropDownOpen)} 
+                <MoreVertOutlinedIcon
+                    className="cursor-pointer"
+                    onClick={() => setIsDropdownOpen(!isDropDownOpen)}
                 />
-                
+
                 {isDropDownOpen && (
-                    <div 
-                        className="transition-all hover:bg-[var(--hover-color)] cursor-pointer flex items-center justify-center bg-white rounded-[var(--spacing-4)] absolute left-0 translate-x-[-50%] shadow-[var(--box-shadow)] border border-[var(--light-gray)] w-[128px] h-[40px] z-10" 
+                    <div
+                        className="transition-all hover:bg-[var(--hover-color)] cursor-pointer flex items-center justify-center bg-white rounded-[var(--spacing-4)] absolute left-0 translate-x-[-50%] shadow-[var(--box-shadow)] border border-[var(--light-gray)] w-[128px] h-[40px] z-10"
                         // onClick={handleRemove()} だとレンダリング時に即時実行されてしまうため、関数を渡す形に修正
                         onClick={handleRemoveClick}
                     >
@@ -48,17 +50,20 @@ export default function CardActionMenu({
             </div>
 
             {/* 開閉トグル（矢印アイコン） */}
-            {isContentOpen ? (
-                <KeyboardArrowDownOutlinedIcon 
-                    className="cursor-pointer" 
-                    onClick={() => setIsContentOpen(false)} 
-                />
-            ) : (
-                <KeyboardArrowUpOutlinedIcon 
-                    className="cursor-pointer" 
-                    onClick={() => setIsContentOpen(true)} 
-                />
+            {isOverflowing && (
+                isContentOpen ? (
+                    <KeyboardArrowDownOutlinedIcon
+                        className="cursor-pointer"
+                        onClick={() => setIsContentOpen(false)}
+                    />
+                ) : (
+                    <KeyboardArrowUpOutlinedIcon
+                        className="cursor-pointer"
+                        onClick={() => setIsContentOpen(true)}
+                    />
+                )
             )}
+
         </div>
     );
 }
