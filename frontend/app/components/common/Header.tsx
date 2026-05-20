@@ -91,7 +91,7 @@ export default function Header() {
                     </div>
                 </div>
                 <div className=" w-[60px] h-full flex justify-center items-center cursor-pointer transition-all hover:bg-[var(--hover-color)] hover:border-b-[3px] hover:border-[var(--main-color)]" onClick={() => navigate("/profile")}>
-                    <Avatar src={"https://pbs.twimg.com/media/HIXLkfsaoAA9T7b.jpg"} alt="User Avatar" className="w-[40px] h-[40px]" />
+                    <Avatar className="w-[40px] h-[40px]" />
                 </div>
                 <div className=" w-[60px] h-full flex justify-center items-center cursor-pointer transition-all hover:bg-[var(--hover-color)] hover:border-b-[3px] hover:border-[var(--main-color)]" onClick={() => handleLogout()}>
                     <LogoutIcon />
