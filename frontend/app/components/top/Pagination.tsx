@@ -43,7 +43,7 @@ export default function Pagination({ max, current, onPageChange }: PaginationPro
                 ))}
             </div>
             <div className='w-[50px] h-[50px] p-[4px]'>
-                <KeyboardArrowRightOutlinedIcon className={`${current === 1 ? "!text-[var(--dark-gray)] !border-[var(--dark-gray)] !cursor-auto" : ""}cursor-pointer !text-[42px] text-[var(--main-color)] border border-[var(--main-color)] rounded-full`} />
+                <KeyboardArrowRightOutlinedIcon className={`${current === max ? "!text-[var(--dark-gray)] !border-[var(--dark-gray)] !cursor-auto" : ""}cursor-pointer !text-[42px] text-[var(--main-color)] border border-[var(--main-color)] rounded-full`} />
             </div>
         </div>
     );
