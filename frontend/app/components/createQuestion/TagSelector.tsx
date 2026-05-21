@@ -1,5 +1,5 @@
 import TagChip from "@/components/common/TagChip";
-
+import { tagPlaceholder } from "@/constants/placeholder";
 type TagSelectorProps = {
     selectedTagIds: number[];
     setSelectedTagIds: React.Dispatch<React.SetStateAction<number[]>>;
@@ -35,7 +35,7 @@ export default function TagSelector({ selectedTagIds, setSelectedTagIds, allTagD
                     );
                 })}
                 {selectedTagIds.length === 0 && (
-                    <p className="cursor-default text-[var(--dark-gray)]">選択されたタグがここに追加されます</p>
+                    <p className="cursor-default text-[var(--dark-gray)]">{tagPlaceholder}</p>
                 )}
             </div>
 
