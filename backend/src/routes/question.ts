@@ -218,7 +218,7 @@ router.delete('/:questionId/like', async (req, res) => {
 
   if (error) {
     console.error('Supabase error removing like:', error);
-    return res.status(500).json({ error: 'いいねの解除に失敗しました' });
+    return res.status(500).json({ message: 'いいねの解除に失敗しました' });
   }
 
   return res.status(200).json({ message: 'いいねを解除しました' });
