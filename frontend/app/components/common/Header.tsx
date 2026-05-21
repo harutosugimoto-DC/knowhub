@@ -5,7 +5,6 @@ import Avatar from "@/components/common/Avatar";
 import Notification from "@/components/common/Notification";
 
 import logoImage from "@/assets/logo.webp";
-import avatarImage from "@/assets/avatar.png";
 
 import HomeIcon from '@mui/icons-material/Home';
 import NotificationsIcon from '@mui/icons-material/Notifications';
@@ -13,8 +12,13 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import { HiMiniPencilSquare } from "react-icons/hi2";
 
 export default function Header() {
+    // ログイン状態の確認
+    // localStorageにuserIdがあればログイン済みと判定する
+    //↓ ※ 認証フェーズでSupabaseのセッション確認に置き換え予定
+    const isLoggedIn = !!localStorage.getItem("userId");
     const [showNotification, setShowNotification] = useState(false);
     const [notifications, setNotifications] = useState([
+
         {
             linkUrl: "/question/1",
             type: "question",
@@ -63,6 +67,9 @@ export default function Header() {
         setShowNotification(!showNotification);
     }
     const navigate = useNavigate()
+    
+
+               {/*↓ ロゴ：ログイン前後どちらも常に表示 */}
     return (
         <div className="flex justify-between items-center h-[64px] w-[100vw] border-b border-[var(--light-gray)] pl-[var(--spacing-16)] z-[var(--z-header)] fixed top-0 left-0 bg-white">
             <div className="flex items-center gap-2 px-[var(--spacing-8)] cursor-pointer" onClick={() => navigate("/top")}>
@@ -71,6 +78,9 @@ export default function Header() {
                     Knowhub
                 </p>
             </div>
+
+             {/* ナビゲーション：ログイン済みのときだけ表示 */}
+            {isLoggedIn && (
             <div className="flex items-center h-full">
                 <div className=" w-[60px] h-full flex justify-center items-center cursor-pointer transition-all hover:bg-[var(--hover-color)] hover:border-b-[3px] hover:border-[var(--main-color)]" onClick={() => navigate("/top")}>
                     <HomeIcon />
@@ -97,7 +107,9 @@ export default function Header() {
                     <LogoutIcon />
                 </div>
             </div>
-            {
+              )}
+               {/* 通知パネル：ログイン済みかつ通知ボタン押下時のみ表示 */}
+            {isLoggedIn && showNotification &&
                 showNotification && (
                     <div
                         className="absolute top-[64px] right-[var(--spacing-16)] shadow-[var(--box-shadow)] rounded-[var(--radius-big)] overflow-hidden bg-white animate-in fade-in slide-in-from-top-2 duration-200"
