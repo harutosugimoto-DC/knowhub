@@ -6,7 +6,7 @@ const router = Router();
 // いいね追加（回答）
 // POST /api/v1/answers/:answerId/like
 router.post('/:answerId/like', async (req, res) => {
-  const userId = req.user?.id ?? 'c0df35c7-2f4d-4d73-bcb7-119ec96ab474';
+  const userId = req.user?.id;
   const { answerId } = req.params;
 
   const { data: existing } = await supabase
@@ -35,7 +35,7 @@ router.post('/:answerId/like', async (req, res) => {
 // いいね解除（回答）
 // DELETE /api/v1/answers/:answerId/like
 router.delete('/:answerId/like', async (req, res) => {
-  const userId = req.user?.id ?? 'c0df35c7-2f4d-4d73-bcb7-119ec96ab474';
+  const userId = req.user?.id;
   const { answerId } = req.params;
 
   const { error } = await supabase
