@@ -5,6 +5,7 @@ type MockQuestionType = QuestionType & { content?: string };
 
 export const questionsMockData: MockQuestionType[] = [
     {
+        id:1,
         title: "ECS Fargateでタスクが起動しない理由が知りたい",
         statusId: 1, // 回答募集中
         isLiked: false,
@@ -18,6 +19,7 @@ export const questionsMockData: MockQuestionType[] = [
         content: "現在、AWS ECS (Fargate) を利用して新規プロジェクトのコンテナ基盤を構築していますが、デプロイしたタスクが正常に実行されず、数秒から数十秒で「STOPPED」状態になってしまう現象に悩まされています。ログを確認しても特に致命的なエラーが出ておらず原因特定に苦戦しています。タスク定義やセキュリティグループの確認ポイントがあれば教えていただきたいです。",
     },
     {
+        id:1,
         title: "ReactのuseEffectが2回実行されるのを防ぎたいです",
         statusId: 3, // 解決済み
         isLiked: true,
@@ -31,6 +33,7 @@ export const questionsMockData: MockQuestionType[] = [
         content: "Next.jsの開発環境（Strict Mode）で、useEffect内のデータフェッチが2回走ってしまいます。本番環境では1回になることは認識していますが、開発中にAPIサーバーに2倍負荷がかかるのが気になります。何か良い回避策や、ベストプラクティスはありますでしょうか？",
     },
     {
+        id:1,
         title: "TypeScriptでコンポーネントのPropsの型を厳密に定義する方法",
         statusId: 2, // 整理中
         isLiked: false,
@@ -44,6 +47,7 @@ export const questionsMockData: MockQuestionType[] = [
         content: "MUIのコンポーネントをラップしたカスタムコンポーネントを作っています。MUIアイコンだけをPropsとして厳密に受け取るために SvgIconComponent を使ってみましたが、自作のSVGも許容したい場合にどう拡張すべきか迷っています。インターフェースの設計思想についてアドバイスが欲しいです。",
     },
     {
+        id:1,
         title: "Next.js (App Router) でのコンポーネント設計について",
         statusId: 1, // 回答募集中
         isLiked: true,
@@ -57,6 +61,7 @@ export const questionsMockData: MockQuestionType[] = [
         content: "Server ComponentとClient Componentの切り分け基準についての質問です。基本的にはServer Componentで組み、インタラクティブな要素だけをClient Componentとして切り出す方針で進めていますが、状態管理（Context）が必要になった場合のファイル配置で悩んでいます。",
     },
     {
+        id:1,
         title: "Tailwind CSSで要素を中央寄せにする一番シンプルな書き方",
         statusId: 3, // 解決済み
         isLiked: false,
@@ -70,6 +75,7 @@ export const questionsMockData: MockQuestionType[] = [
         content: "短い質問です。フレックスボックスを使う方法以外に、グリッド（grid）を使った中央寄せのほうが記述量が少なくなるという噂を聞いたのですが本当ですか？具体的なクラス名を教えてください！", // 3行未満の短いテキストテスト用
     },
     {
+        id:1,
         title: "Prismaのマイグレーションが本番環境で失敗した時の対処法",
         statusId: 1, // 回答募集中
         isLiked: true,
@@ -82,6 +88,7 @@ export const questionsMockData: MockQuestionType[] = [
         tagNames: ["Prisma", "PostgreSQL", "Database"],
         content: "本番環境のデータベース（PostgreSQL）に対して prisma migrate deploy を実行したところ、一部のデータ整合性エラーが原因でロールバックされてしまいました。すでに動いている本番環境で、既存データを壊さずにスキーマを修正する際の手順や注意点、皆さんがやっている運用方法を教えてください。",
     }, {
+        id:1,
         title: "ECS Fargateでタスクが起動しない理由が知りたい",
         statusId: 1, // 回答募集中
         isLiked: false,
@@ -95,6 +102,7 @@ export const questionsMockData: MockQuestionType[] = [
         content: "現在、AWS ECS (Fargate) を利用して新規プロジェクトのコンテナ基盤を構築していますが、デプロイしたタスクが正常に実行されず、数秒から数十秒で「STOPPED」状態になってしまう現象に悩まされています。ログを確認しても特に致命的なエラーが出ておらず原因特定に苦戦しています。タスク定義やセキュリティグループの確認ポイントがあれば教えていただきたいです。",
     },
     {
+        id:1,
         title: "ReactのuseEffectが2回実行されるのを防ぎたいです",
         statusId: 3, // 解決済み
         isLiked: true,
@@ -108,6 +116,7 @@ export const questionsMockData: MockQuestionType[] = [
         content: "Next.jsの開発環境（Strict Mode）で、useEffect内のデータフェッチが2回走ってしまいます。本番環境では1回になることは認識していますが、開発中にAPIサーバーに2倍負荷がかかるのが気になります。何か良い回避策や、ベストプラクティスはありますでしょうか？",
     },
     {
+        id:1,
         title: "TypeScriptでコンポーネントのPropsの型を厳密に定義する方法",
         statusId: 2, // 整理中
         isLiked: false,
@@ -121,6 +130,7 @@ export const questionsMockData: MockQuestionType[] = [
         content: "MUIのコンポーネントをラップしたカスタムコンポーネントを作っています。MUIアイコンだけをPropsとして厳密に受け取るために SvgIconComponent を使ってみましたが、自作のSVGも許容したい場合にどう拡張すべきか迷っています。インターフェースの設計思想についてアドバイスが欲しいです。",
     },
     {
+        id:1,
         title: "Next.js (App Router) でのコンポーネント設計について",
         statusId: 1, // 回答募集中
         isLiked: true,
@@ -134,6 +144,7 @@ export const questionsMockData: MockQuestionType[] = [
         content: "Server ComponentとClient Componentの切り分け基準についての質問です。基本的にはServer Componentで組み、インタラクティブな要素だけをClient Componentとして切り出す方針で進めていますが、状態管理（Context）が必要になった場合のファイル配置で悩んでいます。",
     },
     {
+        id:1,
         title: "Tailwind CSSで要素を中央寄せにする一番シンプルな書き方",
         statusId: 3, // 解決済み
         isLiked: false,
@@ -147,6 +158,7 @@ export const questionsMockData: MockQuestionType[] = [
         content: "短い質問です。フレックスボックスを使う方法以外に、グリッド（grid）を使った中央寄せのほうが記述量が少なくなるという噂を聞いたのですが本当ですか？具体的なクラス名を教えてください！", // 3行未満の短いテキストテスト用
     },
     {
+        id:1,
         title: "Prismaのマイグレーションが本番環境で失敗した時の対処法",
         statusId: 1, // 回答募集中
         isLiked: true,
@@ -160,6 +172,7 @@ export const questionsMockData: MockQuestionType[] = [
         content: "本番環境のデータベース（PostgreSQL）に対して prisma migrate deploy を実行したところ、一部のデータ整合性エラーが原因でロールバックされてしまいました。すでに動いている本番環境で、既存データを壊さずにスキーマを修正する際の手順や注意点、皆さんがやっている運用方法を教えてください。",
     }
     , {
+        id:1,
         title: "ECS Fargateでタスクが起動しない理由が知りたい",
         statusId: 1, // 回答募集中
         isLiked: false,
@@ -173,6 +186,7 @@ export const questionsMockData: MockQuestionType[] = [
         content: "現在、AWS ECS (Fargate) を利用して新規プロジェクトのコンテナ基盤を構築していますが、デプロイしたタスクが正常に実行されず、数秒から数十秒で「STOPPED」状態になってしまう現象に悩まされています。ログを確認しても特に致命的なエラーが出ておらず原因特定に苦戦しています。タスク定義やセキュリティグループの確認ポイントがあれば教えていただきたいです。",
     },
     {
+        id:1,
         title: "ReactのuseEffectが2回実行されるのを防ぎたいです",
         statusId: 3, // 解決済み
         isLiked: true,
@@ -186,6 +200,7 @@ export const questionsMockData: MockQuestionType[] = [
         content: "Next.jsの開発環境（Strict Mode）で、useEffect内のデータフェッチが2回走ってしまいます。本番環境では1回になることは認識していますが、開発中にAPIサーバーに2倍負荷がかかるのが気になります。何か良い回避策や、ベストプラクティスはありますでしょうか？",
     },
     {
+        id:1,
         title: "TypeScriptでコンポーネントのPropsの型を厳密に定義する方法",
         statusId: 2, // 整理中
         isLiked: false,
@@ -199,6 +214,7 @@ export const questionsMockData: MockQuestionType[] = [
         content: "MUIのコンポーネントをラップしたカスタムコンポーネントを作っています。MUIアイコンだけをPropsとして厳密に受け取るために SvgIconComponent を使ってみましたが、自作のSVGも許容したい場合にどう拡張すべきか迷っています。インターフェースの設計思想についてアドバイスが欲しいです。",
     },
     {
+        id:1,
         title: "Next.js (App Router) でのコンポーネント設計について",
         statusId: 1, // 回答募集中
         isLiked: true,
@@ -212,6 +228,7 @@ export const questionsMockData: MockQuestionType[] = [
         content: "Server ComponentとClient Componentの切り分け基準についての質問です。基本的にはServer Componentで組み、インタラクティブな要素だけをClient Componentとして切り出す方針で進めていますが、状態管理（Context）が必要になった場合のファイル配置で悩んでいます。",
     },
     {
+        id:1,
         title: "Tailwind CSSで要素を中央寄せにする一番シンプルな書き方",
         statusId: 3, // 解決済み
         isLiked: false,
@@ -225,6 +242,7 @@ export const questionsMockData: MockQuestionType[] = [
         content: "短い質問です。フレックスボックスを使う方法以外に、グリッド（grid）を使った中央寄せのほうが記述量が少なくなるという噂を聞いたのですが本当ですか？具体的なクラス名を教えてください！", // 3行未満の短いテキストテスト用
     },
     {
+        id:1,
         title: "Prismaのマイグレーションが本番環境で失敗した時の対処法",
         statusId: 1, // 回答募集中
         isLiked: true,
@@ -237,6 +255,7 @@ export const questionsMockData: MockQuestionType[] = [
         tagNames: ["Prisma", "PostgreSQL", "Database"],
         content: "本番環境のデータベース（PostgreSQL）に対して prisma migrate deploy を実行したところ、一部のデータ整合性エラーが原因でロールバックされてしまいました。すでに動いている本番環境で、既存データを壊さずにスキーマを修正する際の手順や注意点、皆さんがやっている運用方法を教えてください。",
     }, {
+        id:1,
         title: "Tailwind CSSで要素を中央寄せにする一番シンプルな書き方",
         statusId: 3, // 解決済み
         isLiked: false,
@@ -250,6 +269,7 @@ export const questionsMockData: MockQuestionType[] = [
         content: "短い質問です。フレックスボックスを使う方法以外に、グリッド（grid）を使った中央寄せのほうが記述量が少なくなるという噂を聞いたのですが本当ですか？具体的なクラス名を教えてください！", // 3行未満の短いテキストテスト用
     },
     {
+        id:1,
         title: "Prismaのマイグレーションが本番環境で失敗した時の対処法",
         statusId: 1, // 回答募集中
         isLiked: true,
