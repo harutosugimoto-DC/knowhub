@@ -26,7 +26,7 @@ router.post('/:answerId/like', async (req, res) => {
 
   if (error) {
     console.error('Supabase error adding like:', error);
-    return res.status(500).json({ error: 'いいねの追加に失敗しました' });
+    return res.status(500).json({ message: 'いいねの追加に失敗しました' });
   }
 
   return res.status(201).json({ message: 'いいねしました' });

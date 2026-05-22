@@ -9,6 +9,7 @@ const router = Router();
 router.get('/', async (req, res) => {
   const page = Number(req.query.page) || 1;
   const order = req.query.order === 'likes' ? 'likes' : 'new';
+  const keyword = req.query.keyword as string | undefined;
   const limit = 20;
   const offset = (page - 1) * limit;
   const userId = req.user?.id;
@@ -28,6 +29,11 @@ router.get('/', async (req, res) => {
     `)
     .is('deleted_at', null)
     .range(offset, offset + limit - 1);
+
+    // キーワードが指定されている場合のみ絞り込む
+    if (keyword) {
+  query = query.or(`title.ilike.%${keyword}%,content.ilike.%${keyword}%`);
+}
 
   if (order === 'likes') {
     query = query.order('created_at', { ascending: false }); // いいね順は後述
@@ -63,6 +69,7 @@ router.get('/', async (req, res) => {
   return res.json({
     page,
     order,
+    keyword: keyword ?? null,
     data: formatted,
   });
 });
@@ -211,7 +218,7 @@ router.delete('/:questionId/like', async (req, res) => {
 
   if (error) {
     console.error('Supabase error removing like:', error);
-    return res.status(500).json({ error: 'いいねの解除に失敗しました' });
+    return res.status(500).json({ message: 'いいねの解除に失敗しました' });
   }
 
   return res.status(200).json({ message: 'いいねを解除しました' });
