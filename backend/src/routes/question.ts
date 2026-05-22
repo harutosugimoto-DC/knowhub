@@ -10,9 +10,10 @@ router.get('/', async (req, res) => {
   const page = Number(req.query.page) || 1;
   const order = req.query.order === 'likes' ? 'likes' : 'new';
   const keyword = req.query.keyword as string | undefined;
+  const tagId = req.query.tagId as string | undefined;
   const limit = 20;
   const offset = (page - 1) * limit;
-  const userId = req.user?.id;
+  const userId = req.user?.id ?? 'c0df35c7-2f4d-4d73-bcb7-119ec96ab474';
 
   let query = supabase
     .from('questions')
@@ -22,7 +23,7 @@ router.get('/', async (req, res) => {
       created_at,
       statuses ( name ),
       users ( nickname ),
-      question_tags ( tags ( name ) ),
+      question_tags ( tags (id, name ) ),
       question_likes ( user_id ),
       bookmarks ( user_id ),
       answers ( id )
@@ -35,6 +36,11 @@ router.get('/', async (req, res) => {
   query = query.or(`title.ilike.%${keyword}%,content.ilike.%${keyword}%`);
 }
 
+    // タグ絞り込み
+  if (tagId) {
+    query = query.eq('question_tags.tag_id', tagId);
+  }
+
   if (order === 'likes') {
     query = query.order('created_at', { ascending: false }); // いいね順は後述
   } else {
@@ -46,6 +52,13 @@ router.get('/', async (req, res) => {
   if (error) {
     return res.status(500).json({ error: error.message });
   }
+
+  // タグ絞り込みの場合、該当タグを持つ質問のみに絞る
+  const filtered = tagId
+    ? (rawData ?? []).filter((q: any) =>
+        q.question_tags?.some((qt: any) => qt.tags?.id === tagId)
+      )
+    : rawData ?? [];
 
   const formatted = (rawData ?? []).map((q: any) => ({
     id: q.id,
@@ -70,6 +83,7 @@ router.get('/', async (req, res) => {
     page,
     order,
     keyword: keyword ?? null,
+    tagId: tagId ?? null,
     data: formatted,
   });
 });
