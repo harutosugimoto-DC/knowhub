@@ -13,7 +13,7 @@ router.get('/', async (req, res) => {
   const tagId = req.query.tagId as string | undefined;
   const limit = 20;
   const offset = (page - 1) * limit;
-  const userId = req.user?.id ?? 'c0df35c7-2f4d-4d73-bcb7-119ec96ab474';
+  const userId = req.user?.id;
 
   let query = supabase
     .from('questions')
