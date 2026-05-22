@@ -27,7 +27,7 @@ router.get('/', async (req, res) => {
       question_likes ( user_id ),
       bookmarks ( user_id ),
       answers ( id )
-    `)
+    `, { count: 'exact' }) // ← 総件数を取得
     .is('deleted_at', null)
     .range(offset, offset + limit - 1);
 
@@ -47,7 +47,7 @@ router.get('/', async (req, res) => {
     query = query.order('created_at', { ascending: false });
   }
 
-  const { data: rawData, error } = await query;
+  const { data: rawData,count,error } = await query;
 
   if (error) {
     return res.status(500).json({ error: error.message });
@@ -79,11 +79,17 @@ router.get('/', async (req, res) => {
     formatted.sort((a, b) => b.likeCount - a.likeCount);
   }
 
+  const totalCount = count ?? 0;
+  const totalPages = Math.ceil(totalCount / limit);
+
+
   return res.json({
     page,
     order,
     keyword: keyword ?? null,
     tagId: tagId ?? null,
+    totalCount,
+    totalPages,
     data: formatted,
   });
 });
