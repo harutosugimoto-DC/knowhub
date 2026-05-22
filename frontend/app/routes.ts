@@ -4,6 +4,7 @@ export default [
   index("routes/login.tsx"),
 
   layout("layouts/auth-guard.tsx", [
+    route("nickname", "routes/nickname.tsx"),
     route("top", "routes/top.tsx"),
     route("create-question", "routes/createQuestion.tsx"),
     route("question/:id", "routes/question.tsx"),
