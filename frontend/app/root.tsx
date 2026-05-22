@@ -19,7 +19,7 @@ export default function App() {
             <body>
                 <Header />
                 {/* Headerの高さだけpadding-topを付与（Headerに隠れないようにするってこと） */}
-                <div className="pt-[60px]">
+                <div className="pt-[64px]">
                     <Outlet />
                 </div>
                 <ScrollRestoration />

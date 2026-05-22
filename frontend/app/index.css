@@ -15,7 +15,7 @@
     --status-color-resolved: #676767;
     --status-color-organize: #488671;
     --status-color-taking: #00A87B;
-    --ai-color: linear-gradient(0, #FF9500 0%, #FF4800 100%);
+    --ai-color: linear-gradient(90deg, #FF9500 0%, #FF4800 100%);
 
     --font-size-big: 22px;
     --font-size-medium: 18px;

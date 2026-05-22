@@ -9,9 +9,11 @@ const router = Router();
 router.get('/', async (req, res) => {
   const page = Number(req.query.page) || 1;
   const order = req.query.order === 'likes' ? 'likes' : 'new';
+  const keyword = req.query.keyword as string | undefined;
+  const tagId = req.query.tagId as string | undefined;
   const limit = 20;
   const offset = (page - 1) * limit;
-  const userId = req.user?.id;
+  const userId = req.user?.id ?? 'c0df35c7-2f4d-4d73-bcb7-119ec96ab474';
 
   let query = supabase
     .from('questions')
@@ -21,13 +23,23 @@ router.get('/', async (req, res) => {
       created_at,
       statuses ( name ),
       users ( nickname ),
-      question_tags ( tags ( name ) ),
+      question_tags ( tags (id, name ) ),
       question_likes ( user_id ),
       bookmarks ( user_id ),
       answers ( id )
     `)
     .is('deleted_at', null)
     .range(offset, offset + limit - 1);
+
+    // キーワードが指定されている場合のみ絞り込む
+    if (keyword) {
+  query = query.or(`title.ilike.%${keyword}%,content.ilike.%${keyword}%`);
+}
+
+    // タグ絞り込み
+  if (tagId) {
+    query = query.eq('question_tags.tag_id', tagId);
+  }
 
   if (order === 'likes') {
     query = query.order('created_at', { ascending: false }); // いいね順は後述
@@ -40,6 +52,13 @@ router.get('/', async (req, res) => {
   if (error) {
     return res.status(500).json({ error: error.message });
   }
+
+  // タグ絞り込みの場合、該当タグを持つ質問のみに絞る
+  const filtered = tagId
+    ? (rawData ?? []).filter((q: any) =>
+        q.question_tags?.some((qt: any) => qt.tags?.id === tagId)
+      )
+    : rawData ?? [];
 
   const formatted = (rawData ?? []).map((q: any) => ({
     id: q.id,
@@ -63,6 +82,8 @@ router.get('/', async (req, res) => {
   return res.json({
     page,
     order,
+    keyword: keyword ?? null,
+    tagId: tagId ?? null,
     data: formatted,
   });
 });
@@ -117,6 +138,104 @@ router.get('/:questionId', async (req, res) => {
   };
 
   return res.json(formatted);
+});
+
+// ブックマーク追加
+// POST /api/v1/questions/:questionId/bookmark
+router.post('/:questionId/bookmark', async (req, res) => {
+  const userId = req.user?.id;
+  const { questionId } = req.params;
+
+  const { data: existing } = await supabase
+    .from('bookmarks')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('question_id', questionId)
+    .maybeSingle();
+
+  if (existing) {
+    return res.status(409).json({ error: '既にブックマーク済みです' });
+  }
+
+  const { error } = await supabase
+    .from('bookmarks')
+    .insert({ user_id: userId, question_id: questionId });
+
+  if (error) {
+    console.error('Supabase error adding bookmark:', error);
+    return res.status(500).json({ error: 'ブックマークの追加に失敗しました' });
+  }
+
+  return res.status(201).json({ message: 'ブックマークに追加しました' });
+});
+
+// ブックマーク解除
+// DELETE /api/v1/questions/:questionId/bookmark
+router.delete('/:questionId/bookmark', async (req, res) => {
+  const userId = req.user?.id;
+  const { questionId } = req.params;
+
+  const { error } = await supabase
+    .from('bookmarks')
+    .delete()
+    .eq('user_id', userId)
+    .eq('question_id', questionId);
+
+  if (error) {
+    console.error('Supabase error removing bookmark:', error);
+    return res.status(500).json({ error: 'ブックマークの解除に失敗しました' });
+  }
+
+  return res.status(200).json({ message: 'ブックマークを解除しました' });
+});
+
+// いいね追加
+// POST /api/v1/questions/:questionId/like
+router.post('/:questionId/like', async (req, res) => {
+  const userId = req.user?.id;
+  const { questionId } = req.params;
+
+  const { data: existing } = await supabase
+    .from('question_likes')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('question_id', questionId)
+    .maybeSingle();
+
+  if (existing) {
+    return res.status(409).json({ error: '既にいいね済みです' });
+  }
+
+  const { error } = await supabase
+    .from('question_likes')
+    .insert({ user_id: userId, question_id: questionId });
+
+  if (error) {
+    console.error('Supabase error adding like:', error);
+    return res.status(500).json({ error: 'いいねの追加に失敗しました' });
+  }
+
+  return res.status(201).json({ message: 'いいねしました' });
+});
+
+// いいね解除
+// DELETE /api/v1/questions/:questionId/like
+router.delete('/:questionId/like', async (req, res) => {
+  const userId = req.user?.id;
+  const { questionId } = req.params;
+
+  const { error } = await supabase
+    .from('question_likes')
+    .delete()
+    .eq('user_id', userId)
+    .eq('question_id', questionId);
+
+  if (error) {
+    console.error('Supabase error removing like:', error);
+    return res.status(500).json({ message: 'いいねの解除に失敗しました' });
+  }
+
+  return res.status(200).json({ message: 'いいねを解除しました' });
 });
 
 export default router;
