@@ -11,8 +11,8 @@ import { createClient } from "@supabase/supabase-js";
 
 // ロゴ画像（assets/logo.webp）
 import logo from "../assets/logo.webp";
-// このページ専用のCSSモジュール
-import styles from "../styles/pages/login.module.css";
+// CSSモジュールからTailwindに移行したためimport不要
+// import styles from "../styles/pages/login.module.css";
 
 // ─────────────────────────────────────────────────────────────
 // Supabaseクライアントの初期化
@@ -111,32 +111,59 @@ export default function Login() {
     };
 
     return (
-        <div className={styles.pageWrapper}>
-            <main className={styles.main}>
-                <div className={styles.card}>
+        // ─────────────────────────────────────────────────────
+        // ページ全体のラッパー
+        // ・min-h-[calc(100vh-60px)]：グローバルHeaderの高さ60px分を引いた残り高さを使う
+        // ・flex items-center justify-center：カードをページ中央に配置する
+        // ・bg-[var(--base-color)]：index.cssの背景色変数を使用
+        // ─────────────────────────────────────────────────────
+        <div className="min-h-[calc(100vh-60px)] flex items-center justify-center bg-[var(--base-color)] p-[var(--spacing-16)]">
+
+            {/* ── カードを中央に配置するmain ──────────────── */}
+            <main className="w-full flex justify-center">
+
+                {/* ── カード本体 ── */}
+                {/* bg-white：白背景 */}
+                {/* rounded-[var(--radius-big)]：index.cssの角丸変数 */}
+                {/* shadow-[var(--box-shadow)]：index.cssの影変数 */}
+                <div className="bg-white rounded-[var(--radius-big)] 
+                shadow-[var(--box-shadow)] px-[var(--spacing-32)]
+                 py-[var(--spacing-48)] w-[600px] h-[400px]
+                 flex flex-col items-center gap-[var(--spacing-24)]">
 
                     <img
                         src={logo}
                         alt="Know Hub アイコン"
-                        className={styles.cardIcon}
+                        className="w-16 h-[59px] rounded-[var(--radius-small)] object-contain"
                     />
 
-                    <div className={styles.cardTextBlock}>
-                        <h1 className={styles.cardTitle}>Know Hub</h1>
-                        <p className={styles.cardSubText}>社内の「わからない」を解決する</p>
-                        <p className={styles.cardSubText}>質問・回答プラットフォーム</p>
+                    {/* ── テキストブロック ── */}
+                    <div className="flex flex-col items-center gap-[var(--spacing-8)] text-center">
+                        <h1 className="text-[length:var(--font-size-big)] font-normal text-[var(--main-color)]">
+                            Know Hub
+                        </h1>
+                        {/* サブテキスト2行 */}
+                        <p className="text-[length:var(--font-size-normal)] 
+                        text-[var(--text-color-black)] leading-[1.6]">
+                            社内の「わからない」を解決する
+                        </p>
+                        <p className="text-[length:var(--font-size-normal)] text-[var(--text-color-black)] leading-[1.6]">
+                            質問・回答プラットフォーム
+                        </p>
                     </div>
 
                     {error && (
-                        <p className={styles.errorText} role="alert">
+                        <p
+                            className="text-sm text-[var(--danger-color)] text-center w-full"
+                            role="alert"
+                        >
                             {error}
                         </p>
                     )}
-
                     <button
                         onClick={handleGoogleLoginClick}
                         disabled={isLoading}
-                        className={styles.googleButton}
+                        className="flex items-center justify-center gap-[var(--spacing-12)] w-[450px] h-[60px] py-[var(--spacing-12)] px-[var(--spacing-16)] bg-white border border-[var(--light-gray)] rounded-[var(--radius-small)] text-[length:var(--font-size-normal)] text-[var(--text-color-black)] cursor-pointer transition-opacity duration-200 ease-in-out hover:opacity-80 disabled:opacity-60 disabled:cursor-not-allowed"
                     >
                         <GoogleIcon />
                         {isLoading ? "処理中..." : "Googleでログイン"}
