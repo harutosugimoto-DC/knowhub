@@ -31,7 +31,7 @@ const chatMessagesMock = [
 
 export default function CreateQuestion() {
 
-    const navigate=useNavigate()
+    const navigate = useNavigate()
     const [titleText, setTitleText] = useState("")
     const [detailText, setDetailText] = useState("")
     const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
@@ -45,7 +45,6 @@ export default function CreateQuestion() {
     const submitAiChat = () => {
         //ここにai用apiへaiInputTextを送信する処理を記載
         //その後setAiChatMessagesでchatに追加
-        navigate("/top")
     }
     const validate = () => {
         const newErrors: typeof errors = {};
@@ -74,30 +73,39 @@ export default function CreateQuestion() {
         // エラーが1つもなければ true を返す
         return Object.keys(newErrors).length === 0;
     };
+    const submitQuestion = () => {
+        navigate("/top")
+    }
     return (
         <div className="flex justify-center gap-4 overflow-x-hidden h-[calc(100vh-64px)]">
-
             <ScrollBar className={`mr-1 flex-1 h-full overflow-y-auto flex flex-col gap-4 px-[var(--spacing-64)] py-[var(--spacing-32)] transition-all `}>
                 <div>
-                    <SectionTitle title="質問タイトル" isRequired>
-                        <button onClick={() => setIsAiOpen(!isAiOpen)} className="shadow-[var(--box-shadow)] cursor-pointer rounded-[16px] text-white bg-[image:var(--ai-color)] px-[var(--spacing-32)] py-[var(--spacing-16)]">
-                            AIに相談する
-                        </button>
-                    </SectionTitle>
+                    <div className="py-[var(--spacing-16)]">
+                        <SectionTitle title="質問タイトル" isRequired>
+                            <button onClick={() => setIsAiOpen(!isAiOpen)} className="shadow-[var(--box-shadow)] cursor-pointer rounded-[16px] text-white bg-[image:var(--ai-color)] px-[var(--spacing-32)] py-[var(--spacing-16)]">
+                                AIに相談する
+                            </button>
+                        </SectionTitle>
+                    </div>
                     <div className="flex flex-col gap-4 px-[var(--spacing-16)] ">
                         <TextInput value={titleText} onChange={setTitleText} placeholder={titlePlaceholder} />
                         {errors.title && <ErrorMessages message={errors.title} />}
                     </div>
                 </div>
                 <div>
-                    <SectionTitle title="詳細" isRequired />
+                    <div className="py-[var(--spacing-16)]">
+                        <SectionTitle title="詳細" isRequired />
+                    </div>
                     <div className="flex flex-col gap-4 px-[var(--spacing-16)]">
                         <TextArea value={detailText} onChange={setDetailText} placeholder={detailPlaceholder} />
                         {errors.detail && <ErrorMessages message={errors.detail} />}
                     </div>
                 </div>
                 <div className="relative">
-                    <SectionTitle title="タグ付け" isRequired isTagSelect />
+                    <div className="py-[var(--spacing-16)]">
+
+                        <SectionTitle title="タグ付け" isRequired isTagSelect />
+                    </div>
                     <div className="flex flex-col gap-4 px-[var(--spacing-16)]">
                         <TagSelector selectedTagIds={selectedTagIds} setSelectedTagIds={setSelectedTagIds} allTagData={tagsMock} />
                         {errors.tags && <ErrorMessages message={errors.tags} />}
@@ -106,10 +114,11 @@ export default function CreateQuestion() {
                 <div className="flex items-center justify-center">
                     <Button text="内容確認" onClick={() => { if (validate()) setIsModalOpen(true) }} />
                 </div>
-            </ScrollBar>
+            </ScrollBar >
 
             {/* 右側：AIサポートアシスタント*/}
-            <div className={`${isAiOpen ? "flex-1" : "flex-0"} transition-all  h-full flex flex-col rounded-l-[16px] shadow-[-4px_0px_4px_rgba(0,0,0,0.25)] overflow-hidden`}>
+            <div className={`${isAiOpen ? "flex-1" : "flex-0"} transition-all  h-full flex flex-col rounded-l-[16px] shadow-[-4px_0px_4px_rgba(0,0,0,0.25)] overflow-hidden`
+            }>
                 <div className="flex justify-between items-center bg-[image:var(--ai-color)] text-white p-2 shrink-0">
                     <div className="flex items-center gap-2 h-[40px] text-[length:var(--font-size-big)]">
                         <div className="h-full w-[40px] flex items-center justify-center">
@@ -150,7 +159,7 @@ export default function CreateQuestion() {
                         <ArrowUpwardIcon className="!text-[16px]" />
                     </button>
                 </div>
-            </div>
+            </div >
             {
                 isModalOpen &&
                 <Modal onClose={() => setIsModalOpen(false)}>
@@ -177,9 +186,9 @@ export default function CreateQuestion() {
                             </div>
                         </div>
                     </Card>
-                    <Button onClick={() => submitAiChat()} text="質問投稿"></Button>
+                    <Button onClick={() => submitQuestion()} text="質問投稿"></Button>
                 </Modal>
             }
-        </div>
+        </div >
     );
 }

@@ -141,9 +141,11 @@ export default function Top() {
                     </div>
                 </div>
             </Card>
-            <SectionTitle title="質問一覧">
-                <DropdownMenu options={DROP_DOWN_OPTIONS} onChange={setCurrentSortOption} value={currentSortOption} />
-            </SectionTitle>
+            <div className="py-[var(--spacing-16)]">
+                <SectionTitle title="質問一覧">
+                    <DropdownMenu options={DROP_DOWN_OPTIONS} onChange={setCurrentSortOption} value={currentSortOption} />
+                </SectionTitle>
+            </div>
             <ScrollBar className="w-full max-h-[1000px]">
                 <div className="flex flex-col gap-2 px-[var(--spacing-16)] pb-[var(--spacing-8)]">
                     {
