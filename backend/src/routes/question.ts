@@ -11,6 +11,8 @@ router.get('/', async (req, res) => {
   const order = req.query.order === 'likes' ? 'likes' : 'new';
   const keyword = req.query.keyword as string | undefined;
   const tagId = req.query.tagId as string | undefined;
+  const myAction = req.query.myAction as string | undefined;
+  const statusName = req.query.status as string | undefined;
   const limit = 20;
   const offset = (page - 1) * limit;
   const userId = req.user?.id;
@@ -21,12 +23,13 @@ router.get('/', async (req, res) => {
       id,
       title,
       created_at,
+      user_id,
       statuses ( name ),
-      users ( nickname ),
+      users ( nickname, profile_icon_url ),
       question_tags ( tags (id, name ) ),
       question_likes ( user_id ),
       bookmarks ( user_id ),
-      answers ( id )
+      answers ( id, user_id, best_answer_at )
     `, { count: 'exact' }) // ← 総件数を取得
     .is('deleted_at', null)
     .range(offset, offset + limit - 1);
@@ -41,6 +44,11 @@ router.get('/', async (req, res) => {
     query = query.eq('question_tags.tag_id', tagId);
   }
 
+  // ステータス絞り込み
+  if (statusName) {
+    query = query.eq('statuses.name', statusName);
+  }
+
   if (order === 'likes') {
     query = query.order('created_at', { ascending: false }); // いいね順は後述
   } else {
@@ -53,18 +61,46 @@ router.get('/', async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 
-  // タグ絞り込みの場合、該当タグを持つ質問のみに絞る
-  const filtered = tagId
-    ? (rawData ?? []).filter((q: any) =>
-        q.question_tags?.some((qt: any) => qt.tags?.id === tagId)
-      )
-    : rawData ?? [];
+ let filtered = rawData ?? [];
 
-  const formatted = (rawData ?? []).map((q: any) => ({
+  // タグ絞り込み
+  if (tagId) {
+    filtered = filtered.filter((q: any) =>
+      q.question_tags?.some((qt: any) => qt.tags?.id === tagId)
+    );
+  }
+
+  // ステータス絞り込み ← 追加
+  if (statusName) {
+    filtered = filtered.filter((q: any) =>
+      q.statuses?.name === statusName
+    );
+  }
+
+  // マイアクション絞り込み
+  if (myAction === 'my_questions') {
+    filtered = filtered.filter((q: any) => q.user_id === userId);
+  } else if (myAction === 'my_answers') {
+    filtered = filtered.filter((q: any) =>
+      q.answers?.some((a: any) => a.user_id === userId)
+    );
+  } else if (myAction === 'my_solved') {
+    filtered = filtered.filter((q: any) =>
+      q.user_id === userId &&
+      q.answers?.some((a: any) => a.best_answer_at !== null)
+    );
+  } else if (myAction === 'bookmarked') {
+    filtered = filtered.filter((q: any) =>
+      q.bookmarks?.some((b: any) => b.user_id === userId)
+    );
+  }
+
+   const formatted = filtered.map((q: any) => ({
     id: q.id,
     title: q.title,
     statusId: q.statuses?.name,
     userName: q.users?.nickname,
+    iconUrl: q.users?.profile_icon_url ?? null,
     postingTime: q.created_at,
     likeCount: q.question_likes?.length ?? 0,
     bookmarkCount: q.bookmarks?.length ?? 0,
@@ -88,6 +124,8 @@ router.get('/', async (req, res) => {
     order,
     keyword: keyword ?? null,
     tagId: tagId ?? null,
+    myAction: myAction ?? null,
+    status: statusName ?? null,
     totalCount,
     totalPages,
     data: formatted,
