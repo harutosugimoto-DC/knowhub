@@ -6,11 +6,13 @@
 // ─────────────────────────────────────────────────────────────
 
 import { useState } from "react";
-
-// 既存の共通コンポーネントをimport
+import { useNavigate } from "react-router";
 import TextInput from "../components/common/TextInput";
 import Button from "../components/common/Button";
 import ErrorMessages from "../components/common/ErrorMessages";
+import { supabase } from "@/lib/supabase";
+
+const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3001";
 
 // ─────────────────────────────────────────────────────────────
 // 定数定義
@@ -20,14 +22,7 @@ const MAX_NICKNAME_LENGTH = 10; // ニックネームの最大文字数
 
 export default function Nickname() {
 
-    // ─────────────────────────────────────────────────────────
-    // state定義
-    // nickname  ：TextInputの入力値を管理する
-    // errors    ：バリデーションエラーのメッセージ一覧を管理する
-    //             → 空配列ならErrorMessagesは非表示になる（コンポーネント仕様）
-    // isLoading ：送信中の連打防止用フラグ
-    //             → 認証フェーズでAPI送信時に活用予定
-    // ─────────────────────────────────────────────────────────
+    const navigate = useNavigate();
     const [nickname, setNickname] = useState<string>("");
     const [errors, setErrors] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -57,32 +52,45 @@ export default function Nickname() {
     // ─────────────────────────────────────────────────────────
     // 【handleSubmit】「次に進む」ボタン押下時の処理
     // ─────────────────────────────────────────────────────────
-    const handleSubmit = () => {
-
-        // バリデーション実行：エラーがあれば画面に表示して処理を止める
+    const handleSubmit = async () => {
         const validationErrors = validate();
         if (validationErrors.length > 0) {
             setErrors(validationErrors);
-            return; // エラーがある場合はここで処理を終了する
+            return;
         }
 
-        // バリデーション通過：エラーをクリアして送信処理へ進む
         setErrors([]);
         setIsLoading(true);
 
-        // TODO: 認証フェーズで以下に置き換える
-        // ─────────────────────────────────────────────────────
-        // const { data: { session } } = await supabase.auth.getSession();
-        // await fetch("/api/profile", {
-        //     method: "PUT",
-        //     headers: {
-        //         "Authorization": `Bearer ${session?.access_token}`,
-        //         "Content-Type": "application/json",
-        //     },
-        //     body: JSON.stringify({ profile_name: nickname }),
-        // });
-        // navigate("/top");
-        // ─────────────────────────────────────────────────────
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                setErrors(["セッションが切れています。再度ログインしてください。"]);
+                setIsLoading(false);
+                return;
+            }
+
+            const response = await fetch(`${API_BASE}/profile/nickname`, {
+                method: "PATCH",
+                headers: {
+                    "Authorization": `Bearer ${session.access_token}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ nickname }),
+            });
+
+            if (!response.ok) {
+                const body = await response.json().catch(() => ({})) as { error?: string };
+                setErrors([body.error ?? "ニックネームの登録に失敗しました"]);
+                setIsLoading(false);
+                return;
+            }
+
+            navigate("/top");
+        } catch {
+            setErrors(["ネットワークエラーが発生しました"]);
+            setIsLoading(false);
+        }
     };
 
     return (

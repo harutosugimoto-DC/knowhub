@@ -1,23 +1,24 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
-import usersRouter from './routes/users';
+import profileRouter from './routes/profile.js';
 import notificationRouter from './routes/notification';
 import questionRouter from './routes/question';
 import answerRouter from './routes/answer';
-import statusesRouter from './routes/statuses';
 import tagsRouter from './routes/tags';
+import aiRouter from './routes/ai';
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 app.get('/', (req, res) => res.json({ message: 'Hello from Express!' }));
-app.use('/api/v1/users', usersRouter);
+app.use('/profile', profileRouter);
 app.use('/api/v1/notifications', notificationRouter);
 app.use('/api/v1/questions', questionRouter);
 app.use('/api/v1/answers', answerRouter);
-app.use('/api/v1/statuses', statusesRouter);
 app.use('/api/v1/tags', tagsRouter);
+app.use('/api/v1/ai', aiRouter);
 
-app.listen(5000, () => console.log('Server running on http://localhost:5000'));
+const port = Number(process.env.PORT) || 3001;
+app.listen(port, () => console.log(`Server running on http://localhost:${port}`));
