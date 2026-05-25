@@ -6,6 +6,7 @@ import "@/index.css";
 import "@fontsource/noto-sans-jp/400.css";
 import "@fontsource/noto-sans-jp/500.css";
 import "@fontsource/lora/400.css";
+import GlobalHandler from "./components/common/GlobalHandler";
 
 export default function App() {
     return (
@@ -17,6 +18,7 @@ export default function App() {
                 <Links />
             </head>
             <body>
+                <GlobalHandler />
                 <Header />
                 {/* Headerの高さだけpadding-topを付与（Headerに隠れないようにするってこと） */}
                 <div className="pt-[64px]">
