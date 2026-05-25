@@ -12,6 +12,7 @@ router.get('/', async (req, res) => {
   const keyword = req.query.keyword as string | undefined;
   const tagId = req.query.tagId as string | undefined;
   const myAction = req.query.myAction as string | undefined;
+  const statusName = req.query.status as string | undefined;
   const limit = 20;
   const offset = (page - 1) * limit;
   const userId = req.user?.id;
@@ -43,6 +44,11 @@ router.get('/', async (req, res) => {
     query = query.eq('question_tags.tag_id', tagId);
   }
 
+  // ステータス絞り込み
+  if (statusName) {
+    query = query.eq('statuses.name', statusName);
+  }
+
   if (order === 'likes') {
     query = query.order('created_at', { ascending: false }); // いいね順は後述
   } else {
@@ -61,6 +67,13 @@ router.get('/', async (req, res) => {
   if (tagId) {
     filtered = filtered.filter((q: any) =>
       q.question_tags?.some((qt: any) => qt.tags?.id === tagId)
+    );
+  }
+
+  // ステータス絞り込み ← 追加
+  if (statusName) {
+    filtered = filtered.filter((q: any) =>
+      q.statuses?.name === statusName
     );
   }
 
@@ -110,6 +123,8 @@ router.get('/', async (req, res) => {
     order,
     keyword: keyword ?? null,
     tagId: tagId ?? null,
+    myAction: myAction ?? null,
+    status: statusName ?? null,
     totalCount,
     totalPages,
     data: formatted,
