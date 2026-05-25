@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
-import profileRouter from './routes/profile.js';
+import profileRouter from './routes/users.js';
 import notificationRouter from './routes/notification';
 import questionRouter from './routes/question';
 import answerRouter from './routes/answer';
