@@ -1,11 +1,12 @@
 export type QuestionType = {
     id:number,
     title: string;
+    iconURL:string;
     statusId: number;
-    isLiked?: boolean;
-    isBookmarked?: boolean;
+    isLiked: boolean;
+    isBookmarked: boolean;
     userName: string;
-    postingTime: Date;
+    postingTime: string;
     likeCount: number;
     bookmarkCount: number;
     replyCount: number;
