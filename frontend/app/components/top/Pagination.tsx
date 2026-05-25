@@ -25,7 +25,7 @@ export default function Pagination({ max, current, onPageChange }: PaginationPro
 
     return (
         <div className="flex items-center justify-center gap-[var(--spacing-32)] p-[var(--spacing-8)]">
-            <div className='w-[50px] h-[50px] p-[4px] '>
+            <div className='w-[50px] h-[50px] p-[4px] ' onClick={() => onPageChange(Math.max(current - 1, 1))} >
                 <KeyboardArrowLeftOutlinedIcon className={`${current === 1 ? "!text-[var(--light-gray)] !border-[var(--light-gray)] !cursor-auto" : ""} cursor-pointer !text-[42px] text-[var(--main-color)] border border-[var(--main-color)] rounded-full`} />
             </div>
             <div className='flex'>
@@ -42,7 +42,7 @@ export default function Pagination({ max, current, onPageChange }: PaginationPro
                     </button>
                 ))}
             </div>
-            <div className='w-[50px] h-[50px] p-[4px]'>
+            <div className='w-[50px] h-[50px] p-[4px]' onClick={() => onPageChange(Math.min(current + 1, max))}>
                 <KeyboardArrowRightOutlinedIcon className={`${current === max ? "!text-[var(--light-gray)] !border-[var(--light-gray)] !cursor-auto" : ""}cursor-pointer !text-[42px] text-[var(--main-color)] border border-[var(--main-color)] rounded-full`} />
             </div>
         </div>
