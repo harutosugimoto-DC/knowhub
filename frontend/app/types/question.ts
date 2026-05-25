@@ -1,4 +1,5 @@
 export type QuestionType = {
+    id:number,
     title: string;
     statusId: number;
     isLiked?: boolean;

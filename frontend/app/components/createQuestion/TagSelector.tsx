@@ -1,55 +1,42 @@
-import { useState } from "react";
-// 先ほど作成されたTagChipをインポートします（パスは環境に合わせて調整してください）
 import TagChip from "@/components/common/TagChip";
-
+import { tagPlaceholder } from "@/constants/placeholder";
 type TagSelectorProps = {
-    id: number;
+    selectedTagIds: number[];
+    setSelectedTagIds: React.Dispatch<React.SetStateAction<number[]>>;
+    allTagData: { id: number, name: string }[];
 };
 
-// 画像に表示されているタグのモックデータ（一覧）
-const AVAILABLE_TAGS = [
-    "Python", "Javascript", "Github", "Figma", "Java", "Ruby",
-    "セキュリティ", "人事", "経費精算", "Claude.ai", "C", "勤怠管理",
-    "開発環境", "リモートワーク"
-];
+export default function TagSelector({ selectedTagIds, setSelectedTagIds, allTagData }: TagSelectorProps) {
 
-export default function TagSelector({ id }: TagSelectorProps) {
-    // 選択されたタグを管理するステート（初期値として3つ入れておきます）
-    const [selectedTags, setSelectedTags] = useState<string[]>(["Python", "Javascript", "Github"]);
-
-    // 下のリストからタグをクリックした時の処理（追加）
-    const handleSelect = (tag: string) => {
-        // まだ選択されていなければ追加する
-        if (!selectedTags.includes(tag)) {
-            setSelectedTags([...selectedTags, tag]);
-        }
-        else{
-            handleRemove(tag);
-        }
-    };
-
-    const handleRemove = (tagToRemove: string) => {
-        setSelectedTags(selectedTags.filter(tag => tag !== tagToRemove));
+    // タグの選択・解除をこれ1つで制御（トグル処理）
+    const handleToggleSelect = (tagId: number) => {
+        setSelectedTagIds((prev) =>
+            prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId]
+        );
     };
 
     return (
         <div className="border border-[var(--light-gray)] rounded-[var(--radius-small)] bg-white w-full">
 
             {/* 上部：選択済みのタグを表示するエリア */}
-            <div className={`p-[var(--spacing-8)] flex flex-wrap gap-[var(--spacing-8)] ${selectedTags.length === 0 ? 'h-[43px] items-center' : ''}`}>
-                {selectedTags.map(tag => (
-                    <TagChip
-                        key={tag}
-                        text={tag}
-                        isButton={true}
-                        onClick={() => handleRemove(tag)}
-                    />
-                ))}
-                {
-                    selectedTags.length === 0 && (
-                        <p className="text-[var(--dark-gray)] ">選択されたタグがここに追加されます</p>
-                    )
-                }
+            <div className={`p-[var(--spacing-8)] flex flex-wrap gap-[var(--spacing-8)] ${selectedTagIds.length === 0 ? 'h-[43px] items-center' : ''}`}>
+                {selectedTagIds.map(tagId => {
+                    // 1. findを使って該当するタグオブジェクトを1件取得
+                    const currentTag = allTagData.find(tag => tag.id === tagId);
+
+                    return (
+                        <TagChip
+                            key={tagId}
+                            // 安全のためにオプショナルチェーニング（?.）とフォールバックを設定
+                            text={currentTag?.name || ""}
+                            isButton={true}
+                            onClick={() => handleToggleSelect(tagId)} // ここも共通の関数で解除可能
+                        />
+                    );
+                })}
+                {selectedTagIds.length === 0 && (
+                    <p className="cursor-default text-[var(--dark-gray)]">{tagPlaceholder}</p>
+                )}
             </div>
 
             {/* 境界線 */}
@@ -57,27 +44,26 @@ export default function TagSelector({ id }: TagSelectorProps) {
 
             {/* 下部：選択可能なタグの一覧エリア */}
             <div className="p-[var(--spacing-16)] flex flex-wrap gap-x-[var(--spacing-8)] gap-y-[var(--spacing-12)]">
-                {AVAILABLE_TAGS.map(tag => {
-                    // このタグが現在選択されているかどうかを判定
-                    const isSelected = selectedTags.includes(tag);
+                {/* 2. 修正：allTagData をそのまま map で回す */}
+                {allTagData.map(tag => {
+                    const isSelected = selectedTagIds.includes(tag.id);
 
                     return (
                         <button
-                            key={tag}
-                            onClick={() => handleSelect(tag)}
+                            key={tag.id}
+                            onClick={() => handleToggleSelect(tag.id)}
                             className={`
                                 cursor-pointer
                                 rounded-[var(--radius-big)] px-[var(--spacing-16)] py-[var(--spacing-8)] 
                                 font-['Lora'] text-[var(--font-size-normal)] transition-all duration-200
                                 ${isSelected
-                                    // 選択中：緑背景、白文字、影あり
                                     ? "bg-[var(--main-color)] text-white shadow-[var(--box-shadow)] border border-transparent"
-                                    // 未選択：白背景、グレー枠線、グレー文字
                                     : "bg-white !text-[var(--dark-gray)] border border-[var(--dark-gray)]"
                                 }
                             `}
                         >
-                            <p className="flex items-center h-[var(--spacing-12)]">{tag}</p>
+                            {/* 3. tag.name を直接描画できるのでシンプル */}
+                            <span className="flex items-center h-[var(--spacing-12)]">{tag.name}</span>
                         </button>
                     );
                 })}
