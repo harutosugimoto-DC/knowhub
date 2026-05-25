@@ -14,7 +14,7 @@ router.get('/', async (req, res) => {
   const myAction = req.query.myAction as string | undefined;
   const limit = 20;
   const offset = (page - 1) * limit;
-  const userId = req.user?.id ?? 'f664ea31-09be-40d7-8b72-0b0c5e6e713c'; // 仮のユーザーID（認証実装後に置き換え）
+  const userId = req.user?.id;
 
   let query = supabase
     .from('questions')
