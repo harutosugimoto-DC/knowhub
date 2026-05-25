@@ -7,21 +7,10 @@
 
 import { useState } from "react";
 import { redirect } from "react-router";
-import { createClient } from "@supabase/supabase-js";
-
-// ロゴ画像（assets/logo.webp）
+import { supabase } from "@/lib/supabase";
 import logo from "../assets/logo.webp";
-// CSSモジュールからTailwindに移行したためimport不要
-// import styles from "../styles/pages/login.module.css";
 
-// ─────────────────────────────────────────────────────────────
-// Supabaseクライアントの初期化
-// ※別ファイル（例: src/lib/supabase.ts）で定義している場合は、
-// それをimportして使ってください。
-// ─────────────────────────────────────────────────────────────
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || process.env.REACT_APP_SUPABASE_URL || "";
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || process.env.REACT_APP_SUPABASE_ANON_KEY || "";
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3001";
 
 // ─────────────────────────────────────────────────────────────
 // GoogleブランドロゴのインラインSVG
@@ -42,48 +31,11 @@ const GoogleIcon = () => (
 // 　新規(null)なら /nickname、既存なら /top へ直接リダイレクトする
 // ─────────────────────────────────────────────────────────────
 export async function clientLoader() {
-    // 1. Supabaseのセッション情報を取得（Google認証から戻ってきた時もここで取得できる）
+    // すでにログイン済みの場合はトップへ
     const { data: { session } } = await supabase.auth.getSession();
-    
-    // セッションが存在する場合（ログイン済み または 認証から戻ってきた直後）
     if (session) {
-        // auth-guard が参照する userId を localStorage に保存する
-        localStorage.setItem("userId", session.user.id);
-
-        try {
-            // 2. バックエンドへプロフィール情報を取得しにいく
-            const response = await fetch("http://localhost:5000/profile", {
-                method: "GET",
-                headers: {
-                    "Authorization": `Bearer ${session.access_token}`
-                }
-            });
-
-            // 3. ユーザーがDBに存在しない場合（新規ユーザー）はニックネーム登録画面へ
-            if (response.status === 404) {
-                return redirect("/nickname");
-            }
-
-            if (response.ok) {
-                const data = await response.json();
-                const profile = data.profile;
-
-                // 4. nickname が null（初期状態）ならニックネーム登録画面へ直接移動
-                if (!profile?.nickname) {
-                    return redirect("/nickname");
-                } else {
-                    // すでに名前が登録されている場合はトップページへ直接移動
-                    return redirect("/top");
-                }
-            }
-        } catch (error) {
-            console.error("プロフィール状態の確認に失敗しました:", error);
-            // エラー時は安全のためにトップページへ逃がす
-            return redirect("/top");
-        }
+        return redirect("/top");
     }
-    
-    // 未ログインの場合はそのままログイン画面を描画する
     return null;
 }
 
@@ -103,9 +55,8 @@ export default function Login() {
             const { error: authError } = await supabase.auth.signInWithOAuth({
                 provider: "google",
                 options: {
-                    // 認証完了後にこのログイン画面へ戻ってくるように指定する
-                    // 戻ってきた瞬間に上の `clientLoader` が走って振り分け処理が行われます
-                    redirectTo: window.location.href,
+                    // 専用コールバックルートへリダイレクト（セッション確立 → 振り分け）
+                    redirectTo: `${window.location.origin}/auth/callback`,
                 },
             });
 
