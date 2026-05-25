@@ -1,4 +1,4 @@
-// src/routes/users.ts
+﻿// src/routes/users.ts
 import { Router } from 'express';
 import { supabase, supabaseAdmin, createUserClient } from '../config/supabase.js';
 import { requireAuth } from '../middleware/auth.js';
@@ -92,9 +92,9 @@ router.patch('/nickname', requireAuth, async (req, res) => {
 });
 
 // プロフィールアイコン取得
-// GET /profile/icon
-router.get('/icon', async (req, res) => {
-  const userId = req.user?.id;
+// GET /profile/:userId
+router.get('/:userId', async (req, res) => {
+  const { userId } = req.params;
 
   const { data, error } = await supabase
     .from('users')
@@ -115,9 +115,9 @@ router.get('/icon', async (req, res) => {
 });
 
 // プロフィールアイコン更新
-// PATCH /profile/icon
-router.patch('/icon', upload.single('icon'), async (req, res) => {
-  const userId = req.user?.id;
+// PATCH /profile/:userId/icon
+router.patch('/:userId/icon', upload.single('icon'), async (req, res) => {
+  const { userId } = req.params;
   const file = req.file;
 
   if (!file) {
