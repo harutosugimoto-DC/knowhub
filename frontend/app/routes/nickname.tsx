@@ -10,33 +10,35 @@ const MAX_NICKNAME_LENGTH = 10;
 export default function Nickname() {
     const navigate = useNavigate();
     const [nickname, setNickname] = useState<string>("");
-    const [errors, setErrors] = useState<string[]>([]);
+    const [error, setError] = useState<string>("");
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    const validate = (): string[] => {
-        const newErrors: string[] = [];
-        if (nickname.trim().length === 0) newErrors.push("ニックネームを入力してください。");
-        if (nickname.length > MAX_NICKNAME_LENGTH) {
-            newErrors.push(`文字数が制限を超えています。${MAX_NICKNAME_LENGTH}文字以内で入力してください。`);
+    const validate = (): string => {
+        if (nickname.trim().length === 0) {
+            return "ニックネームを入力してください。";
         }
-        return newErrors;
+        if (nickname.length > MAX_NICKNAME_LENGTH) {
+            return `文字数が制限を超えています。${MAX_NICKNAME_LENGTH}文字以内で入力してください。`;
+        }
+        return "";
     };
 
     const handleSubmit = async () => {
-        const validationErrors = validate();
-        if (validationErrors.length > 0) {
-            setErrors(validationErrors);
+        const validationError = validate();
+
+        if (validationError) {
+            setError(validationError);
             return;
         }
 
-        setErrors([]);
+        setError("");
         setIsLoading(true);
 
         try {
             await authService.updateNickname(nickname);
             navigate("/top");
         } catch (err: any) {
-            setErrors([err.response?.data?.error || "ニックネームの登録に失敗しました。"]);
+            setError(err.response?.data?.error || "ニックネームの登録に失敗しました。");
             setIsLoading(false);
         }
     };
@@ -50,9 +52,16 @@ export default function Nickname() {
                     </h1>
                     <div className="w-[420px] flex flex-col gap-[var(--spacing-8)]">
                         <TextInput placeholder="ニックネーム" value={nickname} onChange={setNickname} />
-                        <ErrorMessages messages={errors} />
+
+                        <ErrorMessages message={error} />
+
                     </div>
-                    <Button text="次に進む" onClick={handleSubmit} className="w-[420px] h-[50px]" />
+                    <Button
+                        text={isLoading ? "処理中..." : "次に進む"}
+                        onClick={handleSubmit}
+                        className="w-[420px] h-[50px]"
+
+                    />
                 </div>
             </main>
         </div>
