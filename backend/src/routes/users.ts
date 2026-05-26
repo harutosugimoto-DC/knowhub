@@ -158,6 +158,62 @@ router.get('/me', requireAuth, async (req, res) => {
   });
 });
 
+// 自分が解決した（ベストアンサーに選ばれた）質問を2件取得
+// GET /api/v1/users/me/recently-solved
+router.get('/me/recently-solved', requireAuth, async (req, res) => {
+  const userId = req.user!.id;
+  // 自分がベストアンサーに選ばれた回答を取得
+  const { data: bestAnswers, error: answerError } = await supabase
+    .from('answers')
+    .select(`
+      id,
+      question_id,
+      best_answer_at,
+      questions (
+        id,
+        title,
+        created_at,
+        user_id,
+        statuses ( name ),
+        users ( nickname, profile_icon_url ),
+        question_tags ( tags ( id, name ) ),
+        question_likes ( user_id ),
+        bookmarks ( user_id ),
+        answers ( id, user_id, best_answer_at )
+      )
+    `)
+    .eq('user_id', userId)
+    .not('best_answer_at', 'is', null)
+    .is('deleted_at', null)
+    .order('best_answer_at', { ascending: false })
+    .limit(2);
+
+  if (answerError) {
+    return res.status(500).json({ error: answerError.message });
+  }
+
+  const formatted = (bestAnswers ?? []).map((a: any) => {
+    const q = a.questions;
+    return {
+      id: q.id,
+      title: q.title,
+      statusId: q.statuses?.name,
+      myAction: 'my_answers',
+      userName: q.users?.nickname,
+      iconUrl: q.users?.profile_icon_url ?? null,
+      postingTime: q.created_at,
+      likeCount: q.question_likes?.length ?? 0,
+      bookmarkCount: q.bookmarks?.length ?? 0,
+      replyCount: q.answers?.length ?? 0,
+      tagNames: q.question_tags?.map((qt: any) => qt.tags?.name) ?? [],
+      isLiked: q.question_likes?.some((l: any) => l.user_id === userId) ?? false,
+      isBookmarked: q.bookmarks?.some((b: any) => b.user_id === userId) ?? false,
+    };
+  });
+
+  return res.json(formatted);
+});
+
 // プロフィールアイコン取得
 // GET /profile/:userId
 router.get('/:userId', async (req, res) => {
