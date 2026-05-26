@@ -17,8 +17,10 @@ import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDown
 import KeyboardArrowUpOutlinedIcon from '@mui/icons-material/KeyboardArrowUpOutlined';
 
 //仮データ
-import { myActionsMock, statusesMock, tagsMock } from "@/mockData";
+import { myActionsMock } from "@/mockData";
 import { getQuestions } from "@/api/questionService";
+import { getStatuses } from "@/api/statusService"
+import { getTags } from "@/api/tagService";
 import type { QuestionType } from "@/types/question";
 
 export default function Top() {
@@ -35,8 +37,8 @@ export default function Top() {
 
     // --- ステート定義 ---
     const [questions, setQuestions] = useState<QuestionType[]>([]);
-    const [statuses, setStatuses] = useState(statusesMock)
-    const [tags, setTags] = useState(tagsMock)
+    const [statuses, setStatuses] = useState([])
+    const [tags, setTags] = useState([])
     const [currentSortOption, setCurrentSortOption] = useState(DROP_DOWN_OPTIONS[0].value);
     const [currentPage, setCurrentPage] = useState<number>(1);
 
@@ -72,7 +74,7 @@ export default function Top() {
             try {
                 const response = await getStatuses()
 
-                setStatuses(response.data);
+                setStatuses(response);
             } catch (err: any) {
                 console.error('ステータス一覧の取得に失敗しました:', err);
             }
@@ -81,8 +83,7 @@ export default function Top() {
         const fetchTags = async () => {
             try {
                 const response = await getTags()
-
-                setTags(response.data);
+                setTags(response);
             } catch (err: any) {
                 console.error('タグ一覧の取得に失敗しました:', err);
             }
