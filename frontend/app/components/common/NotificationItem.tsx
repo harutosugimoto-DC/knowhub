@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router';
 export type NotificationItemProps = {
     linkUrl: string;
     type: string;
-    createdAt: Date;
+    createdAt: string;
     isRead: boolean;
 };
 export default function NotificationItem({ linkUrl, type, createdAt, isRead }: NotificationItemProps) {

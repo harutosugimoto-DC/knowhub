@@ -2,10 +2,10 @@ import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 type ToastProps = {
     status: boolean; // true: 成功（緑） / false: 失敗（赤）
-    name: string;    // 表示するメッセージテキスト
+    message: string;    // 表示するメッセージテキスト
 };
 
-export default function Toast({ status, name }: ToastProps) {
+export default function Toast({ status, message }: ToastProps) {
     const themeClass = status
         ? "bg-[#D4FFE7] border-[var(--main-color)] text-[var(--main-color)]"
         : "bg-[#FFD4D4] border-[var(--danger-color)] text-[var(--danger-color)]";
@@ -20,7 +20,7 @@ export default function Toast({ status, name }: ToastProps) {
                 )}
             </div>
 
-            <p>{name}</p>
+            <p>{message}</p>
 
         </div>
     );
