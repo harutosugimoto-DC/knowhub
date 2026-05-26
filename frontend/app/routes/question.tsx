@@ -1,30 +1,7 @@
 // routes/question.tsx
 // ─────────────────────────────────────────
 // 質問詳細ページ
-//
-// 【このファイルで定義しているコンポーネント一覧】
-//   AnswererQuestionCard  : 回答者向け質問カード（⋮メニューなし）
-//   AnswerPreviewCard     : 返信モーダルのプレビュー（回答カードの簡易表示）
-//   AnswerCard            : 回答カード（isOwnerにより表示内容を出し分け）
-//   AnswerForm            : 回答・返信入力フォーム（モーダル内で使用）
-//   QuestionPage          : メインページ（このファイルの主役）
-//
-// 【AnswerCard を question.tsx に定義している理由】
-//   Thread.tsx は確定済みコンポーネントのため修正不可。
-//   Thread.tsx には以下の未実装・問題があるため、question.tsx 内に再実装した：
-//     - isBestAnswer に関わらずベストアンサーラベルが常に表示される
-//     - ThreadReply のレンダリングが未実装
-//     - ベストアンサーに選ぶ・返信ボタンの onClick が空
-//
-// 【isOwner（オーナー判定）とは】
-//   「今ログイン中のユーザーが、この質問を書いた本人かどうか」の判定（オーナー判定）
-//   isOwner = true  → 質問者UI：⋮メニュー・ベストアンサーに選ぶボタンを表示
-//   isOwner = false → 回答者UI：⋮メニューなし・回答作成ボタンを表示
-//
-// 【現時点のデータについて】
-//   現時点ではモックデータ（仮のデータ）を使用しています。
-//   API接続は後続フェーズで実装予定（TODO コメントで箇所を明記）。
-// ─────────────────────────────────────────
+// URL例： http://localhost:5173/questions/1
 
 import { useState } from 'react';
 import { useParams } from 'react-router';
@@ -58,19 +35,9 @@ import EmojiEventsOutlinedIcon from '@mui/icons-material/EmojiEventsOutlined';
 import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
 import KeyboardArrowUpOutlinedIcon from '@mui/icons-material/KeyboardArrowUpOutlined';
 
-
-// ═════════════════════════════════════════
-// 型定義（このページ固有）
-// ─────────────────────────────────────────
-// 「型」とは：
-//   変数やオブジェクトに入れられるデータの形を決めるルールのこと（型定義・型注釈）。
-//   例）userName は必ず文字列、likeCount は必ず数値、のように制約をかける。
-//   型が違うデータを入れようとするとエラーになり、バグを事前に防げる。
-// ═════════════════════════════════════════
-
 // 返信データの型
 // replies?: ReplyType[] と書くと「返信の中にさらに返信が入れられる」構造になる（再帰型）。
-// ? は「あってもなくてもよい（省略可能）」を意味する（オプショナル）。
+// ? は「あってもなくてもよい（省略可能）」を意味。
 type ReplyType = {
   id: number;
   userName: string;
@@ -105,21 +72,14 @@ type QuestionDetailType = QuestionType & {
 
 
 // ═════════════════════════════════════════
-// モックデータ（仮データ）
-// ─────────────────────────────────────────
-// 「モックデータ」とは：
-//   API（サーバーとの通信）がまだ完成していない段階で、
-//   見た目の確認やUI実装を進めるために用意する仮のデータのこと。
-//   API接続後はこのデータをAPIのレスポンスに置き換える。
-// ═════════════════════════════════════════
-
+// モックデータ（仮データ）７５～
 const MOCK_QUESTION: QuestionDetailType = {
   id: 1,
 
   // ★ userId をここで変更すると、質問者UI ↔ 回答者UI を切り替えて確認できる
   //   userId: 1 → MOCK_CURRENT_USER_ID(1) と一致 → isOwner = true（質問者UI）
   //   userId: 2 → 一致しない → isOwner = false（回答者UI）
-  userId: 2,
+  userId: 1,
 
   title: 'ECS Fargateでタスクが起動しない理由が知りたい',
 
@@ -200,11 +160,6 @@ const MOCK_CURRENT_USER_ID = 1;
 //   常に表示してしまうため、回答者UI（⋮なし）を作れない。
 //   確定済みコンポーネントを直接修正できないので、
 //   question.tsx 内に⋮なし版を別途実装している。
-//
-// 【使用場面】
-//   ① isOwner = false のとき → メイン画面の質問カード
-//   ② 回答者が「回答作成」モーダルを開いたとき → プレビュー表示
-// ═════════════════════════════════════════
 
 type AnswererQuestionCardProps = {
   question: QuestionDetailType;
@@ -232,14 +187,7 @@ function AnswererQuestionCard({ question }: AnswererQuestionCardProps) {
           <h2 className="text-[length:var(--font-size-big)]">{question.title}</h2>
         </div>
 
-        {/*
-          ∧∨ボタンの表示条件：テキストが3行を超えている（isOverflowing = true）ときだけ表示。
-          3行以内の場合は CollapsibleContent が自動で展開するため、ボタン自体が不要。
-
-          表示するアイコンは isContentOpen の値で切り替える（条件付きレンダリング）：
-            isContentOpen = true  → 現在展開中 → ∧（上矢印）を表示
-            isContentOpen = false → 現在折りたたみ中 → ∨（下矢印）を表示
-        */}
+        {/* 右上の ∧∨ ボタン（テキストが3行を超えているときだけ表示）*/}
         {isOverflowing && (
           isContentOpen
             ? (
@@ -291,12 +239,10 @@ function AnswererQuestionCard({ question }: AnswererQuestionCardProps) {
 
 
 // ═════════════════════════════════════════
-// AnswerPreviewCard（返信モーダル内のプレビューカード）
+// AnswerPreviewCard（回答返信モーダル内のプレビューカード）
 // ─────────────────────────────────────────
-// 返信モーダルを開いたとき「どの回答に返信するか」を確認できるように
+// 回答への返信モーダルを開いたとき「どの回答に返信するか」を確認できるように
 // 対象の回答を簡略表示するカード。アクションボタンは持たない。
-// ═════════════════════════════════════════
-
 type AnswerPreviewCardProps = {
   answer: AnswerType;
 };
@@ -325,23 +271,53 @@ function AnswerPreviewCard({ answer }: AnswerPreviewCardProps) {
   );
 }
 
+// ReplyPreviewCard（ThreadReply返信モーダル内のプレビューカード）
+// ─────────────────────────────────────────
+// ThreadReply の返信ボタンを押したとき「どの返信に返信するか」を確認できるように
+// 対象の返信を簡略表示するカード。アクションボタンは持たない
+
+type ReplyPreviewCardProps = {
+  reply: {
+    userName: string;
+    content: string;
+    postingTime: Date;
+  };
+};
+
+function ReplyPreviewCard({ reply }: ReplyPreviewCardProps) {
+  return (
+    <Card className="w-full">
+      {/* アバター・ニックネーム・投稿時刻 */}
+      <div className="flex gap-2 py-[4px] mb-2">
+        <Avatar className="w-[32px] h-[32px]" />
+        <p>{reply.userName}</p>
+        <Time postingTime={reply.postingTime} />
+      </div>
+
+      {/* 返信本文（縦にはみ出したらスクロールで表示） */}
+      <p className="px-[var(--spacing-16)] text-[length:var(--font-size-medium)]
+       leading-relaxed max-h-[120px] overflow-auto">
+        {reply.content}
+      </p>
+    </Card>
+  );
+}
+
 
 // ═════════════════════════════════════════
 // AnswerCard（回答カード）
-// ─────────────────────────────────────────
-// Thread.tsx の代替として question.tsx 内に実装。
-// isOwner（質問者かどうか）によって表示内容を切り替える。
-// ═════════════════════════════════════════
 
 type AnswerCardProps = {
   answer: AnswerType;
   statusId: number;    // 質問のステータス（1:回答募集中 / 2:整理中 / 3:解決済み）
   isOwner: boolean;    // true = 質問者 / false = 回答者
   onBestAnswer: (answerId: number) => void; // ベストアンサーに選ぶボタンの処理
-  onReply: (answerId: number) => void;      // 返信ボタンの処理
+  onReply: (answerId: number) => void;      // 回答への返信ボタンの処理
+  // ThreadReplyの返信ボタンが押されたとき、プレビュー情報を親（QuestionPage）へ渡すコールバック
+  onThreadReply: (preview: { userName: string; content: string; postingTime: Date }) => void;
 };
 
-function AnswerCard({ answer, statusId, isOwner, onBestAnswer, onReply }: AnswerCardProps) {
+function AnswerCard({ answer, statusId, isOwner, onBestAnswer, onReply, onThreadReply }: AnswerCardProps) {
 
   // 返信一覧の表示・非表示を保持する（state管理）
   const [isReplyOpen, setIsReplyOpen] = useState(false);
@@ -489,10 +465,12 @@ function AnswerCard({ answer, statusId, isOwner, onBestAnswer, onReply }: Answer
               content={reply.content}
               postingTime={reply.postingTime}
               likeCount={reply.likeCount}
-              replyCount={reply.replies?.length ?? 0}
-              // ?. は「replies が存在するときだけ .length を取得する」という書き方（オプショナルチェーン）
-              // ?? 0 は「undefined や null のとき 0 を使う」という意味（null合体演算子）
               isLiked={reply.isLiked}
+              replies={reply.replies}
+              depth={1} // AnswerCard から渡す返信は2段目（depth=1）
+              // ThreadReply内の返信ボタンが押されたら onThreadReply を呼んで
+              // プレビュー情報を QuestionPage まで届ける（コールバックの引き継ぎ）
+              onReply={(preview) => onThreadReply(preview)}
             />
           ))}
         </div>
@@ -506,10 +484,6 @@ function AnswerCard({ answer, statusId, isOwner, onBestAnswer, onReply }: Answer
 // AnswerForm（回答・返信フォーム）
 // ─────────────────────────────────────────
 // 「回答作成」「返信」両方のモーダルで使い回せる共通フォーム。
-// preview に渡す内容を変えることで、どちらのモーダルでも使える。
-//   回答モーダル → preview = <AnswererQuestionCard />（質問のプレビュー）
-//   返信モーダル → preview = <AnswerPreviewCard />（回答のプレビュー）
-// ═════════════════════════════════════════
 
 type AnswerFormProps = {
   title: string;                 // フォームのタイトル文字列
@@ -525,8 +499,10 @@ function AnswerForm({
   title, preview, content, onChange, error, isSubmitting, onSubmit,
 }: AnswerFormProps) {
   return (
-    <div className="w-full max-w-[750px] px-4 sm:px-0 flex flex-col 
-    gap-[var(--spacing-16)] max-h-[80vh] overflow-y-auto">
+    <div
+    style={{ width: '750px', maxWidth: '90vw' }}
+    className="px-4 sm:px-0 flex flex-col gap-[var(--spacing-16)] max-h-[80vh] overflow-y-auto"
+    >
 
       {/* プレビューエリア：縦にはみ出したらスクロールで表示 */}
       <div className="max-h-[240px] overflow-auto">
@@ -535,7 +511,7 @@ function AnswerForm({
 
       {/* 入力エリア */}
       <div className="flex flex-col gap-[var(--spacing-8)]">
-      {/* ラベル：* は必須入力を示す（赤色で表示） */}
+        {/* ラベル：* は必須入力を示す（赤色で表示） */}
         <label className="text-[length:var(--font-size-normal)] font-semibold">
           {title}<span className="text-[var(--danger-color)]">*</span>
           {/* * は「必須入力」を示すマーク */}
@@ -624,13 +600,26 @@ export default function QuestionPage() {
   const [answerError, setAnswerError] = useState('');                 // エラーメッセージ
   const [isAnswerSubmitting, setIsAnswerSubmitting] = useState(false); // 送信中フラグ
 
-  // ── 返信投稿モーダルの状態管理 ──
+  // ── 回答への返信モーダルの状態管理 ──
   // null     = モーダルを表示しない
   // 数値(id) = その回答IDへの返信モーダルを表示する
   const [replyTargetAnswerId, setReplyTargetAnswerId] = useState<number | null>(null);
   const [replyContent, setReplyContent] = useState('');
   const [replyError, setReplyError] = useState('');
   const [isReplySubmitting, setIsReplySubmitting] = useState(false);
+
+  // ── ThreadReplyへの返信モーダルの状態管理 ──
+  // null       = モーダルを表示しない
+  // オブジェクト = その返信のプレビュー情報を使って返信モーダルを表示する
+  //
+  // 【replyContent・replyError・isReplySubmitting を共有している理由】
+  //   回答への返信モーダルと ThreadReply への返信モーダルは同時に開かれることがないため、
+  //   state を使い回している。別々に定義すると変数が増えて管理が複雑になる。
+  const [replyTargetReply, setReplyTargetReply] = useState<{
+    userName: string;
+    content: string;
+    postingTime: Date;
+  } | null>(null);
 
 
   // ─────────────────────────────────────
@@ -690,7 +679,7 @@ export default function QuestionPage() {
     setAnswers((prev) => [...prev, newAnswer]);
 
     // 質問の replyCount（回答件数）を1増やす
-    // スプレッド構文（...prev）で他のプロパティはそのままコピーして statusId だけ更新している
+    // スプレッド構文（...prev）で他のプロパティはそのままコピーして replyCount だけ更新している
     setQuestion((prev) => ({ ...prev, replyCount: prev.replyCount + 1 }));
 
     // モーダルを閉じて入力内容・エラーをリセット
@@ -702,7 +691,7 @@ export default function QuestionPage() {
 
 
   // ─────────────────────────────────────
-  // 返信を投稿する処理
+  // 回答への返信を投稿する処理
   // TODO: API接続時は POST /api/v1/answers/:answerId/replies を呼ぶ
   // ─────────────────────────────────────
   const handlePostReply = () => {
@@ -740,7 +729,34 @@ export default function QuestionPage() {
     );
 
     setIsReplySubmitting(false);
-    setReplyTargetAnswerId(null); // null にするとモーダルが閉じる
+    setReplyTargetAnswerId(null); // null に戻すとモーダルが閉じる
+    setReplyContent('');
+    setReplyError('');
+  };
+
+
+  // ─────────────────────────────────────
+  // ThreadReplyへの返信を投稿する処理
+  // TODO: API接続時は POST /api/v1/replies/:replyId/replies を呼ぶ
+  //
+  // 【モックデータ段階の注意点】
+  //   ネストした replies（返信の中の返信）を再帰的に更新するのは複雑なため、
+  //   現時点ではモーダルを閉じるだけの実装にしている。
+  //   API接続時にサーバー側で処理して再取得する方式に切り替える。
+  // ─────────────────────────────────────
+  const handlePostThreadReply = () => {
+
+    if (validate(replyContent, setReplyError)) return;
+    if (!replyTargetReply) return; // 返信対象がない場合は念のため中断
+
+    setIsReplySubmitting(true);
+
+    // TODO: API接続時はここで POST を呼び、レスポンスで answers を再取得する
+    console.log('ThreadReplyへの返信を投稿:', replyContent);
+
+    // モックデータ段階では送信完了としてモーダルを閉じるだけ
+    setIsReplySubmitting(false);
+    setReplyTargetReply(null); // null に戻すとモーダルが閉じる
     setReplyContent('');
     setReplyError('');
   };
@@ -767,7 +783,7 @@ export default function QuestionPage() {
   };
 
 
-  // 返信モーダルに表示する「返信対象の回答」を answers 配列から探す（配列の検索・find）
+  // 回答への返信モーダルに表示する「返信対象の回答」を answers 配列から探す（配列の検索・find）
   // find は条件に一致する最初の要素を返す。見つからなければ undefined を返す。
   const replyTargetAnswer = answers.find((a) => a.id === replyTargetAnswerId);
 
@@ -820,9 +836,12 @@ export default function QuestionPage() {
                     statusId={question.statusId}
                     isOwner={isOwner}
                     onBestAnswer={handleBestAnswer}
-                    // 返信ボタンが押されたら replyTargetAnswerId に ID をセット
-                    // → replyTargetAnswerId が null でなくなるため返信モーダルが表示される
+                    // 回答の返信ボタンが押されたら replyTargetAnswerId に ID をセット
+                    // → replyTargetAnswerId が null でなくなるため回答返信モーダルが表示される
                     onReply={(answerId) => setReplyTargetAnswerId(answerId)}
+                    // ThreadReply の返信ボタンが押されたら replyTargetReply にプレビュー情報をセット
+                    // → replyTargetReply が null でなくなるため ThreadReply返信モーダルが表示される
+                    onThreadReply={(preview) => setReplyTargetReply(preview)}
                   />
                 ))
               )}
@@ -830,7 +849,7 @@ export default function QuestionPage() {
 
             {/*
               「回答作成」ボタン
-              表示条件：!isOwner（回答者）かつ !isResolved（未解決）のとき
+              表示条件：!isOwner（回答者）かつ statusId !== 3（未解決）のとき
               && の前の条件が false なら右側は描画されない（ショートサーキット評価）
             */}
             {!isOwner && question.statusId !== 3 && (
@@ -876,9 +895,9 @@ export default function QuestionPage() {
       )}
 
       {/*
-        返信投稿モーダル（質問者・回答者どちらも使用）
+        回答への返信モーダル（質問者・回答者どちらも使用）
         replyTargetAnswerId が null でなく、かつ対象回答が見つかったときだけ描画される。
-        find で見つからなかった場合（undefined）も &&で弾かれるため安全。
+        find で見つからなかった場合（undefined）も && で弾かれるため安全。
       */}
       {replyTargetAnswerId !== null && replyTargetAnswer && (
         <Modal
@@ -890,7 +909,7 @@ export default function QuestionPage() {
           }}
         >
           <AnswerForm
-            title="回答を入力してください"
+            title="返信を入力してください"
             // 返信モーダルのプレビューには返信対象の回答カードを表示する（UIデザイン準拠）
             preview={<AnswerPreviewCard answer={replyTargetAnswer} />}
             content={replyContent}
@@ -898,6 +917,36 @@ export default function QuestionPage() {
             error={replyError}
             isSubmitting={isReplySubmitting}
             onSubmit={handlePostReply}
+          />
+        </Modal>
+      )}
+
+      {/*
+        ThreadReplyへの返信モーダル（質問者・回答者どちらも使用）
+        replyTargetReply が null でないときだけ描画される。
+
+        【replyContent・replyError・isReplySubmitting を回答返信モーダルと共有している理由】
+          両モーダルは同時に開かれることがないため、state を使い回している。
+          同時に開かれることがない = どちらか一方しか null でない状態になれない。
+      */}
+      {replyTargetReply !== null && (
+        <Modal
+          onClose={() => {
+            // モーダルを閉じて返信対象・入力内容・エラーをリセット
+            setReplyTargetReply(null); // null に戻すとモーダルが消える
+            setReplyContent('');
+            setReplyError('');
+          }}
+        >
+          <AnswerForm
+            title="返信を入力してください"
+            // 返信モーダルのプレビューには返信対象の返信カードを表示する（UIデザイン準拠）
+            preview={<ReplyPreviewCard reply={replyTargetReply} />}
+            content={replyContent}
+            onChange={setReplyContent}
+            error={replyError}
+            isSubmitting={isReplySubmitting}
+            onSubmit={handlePostThreadReply}
           />
         </Modal>
       )}
