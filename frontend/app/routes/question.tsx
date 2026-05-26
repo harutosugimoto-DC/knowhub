@@ -312,7 +312,8 @@ function AnswerPreviewCard({ answer }: AnswerPreviewCardProps) {
       </div>
 
       {/* 回答本文（縦にはみ出したらスクロールで表示） */}
-      <p className="px-[var(--spacing-16)] text-[length:var(--font-size-medium)] leading-relaxed max-h-[120px] overflow-auto">
+      <p className="px-[var(--spacing-16)] text-[length:var(--font-size-medium)]
+       leading-relaxed max-h-[120px] overflow-auto">
         {answer.content}
       </p>
 
@@ -524,7 +525,8 @@ function AnswerForm({
   title, preview, content, onChange, error, isSubmitting, onSubmit,
 }: AnswerFormProps) {
   return (
-    <div className="w-full max-w-[600px] flex flex-col gap-[var(--spacing-16)]">
+    <div className="w-full max-w-[750px] px-4 sm:px-0 flex flex-col 
+    gap-[var(--spacing-16)] max-h-[80vh] overflow-y-auto">
 
       {/* プレビューエリア：縦にはみ出したらスクロールで表示 */}
       <div className="max-h-[240px] overflow-auto">
@@ -533,6 +535,7 @@ function AnswerForm({
 
       {/* 入力エリア */}
       <div className="flex flex-col gap-[var(--spacing-8)]">
+      {/* ラベル：* は必須入力を示す（赤色で表示） */}
         <label className="text-[length:var(--font-size-normal)] font-semibold">
           {title}<span className="text-[var(--danger-color)]">*</span>
           {/* * は「必須入力」を示すマーク */}
@@ -543,7 +546,7 @@ function AnswerForm({
           placeholder="例：setStateによる更新は非同期で行われるため、同じレンダーサイクル内では古い値を参照してしまうからです。setStateは..."
           value={content}
           onChange={onChange}
-          rows={8}
+          rows={5}
         />
 
         {/* error が空文字でない場合のみ ErrorMessages を表示する（条件付きレンダリング）*/}
@@ -555,7 +558,10 @@ function AnswerForm({
         onClick={onSubmit}
         disabled={isSubmitting} // isSubmitting = true のときクリックできなくなる（二重送信防止）
         className={[
-          'w-full h-[44px] rounded-[var(--radius-small)] text-white font-semibold transition-all duration-200',
+          'w-[250px] max-w-full h-[80px] mx-auto',
+          'rounded-[var(--radius-small)] shadow-[var(--box-shadow)]',
+          'text-white text-[length:var(--font-size-medium)] font-semibold',
+          'transition-all duration-200',
           // isSubmitting の状態でクラスを切り替えてグレー（送信不可）or グリーン（送信可）を出し分ける
           isSubmitting
             ? 'bg-[var(--light-gray)] cursor-not-allowed'
