@@ -61,6 +61,7 @@ export default function ThreadReply({
     onReply,   // 返信ボタンが押されたときに親へ通知するコールバック
 }: ThreadReplyProps) {
     // 返信一覧の表示 / 非表示
+
     const [isReplyOpen, setIsReplyOpen] = useState(false);
     // 本文の展開 / 折りたたみ
     const [isContentOpen, setIsContentOpen] = useState(false);
@@ -77,6 +78,7 @@ export default function ThreadReply({
     // depth 2（3段目）→ false（非表示）
     const canReply = depth < MAX_REPLY_DEPTH;
 
+
     return (
         <div className="flex">
             <div className="pr-[var(--spacing-16)] flex justify-top items-start">
@@ -89,7 +91,7 @@ export default function ThreadReply({
                 {/* ── ヘッダー：アバター / ニックネーム / 時刻 / メニュー ── */}
                 <div className="flex justify-between items-center">
                     <div className="flex gap-2 py-[4px]">
-                        <Avatar className="w-[32px] h-[32px]" />
+                        <Avatar src={iconURL} className="w-[32px] h-[32px]" />
                         <p>{userName}</p>
                         <Time postingTime={postingTime} />
                     </div>
@@ -151,9 +153,10 @@ export default function ThreadReply({
                                 }
                             </button>
                         )}
+
                     </div>
                     <div className="h-[40px] flex gap-8">
-                        <Like count={likeCount} isLiked={isLiked} />
+                        <Like id={id} type="answer" count={likeCount} isLiked={isLiked} />
                     </div>
                 </div>
 

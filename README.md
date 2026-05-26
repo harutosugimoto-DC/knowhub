@@ -65,7 +65,7 @@ npm install
 `frontend/.env.local` を作成し、以下の内容を設定してください：
 
 ```env
-VITE_API_URL=http://localhost:3001
+VITE_API_URL=http://localhost:5000
 VITE_SUPABASE_URL=あなたのURL
 VITE_SUPABASE_ANON_KEY=あなたのキー
 ```
@@ -76,7 +76,7 @@ VITE_SUPABASE_ANON_KEY=あなたのキー
 
 2つのターミナルを開き、それぞれで以下のコマンドを実行します。
 
-**バックエンドサーバー** (`http://localhost:3002`)
+**バックエンドサーバー** (`http://localhost:5000`)
 
 ```bash
 cd backend
