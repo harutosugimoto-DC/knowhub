@@ -4,6 +4,7 @@ import TextInput from "../components/common/TextInput";
 import Button from "../components/common/Button";
 import ErrorMessages from "../components/common/ErrorMessages";
 import { authService } from "@/api/authService";
+import { useUser } from "@/contexts/UserContext";
 
 const MAX_NICKNAME_LENGTH = 10;
 
@@ -13,6 +14,7 @@ export default function Nickname() {
     const [error, setError] = useState<string>("");
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
+    const { setUser } = useUser()
     const validate = (): string => {
         if (nickname.trim().length === 0) {
             return "ニックネームを入力してください。";
@@ -36,6 +38,7 @@ export default function Nickname() {
 
         try {
             await authService.updateNickname(nickname);
+            setUser(prev => prev ? { ...prev, nickname } : null);
             navigate("/top");
         } catch (err: any) {
             setError(err.response?.data?.error || "ニックネームの登録に失敗しました。");

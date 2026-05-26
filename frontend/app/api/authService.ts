@@ -2,9 +2,9 @@ import axiosClient from './axiosClient';
 
 // APIのレスポンス型定義
 export interface UserProfileResponse {
+    id: string;
     nickname: string | null;
-    id?: string;
-    iconURL?: string;
+    profile_icon_url: string;
 }
 
 export const authService = {

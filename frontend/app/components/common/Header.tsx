@@ -10,66 +10,33 @@ import HomeIcon from '@mui/icons-material/Home';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { HiMiniPencilSquare } from "react-icons/hi2";
+import { useUser } from "@/contexts/UserContext";
 
 export default function Header() {
-    // ログイン状態の確認
-    // localStorageにuserIdがあればログイン済みと判定する
-    //↓ ※ 認証フェーズでSupabaseのセッション確認に置き換え予定
-    const isLoggedIn = !!localStorage.getItem("userId");
+    const navigate = useNavigate();
+    const { user, logout } = useUser();
+    const isLoggedIn = !!user;
+
     const [showNotification, setShowNotification] = useState(false);
     const [notifications, setNotifications] = useState([
-
-        {
-            linkUrl: "/question/1",
-            type: "question",
-            createdAt: new Date(),
-            isRead: false
-        },
-        {
-            linkUrl: "/question/2",
-            type: "question",
-            createdAt: new Date(),
-            isRead: true
-        },
-        {
-            linkUrl: "/question/2",
-            type: "question",
-            createdAt: new Date(),
-            isRead: false
-        },
-        {
-            linkUrl: "/question/2",
-            type: "like",
-            createdAt: new Date(),
-            isRead: true
-        },
-        {
-            linkUrl: "/question/2",
-            type: "like",
-            createdAt: new Date(),
-            isRead: false
-        },
-        {
-            linkUrl: "/question/2",
-            type: "question",
-            createdAt: new Date(),
-            isRead: true
-        }
+        { linkUrl: "/question/1", type: "question", createdAt: new Date(), isRead: false },
+        { linkUrl: "/question/2", type: "question", createdAt: new Date(), isRead: true },
+        { linkUrl: "/question/2", type: "question", createdAt: new Date(), isRead: false },
+        { linkUrl: "/question/2", type: "like", createdAt: new Date(), isRead: true },
+        { linkUrl: "/question/2", type: "like", createdAt: new Date(), isRead: false },
+        { linkUrl: "/question/2", type: "question", createdAt: new Date(), isRead: true }
     ]);
+
     const unreadCount = notifications.filter(n => !n.isRead).length;
 
-    const handleLogout = () => {
-        //仮の実装
-        localStorage.removeItem("userId");
-    }
+    const handleLogout = async () => {
+        await logout();
+        navigate("/");
+    };
+
     const toggleNotification = () => {
-        //仮の実装
         setShowNotification(!showNotification);
     }
-    const navigate = useNavigate()
-    
-
-               {/*↓ ロゴ：ログイン前後どちらも常に表示 */}
     return (
         <div className="flex justify-between items-center h-[64px] w-[100vw] border-b border-[var(--light-gray)] pl-[var(--spacing-16)] z-[var(--z-header)] fixed top-0 left-0 bg-white">
             <div className="flex items-center gap-2 px-[var(--spacing-8)] cursor-pointer" onClick={() => navigate("/top")}>
@@ -79,16 +46,15 @@ export default function Header() {
                 </p>
             </div>
 
-             {/* ナビゲーション：ログイン済みのときだけ表示 */}
             {isLoggedIn && (
             <div className="flex items-center h-full">
-                <div className=" w-[60px] h-full flex justify-center items-center cursor-pointer transition-all hover:bg-[var(--hover-color)] hover:border-b-[3px] hover:border-[var(--main-color)]" onClick={() => navigate("/top")}>
+                <div className="w-[60px] h-full flex justify-center items-center cursor-pointer transition-all hover:bg-[var(--hover-color)] hover:border-b-[3px] hover:border-[var(--main-color)]" onClick={() => navigate("/top")}>
                     <HomeIcon />
                 </div>
-                <div className=" w-[60px] h-full flex justify-center items-center cursor-pointer transition-all hover:bg-[var(--hover-color)] hover:border-b-[3px] hover:border-[var(--main-color)]" onClick={() => navigate("/create-question")}>
+                <div className="w-[60px] h-full flex justify-center items-center cursor-pointer transition-all hover:bg-[var(--hover-color)] hover:border-b-[3px] hover:border-[var(--main-color)]" onClick={() => navigate("/create-question")}>
                     <HiMiniPencilSquare className="text-[24px]" />
                 </div>
-                <div className=" w-[60px] h-full flex justify-center items-center cursor-pointer transition-all hover:bg-[var(--hover-color)] hover:border-b-[3px] hover:border-[var(--main-color)]" onClick={() => toggleNotification()}>
+                <div className="w-[60px] h-full flex justify-center items-center cursor-pointer transition-all hover:bg-[var(--hover-color)] hover:border-b-[3px] hover:border-[var(--main-color)]" onClick={toggleNotification}>
                     <div className="relative inline-block">
                         <NotificationsIcon />
                         {unreadCount > 0 && (
@@ -100,24 +66,19 @@ export default function Header() {
                         )}
                     </div>
                 </div>
-                <div className=" w-[60px] h-full flex justify-center items-center cursor-pointer transition-all hover:bg-[var(--hover-color)] hover:border-b-[3px] hover:border-[var(--main-color)]" onClick={() => navigate("/profile")}>
-                    <Avatar className="w-[40px] h-[40px]" />
+                <div className="w-[60px] h-full flex justify-center items-center cursor-pointer transition-all hover:bg-[var(--hover-color)] hover:border-b-[3px] hover:border-[var(--main-color)]" onClick={() => navigate("/profile")}>
+                    <Avatar src={user.iconUrl} className="w-[40px] h-[40px]" />
                 </div>
-                <div className=" w-[60px] h-full flex justify-center items-center cursor-pointer transition-all hover:bg-[var(--hover-color)] hover:border-b-[3px] hover:border-[var(--main-color)]" onClick={() => handleLogout()}>
+                <div className="w-[60px] h-full flex justify-center items-center cursor-pointer transition-all hover:bg-[var(--hover-color)] hover:border-b-[3px] hover:border-[var(--main-color)]" onClick={handleLogout}>
                     <LogoutIcon />
                 </div>
             </div>
-              )}
-               {/* 通知パネル：ログイン済みかつ通知ボタン押下時のみ表示 */}
-            {isLoggedIn && showNotification &&
-                showNotification && (
-                    <div
-                        className="absolute top-[64px] right-[var(--spacing-16)] shadow-[var(--box-shadow)] rounded-[var(--radius-big)] overflow-hidden bg-white animate-in fade-in slide-in-from-top-2 duration-200"
-                    >
-                        <Notification notifications={notifications} />
-                    </div>
-                )
-            }
-        </div >
+            )}
+            {isLoggedIn && showNotification && (
+                <div className="absolute top-[64px] right-[var(--spacing-16)] shadow-[var(--box-shadow)] rounded-[var(--radius-big)] overflow-hidden bg-white animate-in fade-in slide-in-from-top-2 duration-200">
+                    <Notification notifications={notifications} />
+                </div>
+            )}
+        </div>
     );
 }
