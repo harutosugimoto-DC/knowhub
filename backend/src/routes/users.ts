@@ -91,6 +91,73 @@ router.patch('/nickname', requireAuth, async (req, res) => {
   return res.json({ message: 'ニックネームを登録しました' });
 });
 
+// 自分のユーザー情報取得
+// GET /api/v1/users/me
+router.get('/me', requireAuth, async (req, res) => {
+  const userId = req.user!.id;
+
+  // ユーザー基本情報取得
+  const { data: user, error: userError } = await supabase
+    .from('users')
+    .select('id, nickname, profile_icon_url')
+    .eq('id', userId)
+    .maybeSingle();
+
+  if (userError) {
+    console.error('Supabase error fetching user:', userError);
+    return res.status(500).json({ error: 'Failed to fetch user' });
+  }
+
+  if (!user) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+
+  // 質問数取得
+  const { count: questionCount } = await supabase
+    .from('questions')
+    .select('id', { count: 'exact' })
+    .eq('user_id', userId)
+    .is('deleted_at', null);
+
+  // 回答数取得
+  const { count: answerCount } = await supabase
+    .from('answers')
+    .select('id', { count: 'exact' })
+    .eq('user_id', userId)
+    .is('deleted_at', null);
+
+  // ベストアンサーに選ばれた回数取得
+  const { count: bestAnswerCount } = await supabase
+    .from('answers')
+    .select('id', { count: 'exact' })
+    .eq('user_id', userId)
+    .not('best_answer_at', 'is', null);
+
+  // いいねを押された総数取得（質問へのいいね）
+  const { data: questionLikes } = await supabase
+    .from('question_likes')
+    .select('question_id, questions!inner( user_id )')
+    .eq('questions.user_id', userId);
+
+  // いいねを押された総数取得（回答へのいいね）
+  const { data: answerLikes } = await supabase
+    .from('answer_likes')
+    .select('answer_id, answers!inner( user_id )')
+    .eq('answers.user_id', userId);
+
+  const totalLikeCount = (questionLikes?.length ?? 0) + (answerLikes?.length ?? 0);
+
+  return res.json({
+    id: user.id,
+    nickname: user.nickname,
+    iconUrl: user.profile_icon_url,
+    questionCount: questionCount ?? 0,
+    answerCount: answerCount ?? 0,
+    bestAnswerCount: bestAnswerCount ?? 0,
+    totalLikeCount,
+  });
+});
+
 // プロフィールアイコン取得
 // GET /profile/:userId
 router.get('/:userId', async (req, res) => {
