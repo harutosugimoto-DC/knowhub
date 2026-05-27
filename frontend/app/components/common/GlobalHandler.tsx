@@ -54,7 +54,7 @@ export default function GlobalHandler() {
             {/* flexDirection: column で複数トーストを縦に並べる */}
             <div style={{
                 position: 'fixed',       // スクロールしても位置が固定
-                top: '64px',             // ヘッダーの高さ分下げる
+                bottom: '64px',             // ヘッダーの高さ分下げる
                 right: '20px',           // 右端から20px内側
                 zIndex: 9999,            // 他の要素より必ず手前に表示
                 display: 'flex',         // 子要素（Toast）を並べるためのflex
