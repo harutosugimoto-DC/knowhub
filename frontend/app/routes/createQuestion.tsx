@@ -295,7 +295,7 @@ export default function CreateQuestion() {
                     <Card className="max-w-[1000px] min-w-[400px]">
                         <div className="flex items-center justify-between py-[var(--spacing-16)]">
                             <div className="flex items-center gap-4">
-                                <StatusChip id={1} />
+                                <StatusChip name="回答募集中" />
                                 <h2 className="text-[length:var(--font-size-big)]">
                                     {titleText}
                                 </h2>
