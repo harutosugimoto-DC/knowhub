@@ -37,7 +37,7 @@ export default function QuestionCard({ question, isProfile }: QuestionCardProps)
                 <div className='flex flex-col justify-space-around gap-[var(--spacing-16)]'>
                     {/* 一段目 */}
                     <div className="flex items-center gap-[var(--spacing-16)]">
-                        <StatusChip id={statusId} />
+                        <StatusChip name={statusId} />
                     </div>
 
                     {/* 二段目 */}

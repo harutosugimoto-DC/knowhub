@@ -44,7 +44,7 @@ export default function QuestionDetailCard({ question }: QuestionDetailCardProps
         <Card className="w-full">
             <div className="flex items-center justify-between py-[var(--spacing-16)]">
                 <div className="flex items-center gap-4">
-                    <StatusChip id={statusId} />
+                    <StatusChip name={statusId} />
                     <h2 className="text-[length:var(--font-size-big)]">
                         {title}
                     </h2>

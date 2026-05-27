@@ -16,41 +16,50 @@ import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
 import KeyboardArrowUpOutlinedIcon from '@mui/icons-material/KeyboardArrowUpOutlined';
 
-//仮データ
-import { myActionsMock } from "@/mockData";
 import { getQuestions } from "@/api/questionService";
-import { getStatuses } from "@/api/statusService"
-import { getTags } from "@/api/tagService";
+import { useMasterData } from "@/contexts/MasterDataContext";
 import type { QuestionType } from "@/types/question";
+import { DROP_DOWN_OPTIONS, MY_ACTIONS } from "@/constants/Filter"
 
 export default function Top() {
     const navigate = useNavigate();
-
-    const DROP_DOWN_OPTIONS = [
-        { label: "投稿日降順", value: "newDesc" },
-        { label: "投稿日昇順", value: "newAsc" },
-        { label: "いいね数降順", value: "likesDesc" },
-        { label: "いいね数昇順", value: "likesAsc" }
-    ];
 
     const MAX_PAGE = 5;
 
     // --- ステート定義 ---
     const [questions, setQuestions] = useState<QuestionType[]>([]);
-    const [statuses, setStatuses] = useState([])
-    const [tags, setTags] = useState([])
-    const [currentSortOption, setCurrentSortOption] = useState(DROP_DOWN_OPTIONS[0].value);
+    const { statuses, tags } = useMasterData();
+    const [currentSortOption, setCurrentSortOption] = useState<"newDesc" | "newAsc" | "likesDesc" | "likesAsc">(
+        DROP_DOWN_OPTIONS[0].value as "newDesc" | "newAsc" | "likesDesc" | "likesAsc"
+    );
     const [currentPage, setCurrentPage] = useState<number>(1);
 
     // フィルター・検索用
     const [isFilterOpen, setIsFilterOpen] = useState(false);
-    const [selectedMyActionIds, setSelectedMyActionIds] = useState([1]);
-    const [selectedStatusIds, setSelectedStatusIds] = useState([1]);
-    const [selectedTagIds, setSelectedTagIds] = useState([1]);
+    const [selectedMyActionIds, setSelectedMyActionIds] = useState<('my_questions' | 'my_answers' | 'my_solved' | 'bookmarked')[]>([]);
+    const [selectedStatusIds, setSelectedStatusIds] = useState<string[]>([]);
+    const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
 
     const [searchWord, setSearchWord] = useState(""); // 入力中の文字列
     const [activeKeyword, setActiveKeyword] = useState("");
 
+    // 💡 修正: どんなリテラル型の配列ステートでも安全にトグルできるように型を抽象化
+    const handleToggleId = <T extends string>(id: string, setIds: React.Dispatch<React.SetStateAction<T[]>>) => {
+        setIds((prev) =>
+            (prev as string[]).includes(id)
+                ? (prev as string[]).filter((item) => item !== id) as T[]
+                : [...prev, id as T]
+        );
+        setCurrentPage(1);
+    };
+
+    // 💡 ステータス名から背景色を返すヘルパー関数
+    const getStatusBgClass = (name: string) => {
+        if (name === "回答募集中") return "bg-[var(--status-color-taking)]";
+        if (name === "整理中") return "bg-[var(--status-color-organize)]";
+        if (name === "解決済み") return "bg-[var(--status-color-resolved)]";
+        return "bg-[var(--main-color)]"; // 予備の色
+    };
 
     const pageChange = (nextPage: number) => {
         setCurrentPage(nextPage);
@@ -58,7 +67,8 @@ export default function Top() {
 
     //  ソート順が変更された時のハンドラー
     const handleSortChange = (newSortValue: string) => {
-        setCurrentSortOption(newSortValue);
+        // DropdownMenuから渡ってくる string を、安全にステートの型へとキャストします
+        setCurrentSortOption(newSortValue as "newDesc" | "newAsc" | "likesDesc" | "likesAsc");
         setCurrentPage(1);
     };
 
@@ -69,42 +79,19 @@ export default function Top() {
     };
 
     useEffect(() => {
+        console.log(currentPage, currentSortOption, activeKeyword, selectedStatusIds, selectedTagIds, selectedMyActionIds);
 
-        const fetchStatuses = async () => {
-            try {
-                const response = await getStatuses()
-
-                setStatuses(response);
-            } catch (err: any) {
-                console.error('ステータス一覧の取得に失敗しました:', err);
-            }
-        };
-
-        const fetchTags = async () => {
-            try {
-                const response = await getTags()
-                setTags(response);
-            } catch (err: any) {
-                console.error('タグ一覧の取得に失敗しました:', err);
-            }
-        };
-
-        fetchStatuses()
-        fetchTags()
-
-    }, [])
-
-    useEffect(() => {
         const fetchQuestionsData = async () => {
             try {
-                // ドロップダウンの文字列をバックエンドの仕様 ('likes' または 'new') に変換
-                const backendOrder = currentSortOption.startsWith('likes') ? 'likes' : 'new';
 
-                // APIリクエストの送信（ページ、ソート、キーワードを連動）
+                // APIリクエストの送信（ページ、ソート、キーワード、選択された各フィルターを連動）
                 const response = await getQuestions({
-                    page: currentPage,
-                    order: backendOrder,
-                    keyword: activeKeyword || undefined // 空文字ならパラメーターを送らない
+                    currentPage: currentPage,
+                    order: currentSortOption,
+                    keyword: activeKeyword || undefined, // 空文字ならパラメーターを送らない
+                    statusIds: selectedStatusIds.length > 0 ? selectedStatusIds : undefined,
+                    tagIds: selectedTagIds.length > 0 ? selectedTagIds : undefined,
+                    myActions: selectedMyActionIds.length > 0 ? selectedMyActionIds : undefined,
                 });
 
                 setQuestions(response.data);
@@ -114,7 +101,8 @@ export default function Top() {
         };
 
         fetchQuestionsData();
-    }, [currentPage, currentSortOption, activeKeyword]);
+        // 💡 選択中のフィルター状態を依存配列に追加し、チップクリック時に再取得が走るように修正
+    }, [currentPage, currentSortOption, activeKeyword, selectedStatusIds, selectedTagIds, selectedMyActionIds]);
 
     return (
         <div className="px-[var(--spacing-64)]">
@@ -141,8 +129,15 @@ export default function Top() {
                                 </div>
                             </div>
                             <div className="flex gap-2 px-2">
-                                {myActionsMock.map((myAction) => (
-                                    <FilterChip key={myAction.id} id={myAction.id} name={myAction.name} setOnClick={setSelectedMyActionIds} className="h-[36px] bg-[var(--main-color)]" isSelected={selectedMyActionIds.includes(myAction.id)} />
+                                {MY_ACTIONS.map((myAction) => (
+                                    <FilterChip
+                                        key={myAction.id}
+                                        id={myAction.id}
+                                        name={myAction.name}
+                                        isSelected={selectedMyActionIds.includes(myAction.id)}
+                                        onToggle={(id) => handleToggleId(id, setSelectedMyActionIds)}
+                                        className="h-[36px] bg-[var(--main-color)]"
+                                    />
                                 ))}
                             </div>
                         </div>
@@ -153,9 +148,17 @@ export default function Top() {
                                     <p>ステータス</p>
                                 </div>
                             </div>
-                            <div className="flex gap-2 px-2">
-                                {statuses.map((status) => (
-                                    <FilterChip key={status.id} id={status.id} name={status.name} setOnClick={setSelectedStatusIds} className={` ${status.id === 1 ? "bg-[var(--status-color-taking)]" : status.id === 2 ? "bg-[var(--status-color-organize)]" : "bg-[var(--status-color-resolved)]"} h-[36px] `} isSelected={selectedStatusIds.includes(status.id)} />
+                            <div className="flex gap-2 px-2 flex-wrap">
+                                {statuses?.map((status) => (
+                                    <FilterChip
+                                        key={status.id}
+                                        id={status.id}
+                                        name={status.name}
+                                        isSelected={selectedStatusIds.includes(status.id)}
+                                        onToggle={(id) => handleToggleId(id, setSelectedStatusIds)}
+                                        // 💡 id === 1 ではなく、name で背景色を安全に出し分け
+                                        className={`h-[36px] ${getStatusBgClass(status.name)}`}
+                                    />
                                 ))}
                             </div>
                         </div>
@@ -167,8 +170,15 @@ export default function Top() {
                                 </div>
                             </div>
                             <div className="flex gap-2 px-2 flex-wrap">
-                                {tags.map((tags) => (
-                                    <FilterChip key={tags.id} id={tags.id} name={tags.name} setOnClick={setSelectedTagIds} className="font-['Lora'] h-[27px] bg-[var(--main-color)]" isSelected={selectedTagIds.includes(tags.id)} />
+                                {tags?.map((tag) => (
+                                    <FilterChip
+                                        key={tag.id}
+                                        id={tag.id}
+                                        name={tag.name}
+                                        isSelected={selectedTagIds.includes(tag.id)}
+                                        onToggle={(id) => handleToggleId(id, setSelectedTagIds)}
+                                        className="font-['Lora'] h-[27px] bg-[var(--main-color)]"
+                                    />
                                 ))}
                             </div>
                         </div>
