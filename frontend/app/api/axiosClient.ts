@@ -62,7 +62,7 @@ axiosClient.interceptors.response.use(
         }
 
         // 🟢 401以外のエラー（500サーバーエラーなど）を一括で画面に通知する
-        const errorMessage = error.response?.data?.message  || '通信エラーが発生しました';
+        const errorMessage = error.response?.data?.error  || '通信エラーが発生しました';
         window.dispatchEvent(new CustomEvent('global-error', { detail: errorMessage }));
 
         return Promise.reject(error);
