@@ -78,7 +78,8 @@ router.post('/', requireAuth, async (req, res) => {
 
 // 質問一覧取得
 // GET /api/v1/questions?page=1&order=new or likes
-router.get('/', async (req, res) => {
+router.get('/', requireAuth, async (req, res) => {
+  const userId = req.user!.id;
   const page = Number(req.query.page) || 1;
   const order = req.query.order as string | undefined ?? 'new';
   const keyword = req.query.keyword as string | undefined;
@@ -93,7 +94,7 @@ const statusNames = req.query.statuses
   : undefined;
   const limit = 20;
   const offset = (page - 1) * limit;
-  const userId = req.user?.id;
+
 
   let query = supabase
     .from('questions')
@@ -209,7 +210,7 @@ const statusNames = req.query.statuses
 
 // 質問詳細取得
 // GET /api/v1/questions/:questionId
-router.get('/:questionId', async (req, res) => {
+router.get('/:questionId', requireAuth, async (req, res) => {
   const { questionId } = req.params;
   const userId = req.user?.id;
 

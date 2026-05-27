@@ -1,11 +1,12 @@
 import { Router } from 'express';
 import { supabase } from '../config/supabase';
+import { requireAuth } from '../middleware/auth.js';
 
 const router = Router();
 
 // 通知の取得
-router.get('/', async (req, res) => {
-  const userId = req.user?.id ?? 'f664ea31-09be-40d7-8b72-0b0c5e6e713c'; // 仮のユーザーID（認証実装後に置き換え）
+router.get('/', requireAuth, async (req, res) => {
+  const userId = req.user!.id;
 
 const { data, error } = await supabase
     .from('notifications')
