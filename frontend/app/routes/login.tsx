@@ -1,20 +1,9 @@
-// ─────────────────────────────────────────────────────────────
-// ログイン画面
-// ・グローバルHeader（root.tsx）がロゴを表示するため、このファイルにヘッダーは不要
-// ・Googleログインボタン押下でOAuth認証を開始する
-// ・SupabaseのsignInWithOAuthを利用して認証を実行し、プロフィールの状態に応じて直接画面を振り分ける
-// ─────────────────────────────────────────────────────────────
-
 import { useState } from "react";
 import { redirect } from "react-router";
 import { supabase } from "@/lib/supabase";
 import logo from "../assets/logo.webp";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3001";
-
-// ─────────────────────────────────────────────────────────────
 // GoogleブランドロゴのインラインSVG
-// ─────────────────────────────────────────────────────────────
 const GoogleIcon = () => (
     <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -24,12 +13,7 @@ const GoogleIcon = () => (
     </svg>
 );
 
-// ─────────────────────────────────────────────────────────────
 // 【clientLoader】ページ表示前にブラウザ側で実行される処理
-// ・Supabaseのセッションを確認
-// ・ログイン済みならバックエンドにアクセスしてプロフィール状況を確認し、
-// 　新規(null)なら /nickname、既存なら /top へ直接リダイレクトする
-// ─────────────────────────────────────────────────────────────
 export async function clientLoader() {
     // すでにログイン済みの場合はトップへ
     const { data: { session } } = await supabase.auth.getSession();
@@ -43,10 +27,6 @@ export default function Login() {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
-    // ─────────────────────────────────────────────────────────
-    // 【handleGoogleLoginClick】ボタン押下時の処理
-    // ・SupabaseのOAuthログイン処理を実行する
-    // ─────────────────────────────────────────────────────────
     const handleGoogleLoginClick = async () => {
         setIsLoading(true);
         setError(null);
@@ -70,21 +50,8 @@ export default function Login() {
     };
 
     return (
-        // ─────────────────────────────────────────────────────
-        // ページ全体のラッパー
-        // ・min-h-[calc(100vh-60px)]：グローバルHeaderの高さ60px分を引いた残り高さを使う
-        // ・flex items-center justify-center：カードをページ中央に配置する
-        // ・bg-[var(--base-color)]：index.cssの背景色変数を使用
-        // ─────────────────────────────────────────────────────
-        <div className="min-h-[calc(100vh-60px)] flex items-center justify-center bg-[var(--base-color)] p-[var(--spacing-16)]">
-
-            {/* ── カードを中央に配置するmain ──────────────── */}
+        <div className="min-h-[calc(100vh-64px)] flex items-center justify-center bg-[var(--base-color)] p-[var(--spacing-16)]">
             <main className="w-full flex justify-center">
-
-                {/* ── カード本体 ── */}
-                {/* bg-white：白背景 */}
-                {/* rounded-[var(--radius-big)]：index.cssの角丸変数 */}
-                {/* shadow-[var(--box-shadow)]：index.cssの影変数 */}
                 <div className="bg-white rounded-[var(--radius-big)] 
                 shadow-[var(--box-shadow)] px-[var(--spacing-32)]
                  py-[var(--spacing-48)] w-[600px] h-[400px]
@@ -127,7 +94,6 @@ export default function Login() {
                         <GoogleIcon />
                         {isLoading ? "処理中..." : "Googleでログイン"}
                     </button>
-
                 </div>
             </main>
         </div>

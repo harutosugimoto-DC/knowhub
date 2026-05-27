@@ -1,7 +1,7 @@
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 
 type TimeProps = {
-    postingTime: Date;
+    postingTime: string;
 };
 
 const getTimeAgo = (date: Date) => {
@@ -19,11 +19,11 @@ const getTimeAgo = (date: Date) => {
     return "不明な時間";
 };
 export default function Time({ postingTime }: TimeProps) {
-
+    const date = new Date(postingTime);
     return (
         <div className="flex items-center gap-[var(--spacing-4)] text-[var(--dark-gray)]">
             <AccessTimeIcon className="!text-[var(--font-size-normal)]" />
-            <span>{getTimeAgo(postingTime)}</span>
+            <span>{getTimeAgo(date)}</span>
         </div>
     );
 }

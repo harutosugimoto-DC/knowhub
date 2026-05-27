@@ -1,8 +1,80 @@
 // src/routes/question.ts
 import { Router } from 'express';
-import { supabase } from '../config/supabase';
+import { supabase, createUserClient } from '../config/supabase.js';
+import { requireAuth } from '../middleware/auth.js';
 
 const router = Router();
+
+// 質問投稿
+// POST /api/v1/questions
+router.post('/', requireAuth, async (req, res) => {
+  const { id: userId, token } = req.user!;
+  const { title, content, tag_ids } = req.body as {
+    title?: unknown;
+    content?: unknown;
+    tag_ids?: unknown;
+  };
+
+  if (typeof title !== 'string' || title.trim().length < 1 || title.trim().length > 40) {
+    return res.status(400).end();
+  }
+  if (typeof content !== 'string' || content.trim().length < 1 || content.trim().length > 5000) {
+    return res.status(400).end();
+  }
+  if (!Array.isArray(tag_ids) || tag_ids.length < 1 || tag_ids.length > 5) {
+    return res.status(400).end();
+  }
+
+  // ユーザーの JWT で動く認証済みクライアント（RLS を authenticated ロールで通過）
+  const userClient = createUserClient(token);
+
+  // 初期ステータス「回答募集中」のIDを取得
+  const { data: status, error: statusError } = await supabase
+    .from('statuses')
+    .select('id')
+    .eq('name', '回答募集中')
+    .single();
+
+  if (statusError || !status) {
+    console.error('Status fetch error:', statusError);
+    return res.status(500).end();
+  }
+
+  // 質問を挿入（認証済みクライアントで RLS を通過）
+  const { data: question, error: questionError } = await userClient
+    .from('questions')
+    .insert({
+      user_id: userId,
+      title: title.trim(),
+      content: content.trim(),
+      status_id: status.id,
+    })
+    .select('id')
+    .single();
+
+  if (questionError || !question) {
+    console.error('Supabase error inserting question:', questionError);
+    return res.status(500).end();
+  }
+
+  // question_tagsを挿入（認証済みクライアントで RLS を通過）
+  const tagInserts = (tag_ids as string[]).map((tagId) => ({
+    question_id: question.id,
+    tag_id: tagId,
+  }));
+
+  const { error: tagError } = await userClient
+    .from('question_tags')
+    .insert(tagInserts);
+
+  if (tagError) {
+    console.error('Supabase error inserting question_tags:', tagError);
+    await userClient.from('questions').delete().eq('id', question.id);
+    return res.status(500).end();
+  }
+
+  return res.status(201).json({ questionId: question.id });
+});
 
 // 質問一覧取得
 // GET /api/v1/questions?page=1&order=new or likes
@@ -29,13 +101,12 @@ const statusNames = req.query.statuses
       id,
       title,
       created_at,
-      user_id,
       statuses ( name ),
-      users ( nickname, profile_icon_url ),
+      users ( nickname ),
       question_tags ( tags (id, name ) ),
       question_likes ( user_id ),
       bookmarks ( user_id ),
-      answers ( id, user_id, best_answer_at )
+      answers ( id )
     `, { count: 'exact' }) // ← 総件数を取得
     .is('deleted_at', null)
     .range(offset, offset + limit - 1);
@@ -98,12 +169,11 @@ const statusNames = req.query.statuses
   );
 }
 
-   const formatted = filtered.map((q: any) => ({
+  const formatted = filtered.map((q: any) => ({
     id: q.id,
     title: q.title,
     statusId: q.statuses?.name,
     userName: q.users?.nickname,
-    iconUrl: q.users?.profile_icon_url ?? null,
     postingTime: q.created_at,
     likeCount: q.question_likes?.length ?? 0,
     bookmarkCount: q.bookmarks?.length ?? 0,
@@ -160,11 +230,11 @@ router.get('/:questionId', async (req, res) => {
     .maybeSingle();
 
   if (error) {
-    return res.status(500).json({ error: error.message });
+    return res.status(500).end();
   }
 
   if (!rawData) {
-    return res.status(404).json({ error: 'Question not found' });
+    return res.status(404).end();
   }
 
   const data = rawData as any;
@@ -201,7 +271,7 @@ router.post('/:questionId/bookmark', async (req, res) => {
     .maybeSingle();
 
   if (existing) {
-    return res.status(409).json({ error: '既にブックマーク済みです' });
+    return res.status(409).end();
   }
 
   const { error } = await supabase
@@ -210,7 +280,7 @@ router.post('/:questionId/bookmark', async (req, res) => {
 
   if (error) {
     console.error('Supabase error adding bookmark:', error);
-    return res.status(500).json({ error: 'ブックマークの追加に失敗しました' });
+    return res.status(500).end();
   }
 
   return res.status(201).json({ message: 'ブックマークに追加しました' });
@@ -230,7 +300,7 @@ router.delete('/:questionId/bookmark', async (req, res) => {
 
   if (error) {
     console.error('Supabase error removing bookmark:', error);
-    return res.status(500).json({ error: 'ブックマークの解除に失敗しました' });
+    return res.status(500).end();
   }
 
   return res.status(200).json({ message: 'ブックマークを解除しました' });
@@ -250,7 +320,7 @@ router.post('/:questionId/like', async (req, res) => {
     .maybeSingle();
 
   if (existing) {
-    return res.status(409).json({ error: '既にいいね済みです' });
+    return res.status(409).end();
   }
 
   const { error } = await supabase
@@ -259,7 +329,7 @@ router.post('/:questionId/like', async (req, res) => {
 
   if (error) {
     console.error('Supabase error adding like:', error);
-    return res.status(500).json({ error: 'いいねの追加に失敗しました' });
+    return res.status(500).end();
   }
 
   return res.status(201).json({ message: 'いいねしました' });
@@ -279,7 +349,7 @@ router.delete('/:questionId/like', async (req, res) => {
 
   if (error) {
     console.error('Supabase error removing like:', error);
-    return res.status(500).json({ message: 'いいねの解除に失敗しました' });
+    return res.status(500).end();
   }
 
   return res.status(200).json({ message: 'いいねを解除しました' });
