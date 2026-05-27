@@ -261,8 +261,8 @@ router.get('/:questionId', async (req, res) => {
 
 // ブックマーク追加
 // POST /api/v1/questions/:questionId/bookmark
-router.post('/:questionId/bookmark', async (req, res) => {
-  const userId = req.user?.id;
+router.post('/:questionId/bookmark', requireAuth, async (req, res) => {
+  const userId = req.user!.id;
   const { questionId } = req.params;
 
   const { data: existing } = await supabase
@@ -290,8 +290,8 @@ router.post('/:questionId/bookmark', async (req, res) => {
 
 // ブックマーク解除
 // DELETE /api/v1/questions/:questionId/bookmark
-router.delete('/:questionId/bookmark', async (req, res) => {
-  const userId = req.user?.id;
+router.delete('/:questionId/bookmark', requireAuth, async (req, res) => {
+  const userId = req.user!.id;
   const { questionId } = req.params;
 
   const { error } = await supabase
@@ -310,8 +310,8 @@ router.delete('/:questionId/bookmark', async (req, res) => {
 
 // いいね追加
 // POST /api/v1/questions/:questionId/like
-router.post('/:questionId/like', async (req, res) => {
-  const userId = req.user?.id;
+router.post('/:questionId/like', requireAuth, async (req, res) => {
+  const userId = req.user!.id;
   const { questionId } = req.params;
 
   const { data: existing } = await supabase
@@ -339,8 +339,8 @@ router.post('/:questionId/like', async (req, res) => {
 
 // いいね解除
 // DELETE /api/v1/questions/:questionId/like
-router.delete('/:questionId/like', async (req, res) => {
-  const userId = req.user?.id;
+router.delete('/:questionId/like', requireAuth, async (req, res) => {
+  const userId = req.user!.id;
   const { questionId } = req.params;
 
   const { error } = await supabase
