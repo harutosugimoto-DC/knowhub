@@ -79,18 +79,21 @@ router.post('/', requireAuth, async (req, res) => {
 // 質問一覧取得
 // GET /api/v1/questions?page=1&order=new or likes
 router.get('/', requireAuth, async (req, res) => {
+     console.log('受け取ったクエリ:', req.query); // ← 追加
   const userId = req.user!.id;
-  const page = Number(req.query.page) || 1;
+  const page = Number(req.query.currentPage) || 1;
   const order = req.query.order as string | undefined ?? 'new';
   const keyword = req.query.keyword as string | undefined;
-  const tagIds = req.query.tagIds
-  ? (req.query.tagIds as string).split(',')
+  const statusIds = req.query['statusIds[]']
+  ? [req.query['statusIds[]']].flat() as string[]
   : undefined;
-const myActions = req.query.myActions
-  ? (req.query.myActions as string).split(',')
+
+const tagIds = req.query['tagIds[]']
+  ? [req.query['tagIds[]']].flat() as string[]
   : undefined;
-const statusNames = req.query.statuses
-  ? (req.query.statuses as string).split(',')
+
+const myActions = req.query['myActions[]']
+  ? [req.query['myActions[]']].flat() as string[]
   : undefined;
   const limit = 20;
   const offset = (page - 1) * limit;
@@ -99,16 +102,18 @@ const statusNames = req.query.statuses
   let query = supabase
     .from('questions')
     .select(`
-      id,
+     id,
       title,
       created_at,
+      user_id,
+      status_id,
       statuses ( name ),
-      users ( nickname ),
+      users ( nickname, profile_icon_url ),
       question_tags ( tags (id, name ) ),
       question_likes ( user_id ),
       bookmarks ( user_id ),
-      answers ( id )
-    `, { count: 'exact' }) // ← 総件数を取得
+      answers ( id, user_id, best_answer_at )
+    `, { count: 'exact' })
     .is('deleted_at', null)
     .range(offset, offset + limit - 1);
 
@@ -117,15 +122,7 @@ const statusNames = req.query.statuses
   query = query.or(`title.ilike.%${keyword}%,content.ilike.%${keyword}%`);
 }
 
-    // タグ絞り込み
- if (tagIds) {
-  query = query.in('question_tags.tag_id', tagIds);
-}
 
-  // ステータス絞り込み
-  if (statusNames) {
-  query = query.in('statuses.name', statusNames);
-}
 
   if (order === 'likes_asc' || order === 'likes_desc') {
   query = query.order('created_at', { ascending: false });
@@ -151,11 +148,11 @@ const statusNames = req.query.statuses
 }
 
   // ステータス絞り込み ← 追加
- if (statusNames) {
-  filtered = filtered.filter((q: any) =>
-    statusNames.includes(q.statuses?.name)
-  );
-}
+ if (statusIds) {
+    filtered = filtered.filter((q: any) =>
+      statusIds.includes(q.status_id)
+    );
+  }
 
   // マイアクション絞り込み
   if (myActions) {
@@ -196,12 +193,12 @@ const statusNames = req.query.statuses
 
 
   return res.json({
-    page,
+    currentPage: page,
     order,
     keyword: keyword ?? null,
-    tagIds: tagIds ?? null,
+    tagId: tagIds ?? null,
     myActions: myActions ?? null,
-    statuses: statusNames ?? null,
+    statusId: statusIds ?? null,
     totalCount,
     totalPages,
     data: formatted,
