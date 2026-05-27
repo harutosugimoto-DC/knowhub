@@ -1,6 +1,13 @@
 import axios from 'axios';
 
-// 🟢 同時進行しているAPIリクエストの数を数えるカウンター
+// axiosのリクエスト設定に独自のプロパティを追加するための型宣言
+declare module 'axios' {
+    interface InternalAxiosRequestConfig {
+        skipSuccessToast?: boolean; // trueのときは成功トーストを出さない
+    }
+}
+
+// 同時進行しているAPIリクエストの数を数えるカウンター
 let activeRequests = 0;
 
 // ローディングを開始する関数
@@ -28,11 +35,12 @@ const axiosClient = axios.create({
     },
 });
 
-// 2. リクエストインターセプター
+// リクエストインターセプター
 axiosClient.interceptors.request.use(
     (config) => {
         startLoading();
 
+        // localStorageからトークンを取得してヘッダーにセット
         const token = localStorage.getItem('token');
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
@@ -45,24 +53,36 @@ axiosClient.interceptors.request.use(
     }
 );
 
-// 3. レンスポンスインターセプター
+// レスポンスインターセプター
 axiosClient.interceptors.response.use(
     (response) => {
         stopLoading();
+
+        // 以下の3条件を全て満たす場合だけ成功トーストを発火する
+        // ① GET以外（POST・PATCH・DELETE）のリクエスト
+        // ② skipSuccessToast が true でない（いいね系はここでスキップされる）
+        // ③ バックエンドのレスポンスに message が存在する
+        if (
+            response.config.method !== 'get' &&
+            !response.config.skipSuccessToast &&
+            response.data?.message
+        ) {
+            window.dispatchEvent(new CustomEvent('global-success', { detail: response.data.message }));
+        }
+
         return response;
     },
     (error) => {
         stopLoading();
 
-        // 401エラー（認証切れ）の際の共通処理
+        // 401エラー（認証切れ）の処理
         if (error.response?.status === 401) {
-            // localStorage.removeItem('token');
-            // window.location.href = '/login';
             return Promise.reject(error);
         }
 
-        // 🟢 401以外のエラー（500サーバーエラーなど）を一括で画面に通知する
-        const errorMessage = error.response?.data?.error  || '通信エラーが発生しました';
+        // 401以外のエラーはエラートーストを発火
+        // .message はAPI設計書の共通レスポンス形式に合わせている
+        const errorMessage = error.response?.data?.message || '通信エラーが発生しました';
         window.dispatchEvent(new CustomEvent('global-error', { detail: errorMessage }));
 
         return Promise.reject(error);
@@ -70,3 +90,4 @@ axiosClient.interceptors.response.use(
 );
 
 export default axiosClient;
+
