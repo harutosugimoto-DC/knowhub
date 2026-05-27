@@ -10,9 +10,15 @@ router.get('/', async (req, res) => {
   const page = Number(req.query.page) || 1;
   const order = req.query.order === 'likes' ? 'likes' : 'new';
   const keyword = req.query.keyword as string | undefined;
-  const tagId = req.query.tagId as string | undefined;
-  const myAction = req.query.myAction as string | undefined;
-  const statusName = req.query.status as string | undefined;
+  const tagIds = req.query.tagIds
+  ? (req.query.tagIds as string).split(',')
+  : undefined;
+const myActions = req.query.myActions
+  ? (req.query.myActions as string).split(',')
+  : undefined;
+const statusNames = req.query.statuses
+  ? (req.query.statuses as string).split(',')
+  : undefined;
   const limit = 20;
   const offset = (page - 1) * limit;
   const userId = req.user?.id;
@@ -40,14 +46,14 @@ router.get('/', async (req, res) => {
 }
 
     // タグ絞り込み
-  if (tagId) {
-    query = query.eq('question_tags.tag_id', tagId);
-  }
+ if (tagIds) {
+  query = query.in('question_tags.tag_id', tagIds);
+}
 
   // ステータス絞り込み
-  if (statusName) {
-    query = query.eq('statuses.name', statusName);
-  }
+  if (statusNames) {
+  query = query.in('statuses.name', statusNames);
+}
 
   if (order === 'likes') {
     query = query.order('created_at', { ascending: false }); // いいね順は後述
@@ -64,36 +70,33 @@ router.get('/', async (req, res) => {
  let filtered = rawData ?? [];
 
   // タグ絞り込み
-  if (tagId) {
-    filtered = filtered.filter((q: any) =>
+  if (tagIds) {
+  filtered = filtered.filter((q: any) =>
+    tagIds.every((tagId) =>
       q.question_tags?.some((qt: any) => qt.tags?.id === tagId)
-    );
-  }
+    )
+  );
+}
 
   // ステータス絞り込み ← 追加
-  if (statusName) {
-    filtered = filtered.filter((q: any) =>
-      q.statuses?.name === statusName
-    );
-  }
+ if (statusNames) {
+  filtered = filtered.filter((q: any) =>
+    statusNames.includes(q.statuses?.name)
+  );
+}
 
   // マイアクション絞り込み
-  if (myAction === 'my_questions') {
-    filtered = filtered.filter((q: any) => q.user_id === userId);
-  } else if (myAction === 'my_answers') {
-    filtered = filtered.filter((q: any) =>
-      q.answers?.some((a: any) => a.user_id === userId)
-    );
-  } else if (myAction === 'my_solved') {
-    filtered = filtered.filter((q: any) =>
-      q.user_id === userId &&
-      q.answers?.some((a: any) => a.best_answer_at !== null)
-    );
-  } else if (myAction === 'bookmarked') {
-    filtered = filtered.filter((q: any) =>
-      q.bookmarks?.some((b: any) => b.user_id === userId)
-    );
-  }
+  if (myActions) {
+  filtered = filtered.filter((q: any) =>
+    myActions.some((action) => {
+      if (action === 'my_questions') return q.user_id === userId;
+      if (action === 'my_answers') return q.answers?.some((a: any) => a.user_id === userId);
+      if (action === 'my_solved') return q.user_id === userId && q.answers?.some((a: any) => a.best_answer_at !== null);
+      if (action === 'bookmarked') return q.bookmarks?.some((b: any) => b.user_id === userId);
+      return false;
+    })
+  );
+}
 
    const formatted = filtered.map((q: any) => ({
     id: q.id,
@@ -123,9 +126,9 @@ router.get('/', async (req, res) => {
     page,
     order,
     keyword: keyword ?? null,
-    tagId: tagId ?? null,
-    myAction: myAction ?? null,
-    status: statusName ?? null,
+    tagIds: tagIds ?? null,
+    myActions: myActions ?? null,
+    statuses: statusNames ?? null,
     totalCount,
     totalPages,
     data: formatted,
