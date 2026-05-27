@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 
 import Avatar from "@/components/common/Avatar";
@@ -11,23 +11,82 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { HiMiniPencilSquare } from "react-icons/hi2";
 import { useUser } from "@/contexts/UserContext";
+import { getNotifications, type NotificationType } from "@/api/notificationService";
+import { supabase } from "@/lib/supabase";
 
 export default function Header() {
     const navigate = useNavigate();
     const { user, logout } = useUser();
     const isLoggedIn = !!user;
 
-    const [showNotification, setShowNotification] = useState(false);
-    const [notifications, setNotifications] = useState([
-        { linkUrl: "/question/1", type: "question", createdAt: new Date(), isRead: false },
-        { linkUrl: "/question/2", type: "question", createdAt: new Date(), isRead: true },
-        { linkUrl: "/question/2", type: "question", createdAt: new Date(), isRead: false },
-        { linkUrl: "/question/2", type: "like", createdAt: new Date(), isRead: true },
-        { linkUrl: "/question/2", type: "like", createdAt: new Date(), isRead: false },
-        { linkUrl: "/question/2", type: "question", createdAt: new Date(), isRead: true }
-    ]);
+    const [showNotification, setShowNotification] = useState<boolean>(false);
+    const [notifications, setNotifications] = useState<NotificationType[]>([]);
 
-    const unreadCount = notifications.filter(n => !n.isRead).length;
+    const unreadCount = useMemo(() => {
+        return notifications.filter(n => !n.isRead).length;
+    }, [notifications]);
+
+    useEffect(() => {
+        // 未ログイン、またはユーザーIDが取得できない場合は購読しない
+        if (!isLoggedIn || !user?.id) {
+            setNotifications([]);
+            return;
+        }
+
+        // ① 初回レンダリング時に既存の通知をAPIから取得
+        const fetchNotifications = async () => {
+            try {
+                const response = await getNotifications();
+                console.log(response);
+                
+                setNotifications(response);
+            } catch (err) {
+                console.error("通知の取得に失敗しました:", err);
+            }
+        };
+        fetchNotifications();
+
+        // ② Supabase Realtime でデータベースの変更をリアルタイム監視
+        const channel = supabase
+            .channel(`realtime-notifications-${user.id}`)
+            .on(
+                "postgres_changes",
+                {
+                    event: "*", // INSERT, UPDATE, DELETE のすべてを検知
+                    schema: "public",
+                    table: "notifications",
+                    filter: `user_id=eq.${user.id}`, // 💡 ログインユーザー自身の通知のみに絞り込み
+                },
+                (payload) => {
+                    console.log(payload);
+                    
+                    // 新しい通知が届いた時 (INSERT)
+                    if (payload.eventType === "INSERT") {
+                        const newNotification = payload.new as NotificationType;
+                        setNotifications((prev) => [newNotification, ...prev]); // 配列の先頭に追加
+                    }
+
+                    // 通知が「既読」などに更新された時 (UPDATE)
+                    else if (payload.eventType === "UPDATE") {
+                        const updatedNotification = payload.new as NotificationType;
+                        setNotifications((prev) =>
+                            prev.map((n) => (n.id === updatedNotification.id ? updatedNotification : n))
+                        );
+                    }
+
+                    // 通知が削除された時 (DELETE)
+                    else if (payload.eventType === "DELETE") {
+                        setNotifications((prev) => prev.filter((n) => n.id !== payload.old.id));
+                    }
+                }
+            )
+            .subscribe();
+
+        // ③ クリーンアップ：コンポーネントがアンマウントされたら接続を解除
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [isLoggedIn, user?.id]);
 
     const handleLogout = async () => {
         await logout();
