@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 type BookmarkProps = {
     isBookmarked: boolean;
     count: number;
-    id: number
+    id: string
 };
 
 export default function Bookmark({ isBookmarked, count, id }: BookmarkProps) {
@@ -19,7 +19,8 @@ export default function Bookmark({ isBookmarked, count, id }: BookmarkProps) {
         setCountState(count);
     }, [isBookmarked, count]);
 
-    const handleClick = async () => {
+    const handleClick = async (e:React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+        e.stopPropagation()
         if (isPending) return; // 通信中はクリックを無視（連打対策）
 
         // 先に見ための状態をトグルする

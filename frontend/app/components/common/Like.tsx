@@ -1,12 +1,12 @@
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import { useEffect, useState } from 'react';
 import { addLike, removeLike } from '@/api/questionService';
-import answerService from '@/api/answerService'; 
+import answerService from '@/api/answerService';
 
 type LikeProps = {
     isLiked: boolean;
     count: number;
-    id: number;
+    id: string;
     type: "question" | "answer";
 };
 
@@ -20,7 +20,8 @@ export default function Like({ isLiked, count, id, type }: LikeProps) {
         setCountState(count);
     }, [isLiked, count]);
 
-    const handleClick = async () => {
+    const handleClick = async (e:React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+        e.stopPropagation()
         if (isPending) return; // 通信中はクリックを無視（連打対策）
 
         // 先に見ための状態をトグルする
@@ -59,9 +60,8 @@ export default function Like({ isLiked, count, id, type }: LikeProps) {
     return (
         <div className='inline-flex items-center gap-1'>
             <FavoriteIcon
-                className={`cursor-pointer transition-colors ${
-                    likedState ? 'text-[var(--like-color)]' : 'text-[var(--light-gray)]'
-                } ${isPending ? 'opacity-50 Fpointer-events-none' : ''}`}
+                className={`cursor-pointer transition-colors ${likedState ? 'text-[var(--like-color)]' : 'text-[var(--light-gray)]'
+                    } ${isPending ? 'opacity-50 Fpointer-events-none' : ''}`}
                 onClick={handleClick}
             />
             <span>{countState}</span>
