@@ -80,7 +80,7 @@ router.post('/', requireAuth, async (req, res) => {
 // GET /api/v1/questions?page=1&order=new or likes
 router.get('/', async (req, res) => {
   const page = Number(req.query.page) || 1;
-  const order = req.query.order === 'likes' ? 'likes' : 'new';
+  const order = req.query.order as string | undefined ?? 'new';
   const keyword = req.query.keyword as string | undefined;
   const tagIds = req.query.tagIds
   ? (req.query.tagIds as string).split(',')
@@ -126,11 +126,11 @@ const statusNames = req.query.statuses
   query = query.in('statuses.name', statusNames);
 }
 
-  if (order === 'likes') {
-    query = query.order('created_at', { ascending: false }); // いいね順は後述
-  } else {
-    query = query.order('created_at', { ascending: false });
-  }
+  if (order === 'likes_asc' || order === 'likes_desc') {
+  query = query.order('created_at', { ascending: false });
+    } else {
+  query = query.order('created_at', { ascending: false });
+    }
 
   const { data: rawData,count,error } = await query;
 
@@ -184,9 +184,11 @@ const statusNames = req.query.statuses
   }));
 
   // いいね順の場合はアプリ側でソート
-  if (order === 'likes') {
-    formatted.sort((a, b) => b.likeCount - a.likeCount);
-  }
+  if (order === 'likes_desc') {
+  formatted.sort((a, b) => b.likeCount - a.likeCount); // 降順
+} else if (order === 'likes_asc') {
+  formatted.sort((a, b) => a.likeCount - b.likeCount); // 昇順
+}
 
   const totalCount = count ?? 0;
   const totalPages = Math.ceil(totalCount / limit);
