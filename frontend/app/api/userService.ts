@@ -41,6 +41,26 @@ export const updateProfileIcon = async (file: File): Promise<ProfileIconResponse
     return response.data;
 };
 
+/**
+ * ユーザーのよく回答しているタグ一覧取得
+ * @param userId 
+ * @returns 
+ */
+export const getTopTags = async (userId: string): Promise<({ name: string, count: number })[]> => {
+    const response = await axiosClient.get<({ name: string, count: number })[]>(`usrs/${userId}/top-tags`)
+    return response.data
+}
+
+/**
+ * ユーザーの活動推移取得
+ * @param userId 
+ * @returns 
+ */
+export const getActivity = async (userId: string): Promise<({ month: string, count: number })[]> => {
+    const response = await axiosClient.get<({ month: string, count: number })[]>(`users/${userId}/activity`)
+    return response.data
+}
+
 
 const userService = {
     updateProfileIcon,
