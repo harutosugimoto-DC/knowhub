@@ -1,23 +1,28 @@
-export type AnswerReplyType = {
-    id: number;
+export interface AnswerReplyType {
+    id: string;
     iconURL: string;
-    isLiked: boolean;
     userName: string;
     content: string;
     postingTime: string;
+    isLiked: boolean;
     likeCount: number;
-    replyCount: number;
+    replies?: AnswerReplyType[];
 };
 
-export type AnswerType = {
-    id: number;
+export interface AnswerType {
+    id: string;
     iconURL: string;
-    isLiked: boolean;
     userName: string;
     content: string;
     postingTime: string;
     likeCount: number;
-    replyCount: number;
+    isLiked: boolean;
     isBestAnswer: boolean;
-    replies?: AnswerReplyType[]; 
+    replies?: AnswerReplyType[];
 };
+
+export interface postAnswerType {
+    questionId: string,
+    content: string,
+    pearentAnswerId?: string
+}

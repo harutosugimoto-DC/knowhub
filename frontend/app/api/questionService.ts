@@ -1,69 +1,86 @@
-import type { QuestionType } from "@/types/question";
+import type { GetQuestionsParams, GetQuestionsResponse, QuestionDetail, QuestionType } from "@/types/question";
 import axiosClient from "./axiosClient";
-
-export interface GetQuestionsParams {
-    page?: number;
-    order?: 'new' | 'likes';
-    keyword?: string;
-    tagId?: string;
-}
-
-
-export interface GetQuestionsResponse {
-    page: number;
-    order: string;
-    keyword: string | null;
-    tagId: string | null;
-    data: QuestionType[];
-}
-
-export interface QuestionDetail extends QuestionType {
-    content: string;
-}
+import type { AnswerType, postAnswerType } from "@/types/answer";
 
 interface CommonResponse {
     message: string;
 }
 
-// --- API呼び出し関数群 ---
-
-// 1. 質問一覧取得
+/**
+ * 質問一覧取得 
+ * @param params 
+ * @returns 
+ */
 export const getQuestions = async (params?: GetQuestionsParams): Promise<GetQuestionsResponse> => {
     const response = await axiosClient.get<GetQuestionsResponse>('/questions', { params });
     return response.data;
 };
 
-// 2. 質問詳細取得
-export const getQuestionById = async (questionId: number | string): Promise<QuestionDetail> => {
+/**
+ * 質問詳細取得
+ * @param questionId 
+ * @returns 
+ */
+export const getQuestionById = async (questionId: string): Promise<QuestionDetail> => {
     const response = await axiosClient.get<QuestionDetail>(`/questions/${questionId}`);
     return response.data;
 };
 
-// 3. ブックマーク追加
-export const addBookmark = async (questionId: number | string): Promise<CommonResponse> => {
+/**
+ * その質問の回答一覧取得
+ * @param questionId 
+ * @returns 
+ */
+export const getQuestionAnswers = async (questionId: string): Promise<AnswerType[]> => {
+    const response = await axiosClient.get<AnswerType[]>(`/questions/${questionId}/answer`);
+    return response.data;
+};
+
+export const postAnswer = async (params: postAnswerType): Promise<CommonResponse> => {
+    const response = await axiosClient.get<CommonResponse>(`/questions/${params.questionId}/answer`, { params });
+    return response.data;
+};
+
+/**
+ * 質問のブックマーク追加
+ * @param questionId 
+ * @returns 
+ */
+export const addBookmark = async (questionId: string): Promise<CommonResponse> => {
     const response = await axiosClient.post<CommonResponse>(`/questions/${questionId}/bookmark`);
     return response.data;
 };
 
-// 4. ブックマーク解除
-export const removeBookmark = async (questionId: number | string): Promise<CommonResponse> => {
+/**
+ * 質問のブックマーク解除
+ * @param questionId 
+ * @returns 
+ */
+export const removeBookmark = async (questionId: string): Promise<CommonResponse> => {
     const response = await axiosClient.delete<CommonResponse>(`/questions/${questionId}/bookmark`);
     return response.data;
 };
 
-// 5. いいね追加
-export const addLike = async (questionId: number | string): Promise<CommonResponse> => {
+/**
+ * 質問のいいね追加
+ * @param questionId 
+ * @returns 
+ */
+export const addLike = async (questionId: string): Promise<CommonResponse> => {
     const response = await axiosClient.post<CommonResponse>(`/questions/${questionId}/like`);
     return response.data;
 };
 
-// 6. いいね解除
-export const removeLike = async (questionId: number | string): Promise<CommonResponse> => {
+/**
+ * 質問のいいね解除
+ * @param questionId 
+ * @returns 
+ */
+export const removeLike = async (questionId: string): Promise<CommonResponse> => {
     const response = await axiosClient.delete<CommonResponse>(`/questions/${questionId}/like`);
     return response.data;
 };
 
-// まとめてデフォルトエクスポート
 const questionService = {
     getQuestions,
     getQuestionById,
