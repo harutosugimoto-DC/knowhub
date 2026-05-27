@@ -17,6 +17,7 @@ type QuestionDetailCardProps = {
 
 export default function QuestionDetailCard({ question }: QuestionDetailCardProps) {
     const {
+        id,
         title,
         statusId,
         isLiked = false,
@@ -74,8 +75,8 @@ export default function QuestionDetailCard({ question }: QuestionDetailCardProps
                 </div>
 
                 <div className="flex items-center gap-2 ">
-                    <Bookmark isBookmarked={isBookmarked} count={bookmarkCount} />
-                    <Like isLiked={isLiked} count={likeCount} />
+                    <Bookmark id={id} isBookmarked={isBookmarked} count={bookmarkCount} />
+                    <Like id={id} type="question" isLiked={isLiked} count={likeCount} />
                     <Comment count={replyCount} />
                 </div>
             </div>

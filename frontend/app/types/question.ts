@@ -1,13 +1,39 @@
-export type QuestionType = {
-    id:number,
+export interface QuestionType {
+    id: string,
     title: string;
-    statusId: number;
-    isLiked?: boolean;
-    isBookmarked?: boolean;
+    iconURL: string;
+    statusId: string;
+    isLiked: boolean;
+    isBookmarked: boolean;
     userName: string;
-    postingTime: Date;
+    postingTime: string;
     likeCount: number;
     bookmarkCount: number;
     replyCount: number;
     tagNames: string[];
 };
+
+export interface QuestionDetail extends QuestionType {
+    userId: string;
+    content: string;
+}
+
+export interface GetQuestionsParams {
+    currentPage: number,
+    order: 'likesAsc' | 'likesDesc' | 'newAsc' | 'newDesc',
+    keyword?: string,
+    tagIds?: string[],
+    myActions?: ('my_questions' | 'my_answers' | 'my_solved' | 'bookmarked')[],
+    statusIds?: string[],
+}
+
+export interface GetQuestionsResponse {
+    currentPage: number,
+    totalPages: number,
+    order: 'likesAsc' | 'likesDesc' | 'newAsc' | 'newDesc',
+    keyword: string | null,
+    tagId: string | null,
+    myAction: ('my_questions' | 'my_answers' | 'my_solved' | 'bookmarked') | null,
+    statusId: string | null,
+    data: QuestionType[]
+}
