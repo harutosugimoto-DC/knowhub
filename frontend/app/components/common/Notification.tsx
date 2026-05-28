@@ -31,10 +31,14 @@ export default function Notification({ notifications }: NotificationProps) {
                 {notifications.map((notification, i) => (
                     <NotificationItem
                         key={i}
-                        linkUrl={notification.linkUrl}
-                        type={notification.type}
                         createdAt={notification.createdAt}
+                        id={notification.id}
                         isRead={notification.isRead}
+                        linkUrl={notification.linkUrl}
+                        senderIcon={notification.senderIcon}
+                        senderName={notification.senderName}
+                        type={notification.type}
+                        questionTitle={notification.questionTitle}
                     />
                 ))}
             </ScrollBar>
