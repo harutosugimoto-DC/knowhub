@@ -56,6 +56,7 @@ const DropdownMenu = ({ options, value, onChange }: Props) => {
       <button
         onClick={() => setIsOpen((prev) => !prev)}
         className="
+          cursor-pointer
           flex items-center justify-between
           w-[168px] h-[40px]
           border border-[var(--light-gray)]
@@ -95,6 +96,7 @@ const DropdownMenu = ({ options, value, onChange }: Props) => {
               <button
                 onClick={() => handleSelect(option.value)}
                 className="
+                  cursor-pointer
                   w-full h-[40px]
                   flex items-center
                   px-3
