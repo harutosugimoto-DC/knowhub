@@ -24,8 +24,6 @@ import { DROP_DOWN_OPTIONS, MY_ACTIONS } from "@/constants/Filter"
 export default function Top() {
     const navigate = useNavigate();
 
-    const MAX_PAGE = 5;
-
     // --- ステート定義 ---
     const [questions, setQuestions] = useState<QuestionType[]>([]);
     const { statuses, tags } = useMasterData();
@@ -33,6 +31,7 @@ export default function Top() {
         DROP_DOWN_OPTIONS[0].value as "newDesc" | "newAsc" | "likesDesc" | "likesAsc"
     );
     const [currentPage, setCurrentPage] = useState<number>(1);
+    const [maxPage, setMaxPage] = useState<number>(1)
 
     // フィルター・検索用
     const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -79,8 +78,6 @@ export default function Top() {
     };
 
     useEffect(() => {
-        console.log(currentPage, currentSortOption, activeKeyword, selectedStatusIds, selectedTagIds, selectedMyActionIds);
-
         const fetchQuestionsData = async () => {
             try {
 
@@ -101,7 +98,6 @@ export default function Top() {
         };
 
         fetchQuestionsData();
-        // 💡 選択中のフィルター状態を依存配列に追加し、チップクリック時に再取得が走るように修正
     }, [currentPage, currentSortOption, activeKeyword, selectedStatusIds, selectedTagIds, selectedMyActionIds]);
 
     return (
@@ -211,7 +207,7 @@ export default function Top() {
                     ))}
                 </div>
             </ScrollBar>
-            <Pagination current={currentPage} max={MAX_PAGE} onPageChange={pageChange} />
+            <Pagination current={currentPage} max={maxPage} onPageChange={pageChange} />
         </div>
     );
 }
