@@ -45,8 +45,9 @@ export default function Header() {
         fetchNotifications();
 
         // ② Supabase Realtime でデータベースの変更をリアルタイム監視
-        // Strict Mode の二重実行で同名チャンネルが残留しないよう、毎回ユニークな名前を使う
+
         const channelName = `realtime-notifications-${user.id}-${Math.random().toString(36).slice(2)}`;
+
         const targetFilter = `receiver_user_id=eq.${user.id}`;
 
         const channel = supabase
