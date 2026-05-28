@@ -90,7 +90,7 @@ export default function Top() {
                     tagIds: selectedTagIds.length > 0 ? selectedTagIds : undefined,
                     myActions: selectedMyActionIds.length > 0 ? selectedMyActionIds : undefined,
                 });
-
+                setMaxPage(response.totalPages)
                 setQuestions(response.data);
             } catch (err: any) {
                 console.error('質問の取得に失敗しました:', err);
