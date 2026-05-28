@@ -351,7 +351,7 @@ router.patch('/me/icon', requireAuth, upload.single('icon'), async (req, res) =>
   }
 
   // 現在のアイコンURLを取得
-  const { data: currentUser } = await supabase
+  const { data: currentUser } = await supabaseAdmin
     .from('users')
     .select('profile_icon_url')
     .eq('id', userId)
@@ -361,12 +361,12 @@ router.patch('/me/icon', requireAuth, upload.single('icon'), async (req, res) =>
   const isDefaultIcon = currentUser?.profile_icon_url === process.env.DEFAULT_ICON_URL;
   if (currentUser?.profile_icon_url && !isDefaultIcon) {
     const oldPath = currentUser.profile_icon_url.split('/avatars/')[1];
-    await supabase.storage.from('avatars').remove([oldPath]);
+    await supabaseAdmin.storage.from('avatars').remove([oldPath]);
   }
 
   // 新しいアイコンをStorageにアップロード
   const filePath = `icons/${userId}/${Date.now()}`;
-  const { error: uploadError } = await supabase.storage
+  const { error: uploadError } = await supabaseAdmin.storage
     .from('avatars')
     .upload(filePath, file.buffer, { contentType: file.mimetype });
 
@@ -376,11 +376,11 @@ router.patch('/me/icon', requireAuth, upload.single('icon'), async (req, res) =>
   }
 
   // 公開URLを取得してDBを更新
-  const { data: { publicUrl } } = supabase.storage
+  const { data: { publicUrl } } = supabaseAdmin.storage
     .from('avatars')
     .getPublicUrl(filePath);
 
-  const { data, error: updateError } = await supabase
+  const { data, error: updateError } = await supabaseAdmin
     .from('users')
     .update({ profile_icon_url: publicUrl })
     .eq('id', userId)
