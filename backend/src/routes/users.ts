@@ -214,6 +214,64 @@ router.get('/me/recently-solved', requireAuth, async (req, res) => {
   return res.json(formatted);
 });
 
+// 1ヶ月ごとの回答件数取得
+// GET /api/v1/users/:userId/activity?from=2026-01&to=2026-06
+router.get('/me/activity', requireAuth, async (req, res) => {
+  const userId = req.user!.id;
+  const from = req.query.from as string | undefined;
+  const to = req.query.to as string | undefined;
+
+  let query = supabase
+    .from('answers')
+    .select('created_at')
+    .eq('user_id', userId)
+    .is('deleted_at', null);
+
+  if (from) {
+    query = query.gte('created_at', `${from}-01`);
+  }
+  if (to) {
+    query = query.lte('created_at', `${to}-31`);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error('Supabase error fetching activity:', error);
+    return res.status(500).json({ error: 'Failed to fetch activity' });
+  }
+
+  // fromとtoの間の全月を生成
+  const months: string[] = [];
+  if (from && to) {
+    const current = new Date(`${from}-01`);
+    const end = new Date(`${to}-01`);
+    while (current <= end) {
+      months.push(current.toISOString().slice(0, 7));
+      current.setMonth(current.getMonth() + 1);
+    }
+  }
+
+  // 月ごとに集計
+  const monthlyCounts: { [key: string]: number } = {};
+  months.forEach((month) => {
+    monthlyCounts[month] = 0; // データがない月は0で初期化
+  });
+
+  (data ?? []).forEach((answer: any) => {
+    const month = answer.created_at.slice(0, 7);
+    if (monthlyCounts[month] !== undefined) {
+      monthlyCounts[month] += 1;
+    }
+  });
+
+  const formatted = Object.entries(monthlyCounts)
+    .map(([month, count]) => ({ month, count }))
+    .sort((a, b) => a.month.localeCompare(b.month));
+
+  return res.json(formatted);
+});
+
 // プロフィールアイコン取得
 // GET /profile/:userId
 router.get('/:userId', async (req, res) => {
