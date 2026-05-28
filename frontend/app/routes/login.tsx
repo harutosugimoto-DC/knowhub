@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { redirect } from "react-router";
 import { supabase } from "@/lib/supabase";
 import logo from "../assets/logo.webp";
 
@@ -13,16 +12,6 @@ const GoogleIcon = () => (
     </svg>
 );
 
-// 【clientLoader】ページ表示前にブラウザ側で実行される処理
-export async function clientLoader() {
-    // すでにログイン済みの場合はトップへ
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) {
-        return redirect("/top");
-    }
-    return null;
-}
-
 export default function Login() {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
@@ -30,7 +19,7 @@ export default function Login() {
     const handleGoogleLoginClick = async () => {
         setIsLoading(true);
         setError(null);
-        
+
         try {
             const { error: authError } = await supabase.auth.signInWithOAuth({
                 provider: "google",

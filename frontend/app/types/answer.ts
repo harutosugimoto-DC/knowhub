@@ -1,16 +1,18 @@
 export interface AnswerReplyType {
     id: string;
+    userId: string;
     iconURL: string;
     userName: string;
     content: string;
     postingTime: string;
     isLiked: boolean;
     likeCount: number;
-    replies?: AnswerReplyType[];
+    replies: AnswerReplyType[];
 };
 
 export interface AnswerType {
     id: string;
+    userId: string;
     iconURL: string;
     userName: string;
     content: string;
@@ -18,11 +20,11 @@ export interface AnswerType {
     likeCount: number;
     isLiked: boolean;
     isBestAnswer: boolean;
-    replies?: AnswerReplyType[];
+    replies: AnswerReplyType[];
 };
 
 export interface postAnswerType {
     questionId: string,
     content: string,
-    pearentAnswerId?: string
+    parentAnswerId?: string
 }
