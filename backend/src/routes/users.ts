@@ -273,9 +273,9 @@ router.get('/me/activity', requireAuth, async (req, res) => {
 });
 
 // プロフィールアイコン取得
-// GET /profile/:userId
-router.get('/:userId', async (req, res) => {
-  const { userId } = req.params;
+// GET /api/v1/users/me/icon
+router.get('/me/icon', requireAuth, async (req, res) => {
+  const userId = req.user!.id;
 
   const { data, error } = await supabase
     .from('users')
@@ -296,8 +296,8 @@ router.get('/:userId', async (req, res) => {
 });
 
 // プロフィールアイコン更新
-// PATCH /profile/:userId/icon
-router.patch('/:userId/icon', requireAuth, upload.single('icon'), async (req, res) => {
+// PATCH /api/v1/users/me/icon
+router.patch('/me/icon', requireAuth, upload.single('icon'), async (req, res) => {
   const { userId } = req.user!.id === req.params.userId ? req.params : { userId: req.user!.id };
   const file = req.file;
 
