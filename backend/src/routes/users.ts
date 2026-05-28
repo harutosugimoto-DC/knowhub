@@ -274,7 +274,7 @@ router.get('/me/activity', requireAuth, async (req, res) => {
 
 // 自分がよく回答しているタグ上位4件取得
 // GET /api/v1/users/me/favorite-tags
-router.get('/me/favorite-tags', requireAuth, async (req, res) => {
+router.get('/me/top-tags', requireAuth, async (req, res) => {
   const userId = req.user!.id;
 
   // 自分が回答した質問のタグを全件取得
