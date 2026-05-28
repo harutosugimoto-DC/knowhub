@@ -32,7 +32,7 @@ export const updateProfileIcon = async (file: File): Promise<ProfileIconResponse
     const formData = new FormData();
     formData.append('icon', file);
 
-    const response = await axiosClient.patch<ProfileIconResponse>('/profile/icon', formData, {
+    const response = await axiosClient.patch<ProfileIconResponse>(`/users/me/icon`, formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
@@ -43,11 +43,10 @@ export const updateProfileIcon = async (file: File): Promise<ProfileIconResponse
 
 /**
  * ユーザーのよく回答しているタグ一覧取得
- * @param userId 
  * @returns 
  */
-export const getTopTags = async (userId: string): Promise<({ name: string, count: number })[]> => {
-    const response = await axiosClient.get<({ name: string, count: number })[]>(`usrs/${userId}/top-tags`)
+export const getTopTags = async (): Promise<({ name: string, count: number })[]> => {
+    const response = await axiosClient.get<({ name: string, count: number })[]>(`users/me/top-tags`)
     return response.data
 }
 
@@ -56,8 +55,8 @@ export const getTopTags = async (userId: string): Promise<({ name: string, count
  * @param userId 
  * @returns 
  */
-export const getActivity = async (userId: string): Promise<({ month: string, count: number })[]> => {
-    const response = await axiosClient.get<({ month: string, count: number })[]>(`users/${userId}/activity`)
+export const getActivity = async (): Promise<({ month: string, count: number })[]> => {
+    const response = await axiosClient.get<({ month: string, count: number })[]>(`users/me/activity`)
     return response.data
 }
 
