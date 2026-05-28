@@ -239,8 +239,8 @@ router.get('/:userId', async (req, res) => {
 
 // プロフィールアイコン更新
 // PATCH /profile/:userId/icon
-router.patch('/:userId/icon', upload.single('icon'), async (req, res) => {
-  const { userId } = req.params;
+router.patch('/:userId/icon', requireAuth, upload.single('icon'), async (req, res) => {
+  const { userId } = req.user!.id === req.params.userId ? req.params : { userId: req.user!.id };
   const file = req.file;
 
   if (!file) {
