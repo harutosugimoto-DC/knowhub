@@ -29,11 +29,12 @@ export interface GetQuestionsParams {
 
 export interface GetQuestionsResponse {
     currentPage: number,
+    iconUrl:string,
     totalPages: number,
     order: 'likesAsc' | 'likesDesc' | 'newAsc' | 'newDesc',
     keyword: string | null,
-    tagId: string | null,
-    myAction: ('my_questions' | 'my_answers' | 'my_solved' | 'bookmarked') | null,
-    statusId: string | null,
+    tagId: string[] | null,
+    myActions: ('my_questions' | 'my_answers' | 'my_solved' | 'bookmarked') | null,
+    statusId: string[] | null,
     data: QuestionType[]
 }
