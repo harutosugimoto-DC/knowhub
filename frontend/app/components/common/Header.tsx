@@ -38,7 +38,7 @@ export default function Header() {
             try {
                 const response = await getNotifications();
                 console.log(response);
-                
+
                 setNotifications(response);
             } catch (err) {
                 console.error("通知の取得に失敗しました:", err);
@@ -47,8 +47,14 @@ export default function Header() {
         fetchNotifications();
 
         // ② Supabase Realtime でデータベースの変更をリアルタイム監視
+        // 既存の同名チャンネルを削除してから新規作成（React StrictMode の二重実行対策）
+        const channelName = `realtime-notifications-${user.id}`;
+        supabase.getChannels()
+            .filter(ch => ch.topic === `realtime:${channelName}`)
+            .forEach(ch => supabase.removeChannel(ch));
+
         const channel = supabase
-            .channel(`realtime-notifications-${user.id}`)
+            .channel(channelName)
             .on(
                 "postgres_changes",
                 {
@@ -59,7 +65,7 @@ export default function Header() {
                 },
                 (payload) => {
                     console.log(payload);
-                    
+
                     // 新しい通知が届いた時 (INSERT)
                     if (payload.eventType === "INSERT") {
                         const newNotification = payload.new as NotificationType;

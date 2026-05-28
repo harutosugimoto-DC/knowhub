@@ -76,6 +76,40 @@ router.post('/', requireAuth, async (req, res) => {
   return res.status(201).json({ questionId: question.id });
 });
 
+// 質問削除（soft delete）
+// DELETE /api/v1/questions/:questionId
+router.delete('/:questionId', requireAuth, async (req, res) => {
+  const userId = req.user!.id;
+  const { questionId } = req.params;
+
+  // 投稿者本人かどうか確認
+  const { data: question, error: fetchError } = await supabase
+    .from('questions')
+    .select('id, user_id')
+    .eq('id', questionId)
+    .is('deleted_at', null)
+    .single();
+
+  if (fetchError || !question) {
+    return res.status(404).json({ message: '質問が見つかりません' });
+  }
+
+  if (question.user_id !== userId) {
+    return res.status(403).json({ message: '投稿者本人のみ削除できます' });
+  }
+
+  const { error: deleteError } = await supabase
+    .from('questions')
+    .update({ deleted_at: new Date().toISOString() })
+    .eq('id', questionId);
+
+  if (deleteError) {
+    return res.status(500).json({ message: '削除に失敗しました' });
+  }
+
+  return res.status(200).json({ message: '削除しました' });
+});
+
 // 質問一覧取得
 // GET /api/v1/questions?page=1&order=new or likes
 router.get('/', requireAuth, async (req, res) => {
@@ -123,15 +157,31 @@ const myActions = req.query['myActions[]']
 
 
 
-  if (order === 'newAsc') {
-    query = query.order('created_at', { ascending: true });
-  } else {
-    query = query.order('created_at', { ascending: false });
-  }
+  if (order === 'likes_asc' || order === 'likes_desc') {
+  query = query.order('created_at', { ascending: false });
+    } else {
+  query = query.order('created_at', { ascending: false });
+    }
 
   const { data: rawData,count,error } = await query;
 
   if (error) {
+    // PGRST103: ページ範囲外（総件数より大きいオフセットを指定した場合）
+    // → 空リストを正常レスポンスとして返す
+    if (error.code === 'PGRST103') {
+      return res.json({
+        currentPage: page,
+        order,
+        keyword: keyword ?? null,
+        tagId: tagIds ?? null,
+        myActions: myActions ?? null,
+        statusId: statusIds ?? null,
+        totalCount: 0,
+        totalPages: 0,
+        data: [],
+      });
+    }
+    console.error('Supabase error fetching questions:', error);
     return res.status(500).json({ error: error.message });
   }
 
@@ -146,7 +196,7 @@ const myActions = req.query['myActions[]']
   );
 }
 
-  // ステータス絞り込み ← 追加
+  // ステータス絞り込み
  if (statusIds) {
     filtered = filtered.filter((q: any) =>
       statusIds.includes(q.status_id)
@@ -169,7 +219,6 @@ const myActions = req.query['myActions[]']
   const formatted = filtered.map((q: any) => ({
     id: q.id,
     title: q.title,
-    iconUrl: q.users!.profile_icon_url ?? null,
     statusId: q.statuses?.name,
     userName: q.users?.nickname,
     postingTime: q.created_at,
@@ -182,11 +231,11 @@ const myActions = req.query['myActions[]']
   }));
 
   // いいね順の場合はアプリ側でソート
-  if (order === 'likesDesc') {
-    formatted.sort((a, b) => b.likeCount - a.likeCount);
-  } else if (order === 'likesAsc') {
-    formatted.sort((a, b) => a.likeCount - b.likeCount);
-  }
+  if (order === 'likes_desc') {
+  formatted.sort((a, b) => b.likeCount - a.likeCount); // 降順
+} else if (order === 'likes_asc') {
+  formatted.sort((a, b) => a.likeCount - b.likeCount); // 昇順
+}
 
   const totalCount = count ?? 0;
   const totalPages = Math.ceil(totalCount / limit);
@@ -215,11 +264,12 @@ router.get('/:questionId', requireAuth, async (req, res) => {
     .from('questions')
     .select(`
       id,
+      user_id,
       title,
       content,
       created_at,
       statuses ( name ),
-      users ( nickname ),
+      users ( nickname, profile_icon_url ),
       question_tags ( tags ( name ) ),
       question_likes ( user_id ),
       bookmarks ( user_id ),
@@ -241,10 +291,12 @@ router.get('/:questionId', requireAuth, async (req, res) => {
 
   const formatted = {
     id: data.id,
+    userId: data.user_id,
     title: data.title,
     content: data.content,
     statusId: data.statuses?.name,
     userName: data.users?.nickname,
+    iconURL: data.users?.profile_icon_url ?? '',
     postingTime: data.created_at,
     likeCount: data.question_likes?.length ?? 0,
     bookmarkCount: data.bookmarks?.length ?? 0,
@@ -255,6 +307,100 @@ router.get('/:questionId', requireAuth, async (req, res) => {
   };
 
   return res.json(formatted);
+});
+
+// 回答・返信一覧取得（ツリー構造で返す）
+// GET /api/v1/questions/:questionId/answers
+router.get('/:questionId/answers', requireAuth, async (req, res) => {
+  const userId = req.user!.id;
+  const { questionId } = req.params;
+
+  const { data, error } = await supabase
+    .from('answers')
+    .select(`
+      id,
+      user_id,
+      parent_answer_id,
+      content,
+      created_at,
+      best_answer_at,
+      users ( nickname, profile_icon_url ),
+      answer_likes ( user_id )
+    `)
+    .eq('question_id', questionId)
+    .is('deleted_at', null)
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    return res.status(500).json({ error: error.message });
+  }
+
+  const items = (data ?? []) as any[];
+
+  // フラットなリストをツリー構造に変換
+  const map = new Map<string, any>();
+  items.forEach((item) => {
+    map.set(item.id, {
+      id: item.id,
+      userId: item.user_id,
+      userName: item.users?.nickname ?? '不明',
+      iconURL: item.users?.profile_icon_url ?? '',
+      content: item.content,
+      postingTime: item.created_at,
+      likeCount: item.answer_likes?.length ?? 0,
+      isLiked: item.answer_likes?.some((l: any) => l.user_id === userId) ?? false,
+      isBestAnswer: item.best_answer_at !== null,
+      replies: [],
+    });
+  });
+
+  const roots: any[] = [];
+  items.forEach((item) => {
+    const node = map.get(item.id)!;
+    if (item.parent_answer_id) {
+      const parent = map.get(item.parent_answer_id);
+      if (parent) {
+        parent.replies.push(node);
+      }
+    } else {
+      roots.push(node);
+    }
+  });
+
+  return res.json(roots);
+});
+
+// 回答・返信投稿
+// POST /api/v1/questions/:questionId/answers
+router.post('/:questionId/answers', requireAuth, async (req, res) => {
+  const userId = req.user!.id;
+  const { questionId } = req.params;
+  const { content, parentAnswerId } = req.body as {
+    content?: unknown;
+    parentAnswerId?: unknown;
+  };
+
+  if (typeof content !== 'string' || content.trim().length < 1 || content.trim().length > 5000) {
+    return res.status(400).json({ message: 'contentが不正です' });
+  }
+
+  const { data, error } = await supabase
+    .from('answers')
+    .insert({
+      question_id: questionId,
+      user_id: userId,
+      content: content.trim(),
+      parent_answer_id: typeof parentAnswerId === 'string' ? parentAnswerId : null,
+    })
+    .select('id')
+    .single();
+
+  if (error || !data) {
+    console.error('Supabase error inserting answer:', error);
+    return res.status(500).json({ message: '回答の投稿に失敗しました' });
+  }
+
+  return res.status(201).json({ answerId: data.id });
 });
 
 // ブックマーク追加
