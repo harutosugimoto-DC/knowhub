@@ -27,62 +27,49 @@ export default function Header() {
     }, [notifications]);
 
     useEffect(() => {
-        // 未ログイン、またはユーザーIDが取得できない場合は購読しない
         if (!isLoggedIn || !user?.id) {
             setNotifications([]);
             return;
         }
 
-        // ① 初回レンダリング時に既存の通知をAPIから取得
         const fetchNotifications = async () => {
             try {
                 const response = await getNotifications();
-                console.log(response);
-                
                 setNotifications(response);
             } catch (err) {
-                console.error("通知の取得に失敗しました:", err);
+                console.error("❌ [API] 通知の取得に失敗しました:", err);
             }
         };
+
+        // ① 初回レンダリング時に既存の通知を取得
         fetchNotifications();
 
         // ② Supabase Realtime でデータベースの変更をリアルタイム監視
+        const channelName = `realtime-notifications-${user.id}`;
+        const targetFilter = `receiver_user_id=eq.${user.id}`;
+
         const channel = supabase
-            .channel(`realtime-notifications-${user.id}`)
+            .channel(channelName)
             .on(
                 "postgres_changes",
                 {
-                    event: "*", // INSERT, UPDATE, DELETE のすべてを検知
+                    event: "*",
                     schema: "public",
                     table: "notifications",
-                    filter: `user_id=eq.${user.id}`, // 💡 ログインユーザー自身の通知のみに絞り込み
+                    filter: targetFilter,
                 },
-                (payload) => {
-                    console.log(payload);
-                    
-                    // 新しい通知が届いた時 (INSERT)
-                    if (payload.eventType === "INSERT") {
-                        const newNotification = payload.new as NotificationType;
-                        setNotifications((prev) => [newNotification, ...prev]); // 配列の先頭に追加
-                    }
-
-                    // 通知が「既読」などに更新された時 (UPDATE)
-                    else if (payload.eventType === "UPDATE") {
-                        const updatedNotification = payload.new as NotificationType;
-                        setNotifications((prev) =>
-                            prev.map((n) => (n.id === updatedNotification.id ? updatedNotification : n))
-                        );
-                    }
-
-                    // 通知が削除された時 (DELETE)
-                    else if (payload.eventType === "DELETE") {
-                        setNotifications((prev) => prev.filter((n) => n.id !== payload.old.id));
+                async (payload) => {
+                    if (payload.eventType === "INSERT" || payload.eventType === "UPDATE") {
+                        await fetchNotifications();
                     }
                 }
             )
-            .subscribe();
+            .subscribe((status, error) => {
+                if (error) {
+                    console.error("❌ [Realtime接続エラー詳細]:", error);
+                }
+            });
 
-        // ③ クリーンアップ：コンポーネントがアンマウントされたら接続を解除
         return () => {
             supabase.removeChannel(channel);
         };
@@ -106,32 +93,32 @@ export default function Header() {
             </div>
 
             {isLoggedIn && (
-            <div className="flex items-center h-full">
-                <div className="w-[60px] h-full flex justify-center items-center cursor-pointer transition-all hover:bg-[var(--hover-color)] hover:border-b-[3px] hover:border-[var(--main-color)]" onClick={() => navigate("/top")}>
-                    <HomeIcon />
-                </div>
-                <div className="w-[60px] h-full flex justify-center items-center cursor-pointer transition-all hover:bg-[var(--hover-color)] hover:border-b-[3px] hover:border-[var(--main-color)]" onClick={() => navigate("/create-question")}>
-                    <HiMiniPencilSquare className="text-[24px]" />
-                </div>
-                <div className="w-[60px] h-full flex justify-center items-center cursor-pointer transition-all hover:bg-[var(--hover-color)] hover:border-b-[3px] hover:border-[var(--main-color)]" onClick={toggleNotification}>
-                    <div className="relative inline-block">
-                        <NotificationsIcon />
-                        {unreadCount > 0 && (
-                            <div className="absolute top-0 right-0 translate-x-1/3 -translate-y-1/3 w-[20px] h-[20px] bg-[var(--main-color)] rounded-full flex justify-center items-center">
-                                <span className="text-white text-[12px] leading-[20px]">
-                                    {unreadCount > 99 ? '99+' : unreadCount}
-                                </span>
-                            </div>
-                        )}
+                <div className="flex items-center h-full">
+                    <div className="w-[60px] h-full flex justify-center items-center cursor-pointer transition-all hover:bg-[var(--hover-color)] hover:border-b-[3px] hover:border-[var(--main-color)]" onClick={() => navigate("/top")}>
+                        <HomeIcon />
+                    </div>
+                    <div className="w-[60px] h-full flex justify-center items-center cursor-pointer transition-all hover:bg-[var(--hover-color)] hover:border-b-[3px] hover:border-[var(--main-color)]" onClick={() => navigate("/create-question")}>
+                        <HiMiniPencilSquare className="text-[24px]" />
+                    </div>
+                    <div className="w-[60px] h-full flex justify-center items-center cursor-pointer transition-all hover:bg-[var(--hover-color)] hover:border-b-[3px] hover:border-[var(--main-color)]" onClick={toggleNotification}>
+                        <div className="relative inline-block">
+                            <NotificationsIcon />
+                            {unreadCount > 0 && (
+                                <div className="absolute top-0 right-0 translate-x-1/3 -translate-y-1/3 w-[20px] h-[20px] bg-[var(--main-color)] rounded-full flex justify-center items-center">
+                                    <span className="text-white text-[12px] leading-[20px]">
+                                        {unreadCount > 99 ? '99+' : unreadCount}
+                                    </span>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    <div className="w-[60px] h-full flex justify-center items-center cursor-pointer transition-all hover:bg-[var(--hover-color)] hover:border-b-[3px] hover:border-[var(--main-color)]" onClick={() => navigate("/profile")}>
+                        <Avatar src={user.iconUrl} className="w-[40px] h-[40px]" />
+                    </div>
+                    <div className="w-[60px] h-full flex justify-center items-center cursor-pointer transition-all hover:bg-[var(--hover-color)] hover:border-b-[3px] hover:border-[var(--main-color)]" onClick={handleLogout}>
+                        <LogoutIcon />
                     </div>
                 </div>
-                <div className="w-[60px] h-full flex justify-center items-center cursor-pointer transition-all hover:bg-[var(--hover-color)] hover:border-b-[3px] hover:border-[var(--main-color)]" onClick={() => navigate("/profile")}>
-                    <Avatar src={user.iconUrl} className="w-[40px] h-[40px]" />
-                </div>
-                <div className="w-[60px] h-full flex justify-center items-center cursor-pointer transition-all hover:bg-[var(--hover-color)] hover:border-b-[3px] hover:border-[var(--main-color)]" onClick={handleLogout}>
-                    <LogoutIcon />
-                </div>
-            </div>
             )}
             {isLoggedIn && showNotification && (
                 <div className="absolute top-[64px] right-[var(--spacing-16)] shadow-[var(--box-shadow)] rounded-[var(--radius-big)] overflow-hidden bg-white animate-in fade-in slide-in-from-top-2 duration-200">
