@@ -45,7 +45,9 @@ export default function Header() {
         fetchNotifications();
 
         // ② Supabase Realtime でデータベースの変更をリアルタイム監視
-        const channelName = `realtime-notifications-${user.id}`;
+
+        const channelName = `realtime-notifications-${user.id}-${Math.random().toString(36).slice(2)}`;
+
         const targetFilter = `receiver_user_id=eq.${user.id}`;
 
         const channel = supabase
