@@ -20,7 +20,7 @@ export default function QuestionCard({ question, isProfile }: QuestionCardProps)
     const {
         id,
         title,
-        iconURL,
+        iconUrl,
         statusId,
         isLiked = false,
         isBookmarked = false,
@@ -48,7 +48,7 @@ export default function QuestionCard({ question, isProfile }: QuestionCardProps)
                     {/* 三段目 */}
                     <div className="flex items-center gap-[var(--spacing-16)]">
                         <div className="flex items-center gap-[var(--spacing-4)]">
-                            <Avatar src={iconURL} className="w-[24px] h-[24px]" />
+                            <Avatar src={iconUrl} className="w-[24px] h-[24px]" />
                             <span className="text-[var(--text-color-black)]">{userName}</span>
                         </div>
                         <Time postingTime={postingTime} />

@@ -1,7 +1,7 @@
 export interface QuestionType {
     id: string,
     title: string;
-    iconURL: string;
+    iconUrl: string;
     statusId: string;
     isLiked: boolean;
     isBookmarked: boolean;
