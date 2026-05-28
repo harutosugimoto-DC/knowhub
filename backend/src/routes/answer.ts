@@ -1,12 +1,13 @@
 import { Router } from 'express';
 import { supabase } from '../config/supabase';
+import { requireAuth } from '../middleware/auth.js';
 
 const router = Router();
 
 // いいね追加（回答）
 // POST /api/v1/answers/:answerId/like
-router.post('/:answerId/like', async (req, res) => {
-  const userId = req.user?.id;
+router.post('/:answerId/like', requireAuth, async (req, res) => {
+  const userId = req.user!.id;
   const { answerId } = req.params;
 
   const { data: existing } = await supabase
@@ -34,8 +35,8 @@ router.post('/:answerId/like', async (req, res) => {
 
 // いいね解除（回答）
 // DELETE /api/v1/answers/:answerId/like
-router.delete('/:answerId/like', async (req, res) => {
-  const userId = req.user?.id;
+router.delete('/:answerId/like', requireAuth, async (req, res) => {
+  const userId = req.user!.id;
   const { answerId } = req.params;
 
   const { error } = await supabase

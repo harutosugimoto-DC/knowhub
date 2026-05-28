@@ -79,7 +79,6 @@ router.post('/', requireAuth, async (req, res) => {
 // 質問一覧取得
 // GET /api/v1/questions?page=1&order=new or likes
 router.get('/', requireAuth, async (req, res) => {
-     console.log('受け取ったクエリ:', req.query); // ← 追加
   const userId = req.user!.id;
   const page = Number(req.query.currentPage) || 1;
   const order = req.query.order as string | undefined ?? 'new';
@@ -209,7 +208,7 @@ const myActions = req.query['myActions[]']
 // GET /api/v1/questions/:questionId
 router.get('/:questionId', requireAuth, async (req, res) => {
   const { questionId } = req.params;
-  const userId = req.user?.id;
+  const userId = req.user!.id;
 
   const { data: rawData, error } = await supabase
     .from('questions')
