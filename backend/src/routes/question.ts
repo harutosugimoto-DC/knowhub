@@ -123,11 +123,11 @@ const myActions = req.query['myActions[]']
 
 
 
-  if (order === 'likes_asc' || order === 'likes_desc') {
-  query = query.order('created_at', { ascending: false });
-    } else {
-  query = query.order('created_at', { ascending: false });
-    }
+  if (order === 'newAsc') {
+    query = query.order('created_at', { ascending: true });
+  } else {
+    query = query.order('created_at', { ascending: false });
+  }
 
   const { data: rawData,count,error } = await query;
 
@@ -181,11 +181,11 @@ const myActions = req.query['myActions[]']
   }));
 
   // いいね順の場合はアプリ側でソート
-  if (order === 'likes_desc') {
-  formatted.sort((a, b) => b.likeCount - a.likeCount); // 降順
-} else if (order === 'likes_asc') {
-  formatted.sort((a, b) => a.likeCount - b.likeCount); // 昇順
-}
+  if (order === 'likesDesc') {
+    formatted.sort((a, b) => b.likeCount - a.likeCount);
+  } else if (order === 'likesAsc') {
+    formatted.sort((a, b) => a.likeCount - b.likeCount);
+  }
 
   const totalCount = count ?? 0;
   const totalPages = Math.ceil(totalCount / limit);
