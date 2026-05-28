@@ -272,6 +272,51 @@ router.get('/me/activity', requireAuth, async (req, res) => {
   return res.json(formatted);
 });
 
+// 自分がよく回答しているタグ上位4件取得
+// GET /api/v1/users/me/favorite-tags
+router.get('/me/favorite-tags', requireAuth, async (req, res) => {
+  const userId = req.user!.id;
+
+  // 自分が回答した質問のタグを全件取得
+  const { data, error } = await supabase
+    .from('answers')
+    .select(`
+      questions!inner (
+        question_tags (
+          tags ( name )
+        )
+      )
+    `)
+    .eq('user_id', userId)
+    .is('deleted_at', null);
+
+  if (error) {
+    console.error('Supabase error fetching favorite tags:', error);
+    return res.status(500).json({ error: 'Failed to fetch favorite tags' });
+  }
+
+  // タグごとに集計
+  const tagCounts: { [key: string]: number } = {};
+
+  (data ?? []).forEach((answer: any) => {
+    const questionTags = answer.questions?.question_tags ?? [];
+    questionTags.forEach((qt: any) => {
+      const tagName = qt.tags?.name;
+      if (tagName) {
+        tagCounts[tagName] = (tagCounts[tagName] ?? 0) + 1;
+      }
+    });
+  });
+
+  // 上位4件に絞り込んで返す
+  const formatted = Object.entries(tagCounts)
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 4);
+
+  return res.json(formatted);
+});
+
 // プロフィールアイコン取得
 // GET /api/v1/users/me/icon
 router.get('/me/icon', requireAuth, async (req, res) => {
