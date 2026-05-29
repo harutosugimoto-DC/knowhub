@@ -254,7 +254,7 @@ export default function CreateQuestion() {
                             const isAi = msg.role === "model";
                             return (
                                 <div key={msg.id} className={`flex w-full ${isAi ? "justify-start" : "justify-end"}`}>
-                                    <div className={`max-w-[80%] p-3 text-sm leading-relaxed whitespace-pre-wrap rounded-lg shadow-sm border ${isAi ? "bg-[#FDF3E7] border-[#FFEBD0] text-[#444]" : "bg-white border-gray-200 text-[#333]"}`}>
+                                    <div className={`!select-text max-w-[80%] p-3 text-sm leading-relaxed whitespace-pre-wrap rounded-lg shadow-sm border ${isAi ? "bg-[#FDF3E7] border-[#FFEBD0] text-[#444]" : "bg-white border-gray-200 text-[#333]"}`}>
                                         {msg.text}
                                     </div>
                                 </div>

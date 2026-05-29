@@ -60,13 +60,14 @@ function AnswererQuestionCard({ question }: AnswererQuestionCardProps) {
             : <KeyboardArrowDownOutlinedIcon className="cursor-pointer text-[var(--dark-gray)]" onClick={() => setIsContentOpen(true)} />
         )}
       </div>
-
-      <CollapsibleContent
-        content={question.content}
-        isContentOpen={isContentOpen}
-        setIsContentOpen={setIsContentOpen}
-        setIsOverflowing={setIsOverflowing}
-      />
+      <div className='!select-text'>
+        <CollapsibleContent
+          content={question.content}
+          isContentOpen={isContentOpen}
+          setIsContentOpen={setIsContentOpen}
+          setIsOverflowing={setIsOverflowing}
+        />
+      </div>
 
       <div className="px-[var(--spacing-16)] py-[var(--spacing-8)] flex items-center justify-between">
         <div className="flex flex-wrap gap-2">
@@ -100,7 +101,7 @@ function AnswerPreviewCard({ answer }: AnswerPreviewCardProps) {
         <p>{answer.userName}</p>
         <Time postingTime={answer.postingTime} />
       </div>
-      <p className="px-[var(--spacing-16)] text-[length:var(--font-size-medium)] leading-relaxed max-h-[120px] overflow-auto">
+      <p className="!select-text px-[var(--spacing-16)] text-[length:var(--font-size-medium)] leading-relaxed max-h-[120px] overflow-auto">
         {answer.content}
       </p>
       <div className="flex justify-end mt-2">
@@ -130,7 +131,7 @@ function ReplyPreviewCard({ reply }: ReplyPreviewCardProps) {
         <p>{reply.userName}</p>
         <Time postingTime={reply.postingTime} />
       </div>
-      <p className="px-[var(--spacing-16)] text-[length:var(--font-size-medium)] leading-relaxed max-h-[120px] overflow-auto">
+      <p className="!select-text px-[var(--spacing-16)] text-[length:var(--font-size-medium)] leading-relaxed max-h-[120px] overflow-auto">
         {reply.content}
       </p>
     </Card>
