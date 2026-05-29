@@ -11,7 +11,7 @@ type NotificationProps = {
 const calculateUnreadCount = (notifications: NotificationItemProps[]) => {
     let count = 0;
     notifications.forEach(notification => {
-        if (notification.isRead) {
+        if (!notification.isRead) {
             count++;
         }
     });
