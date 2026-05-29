@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 
 import Avatar from "@/components/common/Avatar";
 import Notification from "@/components/common/Notification";
@@ -16,11 +16,16 @@ import { supabase } from "@/lib/supabase";
 
 export default function Header() {
     const navigate = useNavigate();
+    const location = useLocation()
     const { user, logout } = useUser();
     const isLoggedIn = !!user;
 
     const [showNotification, setShowNotification] = useState<boolean>(false);
     const [notifications, setNotifications] = useState<NotificationType[]>([]);
+
+    useEffect(() => {
+        setShowNotification(false);
+    }, [location.pathname]);
 
     const unreadCount = useMemo(() => {
         return notifications.filter(n => !n.isRead).length;

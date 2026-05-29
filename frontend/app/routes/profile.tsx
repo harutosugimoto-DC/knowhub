@@ -123,14 +123,14 @@ export default function Profile() {
                 <div className="flex-1 flex flex-col items-center justify-center gap-4 py-2 min-h-[120px]">
                     <div className="relative w-full max-w-[140px] aspect-square text-[var(--main-color)] flex items-center justify-center rounded-full border">
                         <Avatar src={profileData?.iconUrl || user?.iconUrl || "/images/default-avatar.png"} className="w-full h-full" />
-                        <label className="absolute bottom-0 right-0 w-7 h-7 bg-white text-[var(--dark-gray)] border border-[var(--dark-gray)] rounded-full flex items-center justify-center cursor-pointer">
+                        <label className=" transition-all hover:text-[var(--main-color)] hover:border-[var(--main-color)] hover:scale-110 absolute bottom-0 right-0 w-7 h-7 bg-white text-[var(--dark-gray)] border border-[var(--dark-gray)] rounded-full flex items-center justify-center cursor-pointer">
                             <input
                                 type="file"
                                 onChange={handleFileChange}
                                 accept="image/*"
                                 className="hidden"
                             />
-                            <CameraAltIcon className="!text-[16px] pointer-events-none" />
+                            <CameraAltIcon className="!text-[16px] pointer-events-none " />
                         </label>
                     </div>
 
@@ -148,10 +148,13 @@ export default function Profile() {
                         ) : (
                             <>
                                 <span>{nickname || "未設定"}</span>
-                                <EditIcon
+                                <span
                                     onClick={() => setIsEditing(true)}
-                                    className="!text-[length:var(--font-size-normal)] !text-[var(--dark-gray)] cursor-pointer hover:text-[var(--main-color)] transition-colors"
-                                />
+                                    className="inline-flex items-center justify-center text-[var(--dark-gray)] hover:text-[var(--main-color)] transition-all  hover:scale-130 cursor-pointer"
+                                >
+                                    {/* 💡 アイコン自体は形とサイズだけを担当させ、ホバーやアニメーションは外側の器に任せる */}
+                                    <EditIcon className="!text-[length:var(--font-size-normal)] pointer-events-none" />
+                                </span>
                             </>
                         )}
                     </div>
@@ -190,7 +193,7 @@ export default function Profile() {
             {/* ─── 3. よく回答しているタグ ─── */}
             <Card className="px-4 pt-0 flex flex-col gap-4 lg:order-3">
                 <SectionTitle title="よく回答しているタグ" />
-                <div className="flex-1 flex flex-col justify-around min-h-[150px]">
+                <div className="flex-1 flex flex-col gap-4 min-h-[150px]">
                     {topTags.length === 0 ? (
                         <p className="text-sm text-[var(--dark-gray)] text-center py-4">データがありません</p>
                     ) : (
