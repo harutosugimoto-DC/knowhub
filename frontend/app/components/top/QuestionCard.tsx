@@ -33,7 +33,7 @@ export default function QuestionCard({ question, isProfile }: QuestionCardProps)
     } = question;
     return (
         <div className="rounded-4 cursor-pointer" onClick={() => navigate(`/question/${id}`)}>
-            <Card className={`${isProfile ? "border border-[var(--light-gray)]" : ""} flex justify-between`}>
+            <Card className={`${isProfile ? "border border-[var(--light-gray)]" : ""}  transition-all hover:shadow-[var(--hover-box-shadow)] hover:bg-[var(--hover-color)] flex justify-between`}>
                 <div className='flex flex-col justify-space-around gap-[var(--spacing-16)]'>
                     {/* 一段目 */}
                     <div className="flex items-center gap-[var(--spacing-16)]">

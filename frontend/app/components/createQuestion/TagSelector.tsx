@@ -55,10 +55,10 @@ export default function TagSelector({ selectedTagIds, setSelectedTagIds, allTagD
                             className={`
                                 cursor-pointer
                                 rounded-[var(--radius-big)] px-[var(--spacing-16)] py-[var(--spacing-8)] 
-                                font-['Lora'] text-[var(--font-size-normal)] transition-all duration-200
+                                font-['Lora'] text-[var(--font-size-normal)] transition-all
                                 ${isSelected
                                     ? "bg-[var(--main-color)] text-white shadow-[var(--box-shadow)] border border-transparent"
-                                    : "bg-white !text-[var(--dark-gray)] border border-[var(--dark-gray)]"
+                                    : "bg-white !text-[var(--dark-gray)] border border-[var(--dark-gray)] hover:bg-[var(--hover-color)]"
                                 }
                             `}
                         >

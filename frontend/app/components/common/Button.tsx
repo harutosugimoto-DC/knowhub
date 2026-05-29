@@ -10,7 +10,7 @@ export default function Button({ text, onClick, className }: ButtonProps) {
     return (
         <button 
         onClick={()=>onClick()}
-        className={`shadow-[var(--box-shadow)] inline-block px-[var(--spacing-128)] py-[var(--spacing-16)] 
+        className={`transition-all hover:shadow-[var(--hover-box-shadow)] shadow-[var(--box-shadow)] inline-block px-[var(--spacing-128)] py-[var(--spacing-16)] 
         bg-[image:var(--gradation-green)] text-white rounded-[var(--radius-small)] cursor-pointer ${className || ''}`}>
             {text}
         </button>

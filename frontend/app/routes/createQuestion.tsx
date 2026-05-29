@@ -196,7 +196,7 @@ export default function CreateQuestion() {
                 <div>
                     <div className="py-[var(--spacing-16)]">
                         <SectionTitle title="質問タイトル" isRequired>
-                            <button onClick={() => setIsAiOpen(!isAiOpen)} className="shadow-[var(--box-shadow)] cursor-pointer rounded-[16px] text-white bg-[image:var(--ai-color)] px-[var(--spacing-32)] py-[var(--spacing-16)]">
+                            <button onClick={() => setIsAiOpen(!isAiOpen)} className="transition-all hover:shadow-[var(--hover-box-shadow)] shadow-[var(--box-shadow)] cursor-pointer rounded-[16px] text-white bg-[image:var(--ai-color)] px-[var(--spacing-32)] py-[var(--spacing-16)]">
                                 AIに相談する
                             </button>
                         </SectionTitle>
@@ -241,7 +241,10 @@ export default function CreateQuestion() {
                         </div>
                         <p>AI サポートアシスタント</p>
                     </div>
-                    <CloseIcon className="cursor-pointer" onClick={() => setIsAiOpen(false)} />
+                    <div className="transition-all hover:text-[var(--dark-gray)]">
+                        <CloseIcon className="cursor-pointer " onClick={() => setIsAiOpen(false)} />
+
+                    </div>
                 </div>
 
                 {/* メッセージエリア */}
