@@ -186,7 +186,7 @@ export default function Top() {
                                 </div>
                             </div>
                             <div className="flex gap-2 px-2 relative">
-                                <TextInput placeholder="検索ワードを入力してください" value={searchWord} onChange={setSearchWord} />
+                                <TextInput placeholder="検索ワードを入力してください" value={searchWord} onChange={setSearchWord} onKeyDown={(e) => { if (e.key === "Enter") handleSearch() }} />
                                 <div onClick={handleSearch} className="rounded-full p-1 cursor-pointer bg-[var(--main-color)] absolute flex justify-center items-center top-[50%] right-[var(--spacing-16)] -translate-x-1/2 -translate-y-1/2">
                                     <SearchOutlinedIcon className="!text-[length:var(--font-size-normal)] text-white" />
                                 </div>
