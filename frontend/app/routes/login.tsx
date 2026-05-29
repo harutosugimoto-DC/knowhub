@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import logo from "../assets/logo.webp";
+import { useNavigate } from "react-router";
+import { useUser } from "@/contexts/UserContext";
 
 // GoogleブランドロゴのインラインSVG
 const GoogleIcon = () => (
@@ -13,8 +15,26 @@ const GoogleIcon = () => (
 );
 
 export default function Login() {
+    const navigate = useNavigate();
+    const { user } = useUser();
+
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        // user情報が存在し、かつ nickname が設定されている場合
+        if (user && user.nickname) {
+            // `{ replace: true }` を入れることで、戻るボタンを押したときの無限ループを防ぎます
+            navigate("/top", { replace: true });
+        }
+        else if (user) {
+            navigate("/nickname", { replace: true })
+        }
+    }, [user, navigate]);
+
+    if (user && user.nickname) {
+        return null;
+    }
 
     const handleGoogleLoginClick = async () => {
         setIsLoading(true);
@@ -30,7 +50,7 @@ export default function Login() {
             });
 
             if (authError) throw authError;
-            
+
         } catch (err: any) {
             console.error("Googleログインエラー:", err);
             setError(err.message || "ログインに失敗しました。もう一度お試しください。");

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import TextInput from "../components/common/TextInput";
 import Button from "../components/common/Button";
@@ -14,7 +14,14 @@ export default function Nickname() {
     const [error, setError] = useState<string>("");
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    const { setUser } = useUser()
+    const { user, setUser } = useUser()
+    useEffect(() => {
+        if (user && user.nickname) {
+            // `{ replace: true }` をれることで、戻るボタンを押したときの無限ループを防ぎます
+            navigate("/top", { replace: true });
+        }
+    }, [user, navigate]);
+
     const validate = (): string => {
         if (nickname.trim().length === 0) {
             return "ニックネームを入力してください。";
