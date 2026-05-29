@@ -113,6 +113,8 @@ export default function Profile() {
     const ceilMax = maxCount === 0 ? 15 : Math.ceil(maxCount / 5) * 5;
     const yTicks = Array.from({ length: 6 }, (_, i) => (ceilMax / 5) * i);
 
+    const maxTagCount = Math.max(...topTags.map((tag) => tag.count), 0);
+
     return (
         <div className="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-4 px-[var(--spacing-64)] py-[var(--spacing-32)] h-[calc(100vh-64px)] overflow-y-auto bg-[#FAF9F5]">
 
@@ -197,15 +199,21 @@ export default function Profile() {
                     {topTags.length === 0 ? (
                         <p className="text-sm text-[var(--dark-gray)] text-center py-4">データがありません</p>
                     ) : (
-                        topTags.map((tag, index) => (
-                            <div key={index} className="flex flex-col gap-2 p-1">
-                                <div className="flex justify-between text-sm">
-                                    <span>{tag.name}</span>
-                                    <span className="text-[var(--dark-gray)]">{tag.count}件</span>
+                        topTags.map((tag, index) => {
+
+                            const percentage = maxTagCount > 0 ? (tag.count / maxTagCount) * 100 : 0;
+
+                            return (
+
+                                <div key={index} className="flex flex-col gap-2 p-1">
+                                    <div className="flex justify-between text-sm">
+                                        <span>{tag.name}</span>
+                                        <span className="text-[var(--dark-gray)]">{tag.count}件</span>
+                                    </div>
+                                    <ProgressBar percentage={percentage} />
                                 </div>
-                                <ProgressBar percentage={tag.count} />
-                            </div>
-                        ))
+                            )
+                        })
                     )}
                 </div>
             </Card>
