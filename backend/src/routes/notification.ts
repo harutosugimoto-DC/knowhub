@@ -29,4 +29,35 @@ const { data, error } = await supabase
   return res.json(data ?? []);
 });
 
+// 通知既読
+// PATCH /api/v1/notifications/:notificationId/read
+router.patch('/:notificationId/read', requireAuth, async (req, res) => {
+  const { notificationId } = req.params;
+  const userId = req.user!.id;
+
+  // 自分宛ての通知かチェック
+  const { data: existing } = await supabase
+    .from('notifications')
+    .select('id')
+    .eq('id', notificationId)
+    .eq('receiver_user_id', userId)
+    .maybeSingle();
+
+  if (!existing) {
+    return res.status(404).end();
+  }
+
+  const { error } = await supabase
+    .from('notifications')
+    .update({ is_read: true })
+    .eq('id', notificationId);
+
+  if (error) {
+    console.error('Supabase error updating notification:', error);
+    return res.status(500).end();
+  }
+
+  return res.status(204).end();
+});
+
 export default router;
