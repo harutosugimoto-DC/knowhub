@@ -39,10 +39,9 @@ export default function Bookmark({ isBookmarked, count, id }: BookmarkProps) {
             }
         } catch (error) {
             console.error('ブックマーク操作に失敗しました:', error);
-            // ❌ APIが失敗した場合は、ステートを元の状態に巻き戻す
+            // APIが失敗した場合は、ステートを元の状態に巻き戻す
             setBookmarkedState(bookmarkedState);
             setCountState(countState);
-            alert("操作に失敗しました。時間をおいて再度お試しください。");
         } finally {
             setIsPending(false);
         }
