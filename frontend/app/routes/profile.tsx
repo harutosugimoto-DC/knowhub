@@ -36,11 +36,20 @@ export default function Profile() {
 
         const fetchProfileData = async () => {
             try {
-                // 404エラー対策： getTopTags や getActivity のURLタイポが直るまでは個別取得にしてあります
+                const toDate = new Date();
+                const fromDate = new Date();
+                fromDate.setMonth(fromDate.getMonth() - 5); // 今月を含めて6ヶ月にするため「-5」
+
+                // YYYY-MM 形式に変換するヘルパー関数
+                const formatDate = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+
+                const from = formatDate(fromDate); // 例: "2026-01"
+                const to = formatDate(toDate);     // 例: "2026-06"
+
                 const myDetails = await getMyData();
                 const recentlySolved = await getRecentlySolved();
                 const tagsData = await getTopTags();
-                const activityData = await getActivity();
+                const activityData = await getActivity(from, to);
 
                 setProfileData(myDetails);
                 setQuestions(recentlySolved);
