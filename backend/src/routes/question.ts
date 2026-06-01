@@ -401,6 +401,29 @@ router.post('/:questionId/answers', requireAuth, async (req, res) => {
     return res.status(500).json({ message: '回答の投稿に失敗しました' });
   }
 
+  if (!parentAnswerId) {
+    const { data: interiStatus } = await supabase
+      .from('statuses')
+      .select('id')
+      .eq('name', '整理中')
+      .single();
+
+    const { data: currentQuestion } = await supabase
+      .from('questions')
+      .select('statuses ( name )')
+      .eq('id', questionId)
+      .single();
+
+    const currentStatusName = (currentQuestion as any)?.statuses?.name;
+
+    if (interiStatus && currentStatusName !== '解決済み') {
+      await supabase
+        .from('questions')
+        .update({ status_id: interiStatus.id })
+        .eq('id', questionId);
+    }
+  }
+
   return res.status(201).json({ answerId: data.id });
 });
 
