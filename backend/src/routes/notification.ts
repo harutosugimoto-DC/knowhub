@@ -62,4 +62,23 @@ router.patch('/:notificationId/read', requireAuth, async (req, res) => {
   return res.status(204).end();
 });
 
+// 全件既読
+// PATCH /api/v1/notifications/read-all
+router.patch('/read-all', requireAuth, async (req, res) => {
+  const userId = req.user!.id;
+
+  const { error } = await supabase
+    .from('notifications')
+    .update({ is_read: true })
+    .eq('receiver_user_id', userId)
+    .eq('is_read', false);
+
+  if (error) {
+    console.error('Supabase error updating notifications:', error);
+    return res.status(500).end();
+  }
+
+  return res.status(204).end();
+});
+
 export default router;
