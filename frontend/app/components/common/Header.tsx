@@ -24,6 +24,22 @@ export default function Header() {
     const [showNotification, setShowNotification] = useState<boolean>(false);
     const [notifications, setNotifications] = useState<NotificationType[]>([]);
 
+    
+    useEffect(()=>{
+        //通知部分以外をクリックしたときに通知を閉じる
+        const handleClickOutside = (event: MouseEvent) => {
+            const target = event.target as HTMLElement;
+            if (!target.closest('.notification-container') && !target.closest('.notification-icon')) {
+                setShowNotification(false);
+            }
+        };
+        
+        document.addEventListener('click', handleClickOutside);
+
+        return () => {
+            document.removeEventListener('click', handleClickOutside);
+        };
+    },[])
     useEffect(() => {
         setShowNotification(false);
     }, [location.pathname]);
@@ -113,7 +129,7 @@ export default function Header() {
                     <div className="w-[60px] h-full flex justify-center items-center cursor-pointer transition-all hover:bg-[var(--hover-color)] hover:border-b-[3px] hover:border-[var(--main-color)]" onClick={() => navigate("/create-question")}>
                         <HiMiniPencilSquare className="text-[24px]" />
                     </div>
-                    <div className="w-[60px] h-full flex justify-center items-center cursor-pointer transition-all hover:bg-[var(--hover-color)] hover:border-b-[3px] hover:border-[var(--main-color)]" onClick={toggleNotification}>
+                    <div className="notification-icon w-[60px] h-full flex justify-center items-center cursor-pointer transition-all hover:bg-[var(--hover-color)] hover:border-b-[3px] hover:border-[var(--main-color)]" onClick={toggleNotification}>
                         <div className="relative inline-block">
                             <NotificationsIcon />
                             {unreadCount > 0 && (
@@ -134,7 +150,7 @@ export default function Header() {
                 </div>
             )}
             {isLoggedIn && showNotification && (
-                <div className="absolute top-[64px] right-[var(--spacing-16)] shadow-[var(--box-shadow)] rounded-[var(--radius-big)] overflow-hidden bg-white animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="notification-container absolute top-[64px] right-[var(--spacing-16)] shadow-[var(--box-shadow)] rounded-[var(--radius-big)] overflow-hidden bg-white animate-in fade-in slide-in-from-top-2 duration-200">
                     <Notification notifications={notifications} />
                 </div>
             )}
