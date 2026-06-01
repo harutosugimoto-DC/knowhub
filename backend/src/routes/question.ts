@@ -121,16 +121,39 @@ router.get('/', requireAuth, async (req, res) => {
   ? [req.query['statusIds[]']].flat() as string[]
   : undefined;
 
-const tagIds = req.query['tagIds[]']
+  const tagIds = req.query['tagIds[]']
   ? [req.query['tagIds[]']].flat() as string[]
   : undefined;
 
-const myActions = req.query['myActions[]']
+  const myActions = req.query['myActions[]']
   ? [req.query['myActions[]']].flat() as string[]
   : undefined;
   const limit = 20;
   const offset = (page - 1) * limit;
 
+  // 💡 【追加】ステップ1: 絞り込み条件に合う質問IDを事前抽出
+  let targetIds: string[] | null = null;
+  if (tagIds || statusIds || myActions || keyword) {
+    let idQuery = supabase.from('questions').select('id, user_id, status_id, question_tags(tag_id), bookmarks(user_id), answers(user_id, best_answer_at)').is('deleted_at', null);
+    if (keyword) idQuery = idQuery.or(`title.ilike.%${keyword}%,content.ilike.%${keyword}%`);
+    const { data: idData } = await idQuery;
+    let idFiltered = idData ?? [];
+    if (tagIds) idFiltered = idFiltered.filter((q: any) => tagIds.every((id) => q.question_tags?.some((qt: any) => qt.tag_id === id)));
+    if (statusIds) idFiltered = idFiltered.filter((q: any) => statusIds.includes(q.status_id));
+    if (myActions) {
+      idFiltered = idFiltered.filter((q: any) => myActions.some((action) => {
+        if (action === 'my_questions') return q.user_id === userId;
+        if (action === 'my_answers') return q.answers?.some((a: any) => a.user_id === userId);
+        if (action === 'my_solved') return q.user_id === userId && q.answers?.some((a: any) => a.best_answer_at !== null);
+        if (action === 'bookmarked') return q.bookmarks?.some((b: any) => b.user_id === userId);
+        return false;
+      }));
+    }
+    targetIds = idFiltered.map((q: any) => q.id);
+    if (targetIds.length === 0) {
+      return res.json({ currentPage: page, order, keyword: keyword ?? null, tagId: tagIds ?? null, myActions: myActions ?? null, statusId: statusIds ?? null, totalCount: 0, totalPages: 0, data: [] });
+    }
+  }
 
   let query = supabase
     .from('questions')
@@ -147,8 +170,11 @@ const myActions = req.query['myActions[]']
       bookmarks ( user_id ),
       answers ( id, user_id, best_answer_at )
     `, { count: 'exact' })
-    .is('deleted_at', null)
-    .range(offset, offset + limit - 1);
+    .is('deleted_at', null);
+
+  if (targetIds) query = query.in('id', targetIds); // 💡 【追加】抽出したIDでDB側で絞り込む
+
+  query = query.range(offset, offset + limit - 1); // 💡 【位置調整】
 
     // キーワードが指定されている場合のみ絞り込む
     if (keyword) {
