@@ -20,6 +20,7 @@ const { data, error } = await supabase
     questions ( title )
   `)
     .eq('receiver_user_id', userId)
+    .eq('is_read', false)
     .order('created_at', { ascending: false });
         
   if (error) {
