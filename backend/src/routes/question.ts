@@ -178,7 +178,7 @@ router.get('/', requireAuth, async (req, res) => {
 
     // キーワードが指定されている場合のみ絞り込む
     if (keyword) {
-  query = query.or(`title.ilike.%${keyword}%,content.ilike.%${keyword}%`);
+  query = query.ilike('title', `%${keyword}%`);
 }
 
 
