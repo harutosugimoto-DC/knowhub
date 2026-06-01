@@ -231,7 +231,9 @@ router.get('/me/activity', requireAuth, async (req, res) => {
     query = query.gte('created_at', `${from}-01`);
   }
   if (to) {
-    query = query.lte('created_at', `${to}-31`);
+    const [y, m] = to.split('-');
+    const lastDay = new Date(Number(y), Number(m), 0).getDate(); // 💡 その月の最終日(30や28など)を自動計算
+    query = query.lte('created_at', `${to}-${lastDay}`);
   }
 
   const { data, error } = await query;

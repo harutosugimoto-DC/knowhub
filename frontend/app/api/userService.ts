@@ -51,14 +51,23 @@ export const getTopTags = async (): Promise<({ name: string, count: number })[]>
 }
 
 /**
- * ユーザーの活動推移取得
- * @param userId 
- * @returns 
+ * ユーザーの活動推移（月ごとの回答件数）を取得
+ * @param from 開始月 (フォーマット: "YYYY-MM")
+ * @param to 終了月 (フォーマット: "YYYY-MM")
+ * @returns 月ごとの件数配列
  */
-export const getActivity = async (): Promise<({ month: string, count: number })[]> => {
-    const response = await axiosClient.get<({ month: string, count: number })[]>(`users/me/activity`)
-    return response.data
-}
+export const getActivity = async (
+    from?: string,
+    to?: string
+): Promise<{ month: string; count: number }[]> => {
+
+    const response = await axiosClient.get<{ month: string; count: number }[]>(
+        `users/me/activity`,
+        { params: { from, to } }
+    );
+
+    return response.data;
+};
 
 
 const userService = {
