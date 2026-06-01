@@ -75,8 +75,8 @@ function AnswererQuestionCard({ question }: AnswererQuestionCardProps) {
           ))}
         </div>
         <div className="flex items-center gap-2">
-          <Bookmark id={question.id} isBookmarked={question.isBookmarked ?? false} count={question.bookmarkCount} />
-          <Like id={question.id} type="question" isLiked={question.isLiked ?? false} count={question.likeCount} />
+          <Bookmark isBookmarked={question.isBookmarked ?? false} count={question.bookmarkCount} />
+          <Like isLiked={question.isLiked ?? false} count={question.likeCount} />
           <Comment count={question.replyCount} />
         </div>
       </div>
@@ -104,7 +104,7 @@ function AnswerPreviewCard({ answer }: AnswerPreviewCardProps) {
         {answer.content}
       </p>
       <div className="flex justify-end mt-2">
-        <Like id={answer.id} type="answer" count={answer.likeCount} isLiked={answer.isLiked} />
+        <Like count={answer.likeCount} isLiked={answer.isLiked} />
       </div>
     </Card>
   );
@@ -396,7 +396,8 @@ export default function QuestionPage() {
     try {
       await postAnswer({ questionId: id, content: answerContent });
       await refreshAnswers();
-      setQuestion((prev) => prev ? { ...prev, replyCount: prev.replyCount + 1 } : prev);
+      const updatedQuestion = await getQuestionById(id);
+      setQuestion(updatedQuestion);
       setIsAnswerModalOpen(false);
       setAnswerContent('');
       setAnswerError('');
