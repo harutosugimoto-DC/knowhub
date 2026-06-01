@@ -105,13 +105,17 @@ export default function Top() {
             <div className="flex justify-center m-[var(--spacing-64)]">
                 <Button text="質問作成" onClick={() => navigate("/create-question")} />
             </div>
-            <Card className="flex flex-col">
-                <div className={`flex items-center justify-between border-b transition-all ${isFilterOpen ? "border-[var(--main-color)] mb-[var(--spacing16)]" : "border-transparent mb-0"}`}>
+            <Card className="flex flex-col cursor-pointer" onClick={(e: React.MouseEvent<HTMLDivElement>) => {
+                if (e.target === e.currentTarget) {
+                    setIsFilterOpen(true);
+                }
+            }}>
+                <div className={`flex items-center justify-between border-b transition-all ${isFilterOpen ? "border-[var(--main-color)] mb-[var(--spacing16)]" : "border-transparent mb-0"}`}  onClick={()=> setIsFilterOpen(!isFilterOpen)}>
                     <div className="flex items-center">
                         <FilterAltOutlinedIcon className="text-[var(--main-color)]" />
                         <p className="text-[length:var(--font-size-big)]">フィルター</p>
                     </div>
-                    <div className="cursor-pointer !text-[var(--dark-gray)] text-[length:var(--font-size-normal)]" onClick={() => setIsFilterOpen(!isFilterOpen)}>
+                    <div className="cursor-pointer !text-[var(--dark-gray)] text-[length:var(--font-size-normal)]" >
                         {isFilterOpen ? <KeyboardArrowUpOutlinedIcon /> : <KeyboardArrowDownOutlinedIcon />}
                     </div>
                 </div>
