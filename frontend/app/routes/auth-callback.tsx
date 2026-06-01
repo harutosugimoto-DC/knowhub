@@ -3,7 +3,6 @@ import { useNavigate } from "react-router";
 import { supabase } from "@/lib/supabase";
 import { useUser } from "@/contexts/UserContext";
 import { authService } from "@/api/authService";
-import { toast } from "@/utils/toast";
 
 export async function clientLoader() {
     const { data: { session } } = await supabase.auth.getSession();
@@ -33,6 +32,14 @@ export default function AuthCallback() {
 
     useEffect(() => {
         const processLoginAndRouting = async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const hashParams = new URLSearchParams(window.location.hash.replace("#", ""));
+            const errorCode = urlParams.get("error_code") || hashParams.get("error_code");
+            if (errorCode) {
+                window.location.href = "/?error=unauthorized_domain";
+                return;
+            }
+
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) {
                 navigate("/");
@@ -42,7 +49,7 @@ export default function AuthCallback() {
             const email = session.user.email ?? "";
             if (!email.endsWith("@g.dreamcareer.co.jp")) {
                 await supabase.auth.signOut();
-                navigate("/?error=unauthorized_domain");
+                window.location.href = "/?error=unauthorized_domain";
                 return;
             }
 
@@ -59,7 +66,6 @@ export default function AuthCallback() {
                 });
 
                 const hasNickname = profile.nickname && profile.nickname.trim().length > 0;
-                toast.success('ログインしました。');
                 navigate(hasNickname ? "/top" : "/nickname");
 
             } catch (err) {
