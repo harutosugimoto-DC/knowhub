@@ -272,16 +272,17 @@ export default function CreateQuestion() {
 
                 {/* 入力エリア */}
                 <div className="px-4 pt-3 pb-4 border-t border-[var(--light-gray)] bg-white flex flex-col gap-1">
-                    <div className="flex gap-2 items-center">
-                        <input
-                            type="text"
+                    <div className="flex gap-2 items-end">
+                        <textarea
                             value={aiInputText}
                             onChange={(e) => setAiInputText(e.target.value)}
                             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submitAiChat(); } }}
                             placeholder="質問したい内容を入力..."
                             maxLength={AI_INPUT_MAX}
-                            className={`px-[var(--spacing-16)] flex-1 h-[44px] border rounded-[16px] focus:outline-none ${aiInputText.length > AI_INPUT_MAX ? 'border-[var(--danger-color)]' : 'border-[var(--light-gray)] focus:border-[#FF9500]'}`}
+                            rows={1}
+                            className={`px-[var(--spacing-16)] py-[10px] flex-1 min-h-[44px] max-h-[160px] border rounded-[16px] focus:outline-none resize-none overflow-y-auto ${aiInputText.length > AI_INPUT_MAX ? 'border-[var(--danger-color)]' : 'border-[var(--light-gray)] focus:border-[#FF9500]'}`}
                             disabled={isAiLoading}
+                            style={{ fieldSizing: 'content' } as React.CSSProperties}
                         />
                         <button onClick={() => submitAiChat()} disabled={isAiLoading || aiInputText.trim().length === 0 || aiInputText.length > AI_INPUT_MAX} className="w-[44px] h-[44px] rounded-full bg-[image:var(--ai-color)] text-white flex items-center justify-center cursor-pointer disabled:opacity-50">
                             <ArrowUpwardIcon className="!text-[16px]" />
