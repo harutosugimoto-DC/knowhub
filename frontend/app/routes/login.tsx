@@ -3,7 +3,6 @@ import { supabase } from "@/lib/supabase";
 import logo from "../assets/logo.webp";
 import { useNavigate } from "react-router";
 import { useUser } from "@/contexts/UserContext";
-import { toast } from "@/utils/toast";
 
 // GoogleブランドロゴのインラインSVG
 const GoogleIcon = () => (
@@ -29,10 +28,13 @@ export default function Login() {
     });
 
     useEffect(() => {
+        // user情報が存在し、かつ nickname が設定されている場合
         if (user && user.nickname) {
+            // `{ replace: true }` を入れることで、戻るボタンを押したときの無限ループを防ぎます
             navigate("/top", { replace: true });
-        } else if (user) {
-            navigate("/nickname", { replace: true });
+        }
+        else if (user) {
+            navigate("/nickname", { replace: true })
         }
     }, [user, navigate]);
 
@@ -48,6 +50,7 @@ export default function Login() {
             const { error: authError } = await supabase.auth.signInWithOAuth({
                 provider: "google",
                 options: {
+                    // 専用コールバックルートへリダイレクト（セッション確立 → 振り分け）
                     redirectTo: `${window.location.origin}/auth/callback`,
                 },
             });
@@ -56,7 +59,7 @@ export default function Login() {
 
         } catch (err: any) {
             console.error("Googleログインエラー:", err);
-            toast.error('Googleログインに失敗しました。');
+            setError("ログインに失敗しました。もう一度お試しください。");
             setIsLoading(false);
         }
     };
@@ -64,25 +67,37 @@ export default function Login() {
     return (
         <div className="min-h-[calc(100vh-64px)] flex items-center justify-center bg-[var(--base-color)] p-[var(--spacing-16)]">
             <main className="w-full flex justify-center">
-                <div className="bg-white rounded-[var(--radius-big)] shadow-[var(--box-shadow)] px-[var(--spacing-32)] py-[var(--spacing-48)] w-[600px] h-[400px] flex flex-col items-center gap-[var(--spacing-24)]">
+                <div className="bg-white rounded-[var(--radius-big)]
+                shadow-[var(--box-shadow)] px-[var(--spacing-32)]
+                 py-[var(--spacing-48)] w-[600px] h-[400px]
+                 flex flex-col items-center gap-[var(--spacing-24)]">
+
                     <img
                         src={logo}
                         alt="Know Hub アイコン"
                         className="w-16 h-[59px] rounded-[var(--radius-small)] object-contain"
                     />
+
+                    {/* ── テキストブロック ── */}
                     <div className="flex flex-col items-center gap-[var(--spacing-8)] text-center">
                         <h1 className="text-[length:var(--font-size-big)] font-normal text-[var(--main-color)]">
                             Know Hub
                         </h1>
-                        <p className="text-[length:var(--font-size-normal)] text-[var(--text-color-black)] leading-[1.6]">
+                        {/* サブテキスト2行 */}
+                        <p className="text-[length:var(--font-size-normal)]
+                        text-[var(--text-color-black)] leading-[1.6]">
                             社内の「わからない」を解決する
                         </p>
                         <p className="text-[length:var(--font-size-normal)] text-[var(--text-color-black)] leading-[1.6]">
                             質問・回答プラットフォーム
                         </p>
                     </div>
+
                     {error && (
-                        <p className="text-sm text-[var(--danger-color)] text-center w-full" role="alert">
+                        <p
+                            className="text-sm text-[var(--danger-color)] text-center w-full"
+                            role="alert"
+                        >
                             {error}
                         </p>
                     )}
