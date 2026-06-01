@@ -121,16 +121,39 @@ router.get('/', requireAuth, async (req, res) => {
   ? [req.query['statusIds[]']].flat() as string[]
   : undefined;
 
-const tagIds = req.query['tagIds[]']
+  const tagIds = req.query['tagIds[]']
   ? [req.query['tagIds[]']].flat() as string[]
   : undefined;
 
-const myActions = req.query['myActions[]']
+  const myActions = req.query['myActions[]']
   ? [req.query['myActions[]']].flat() as string[]
   : undefined;
   const limit = 20;
   const offset = (page - 1) * limit;
 
+  // 💡 【追加】ステップ1: 絞り込み条件に合う質問IDを事前抽出
+  let targetIds: string[] | null = null;
+  if (tagIds || statusIds || myActions || keyword) {
+    let idQuery = supabase.from('questions').select('id, user_id, status_id, question_tags(tag_id), bookmarks(user_id), answers(user_id, best_answer_at)').is('deleted_at', null);
+    if (keyword) idQuery = idQuery.or(`title.ilike.%${keyword}%,content.ilike.%${keyword}%`);
+    const { data: idData } = await idQuery;
+    let idFiltered = idData ?? [];
+    if (tagIds) idFiltered = idFiltered.filter((q: any) => tagIds.every((id) => q.question_tags?.some((qt: any) => qt.tag_id === id)));
+    if (statusIds) idFiltered = idFiltered.filter((q: any) => statusIds.includes(q.status_id));
+    if (myActions) {
+      idFiltered = idFiltered.filter((q: any) => myActions.some((action) => {
+        if (action === 'my_questions') return q.user_id === userId;
+        if (action === 'my_answers') return q.answers?.some((a: any) => a.user_id === userId);
+        if (action === 'my_solved') return q.user_id === userId && q.answers?.some((a: any) => a.best_answer_at !== null);
+        if (action === 'bookmarked') return q.bookmarks?.some((b: any) => b.user_id === userId);
+        return false;
+      }));
+    }
+    targetIds = idFiltered.map((q: any) => q.id);
+    if (targetIds.length === 0) {
+      return res.json({ currentPage: page, order, keyword: keyword ?? null, tagId: tagIds ?? null, myActions: myActions ?? null, statusId: statusIds ?? null, totalCount: 0, totalPages: 0, data: [] });
+    }
+  }
 
   let query = supabase
     .from('questions')
@@ -145,10 +168,13 @@ const myActions = req.query['myActions[]']
       question_tags ( tags (id, name ) ),
       question_likes ( user_id ),
       bookmarks ( user_id ),
-      answers ( id, user_id, best_answer_at )
+      answers ( id, user_id, best_answer_at, parent_answer_id, deleted_at )
     `, { count: 'exact' })
-    .is('deleted_at', null)
-    .range(offset, offset + limit - 1);
+    .is('deleted_at', null);
+
+  if (targetIds) query = query.in('id', targetIds); // 💡 【追加】抽出したIDでDB側で絞り込む
+
+  query = query.range(offset, offset + limit - 1); // 💡 【位置調整】
 
     // キーワードが指定されている場合のみ絞り込む
     if (keyword) {
@@ -157,8 +183,8 @@ const myActions = req.query['myActions[]']
 
 
 
-  if (order === 'likes_asc' || order === 'likes_desc') {
-  query = query.order('created_at', { ascending: false });
+  if (order === 'newAsc') {
+  query = query.order('created_at', { ascending: true });
     } else {
   query = query.order('created_at', { ascending: false });
     }
@@ -225,18 +251,18 @@ const myActions = req.query['myActions[]']
     postingTime: q.created_at,
     likeCount: q.question_likes?.length ?? 0,
     bookmarkCount: q.bookmarks?.length ?? 0,
-    replyCount: q.answers?.length ?? 0,
+    replyCount: q.answers?.filter((a: any) => a.parent_answer_id === null && a.deleted_at === null).length ?? 0,
     tagNames: q.question_tags?.map((qt: any) => qt.tags?.name) ?? [],
     isLiked: q.question_likes?.some((l: any) => l.user_id === userId) ?? false,
     isBookmarked: q.bookmarks?.some((b: any) => b.user_id === userId) ?? false,
   }));
 
   // いいね順の場合はアプリ側でソート
-  if (order === 'likes_desc') {
-  formatted.sort((a, b) => b.likeCount - a.likeCount); // 降順
-} else if (order === 'likes_asc') {
-  formatted.sort((a, b) => a.likeCount - b.likeCount); // 昇順
-}
+  if (order === 'likesDesc') {
+  formatted.sort((a, b) => b.likeCount - a.likeCount);// 降順
+    } else if (order === 'likesAsc') {
+  formatted.sort((a, b) => a.likeCount - b.likeCount);// 昇順
+    }
 
   const totalCount = count ?? 0;
   const totalPages = Math.ceil(totalCount / limit);
@@ -274,7 +300,7 @@ router.get('/:questionId', requireAuth, async (req, res) => {
       question_tags ( tags ( name ) ),
       question_likes ( user_id ),
       bookmarks ( user_id ),
-      answers ( id )
+      answers ( id, parent_answer_id, deleted_at )
     `)
     .eq('id', questionId)
     .is('deleted_at', null)
@@ -301,7 +327,7 @@ router.get('/:questionId', requireAuth, async (req, res) => {
     postingTime: data.created_at,
     likeCount: data.question_likes?.length ?? 0,
     bookmarkCount: data.bookmarks?.length ?? 0,
-    replyCount: data.answers?.length ?? 0,
+    replyCount: data.answers?.filter((a: any) => a.parent_answer_id === null && a.deleted_at === null).length ?? 0,
     tagNames: data.question_tags?.map((qt: any) => qt.tags?.name) ?? [],
     isLiked: data.question_likes?.some((l: any) => l.user_id === userId) ?? false,
     isBookmarked: data.bookmarks?.some((b: any) => b.user_id === userId) ?? false,
