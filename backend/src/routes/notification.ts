@@ -16,7 +16,8 @@ const { data, error } = await supabase
     created_at,
     link_url,
     notification_types ( name ),
-    sender:sender_user_id ( nickname, profile_icon_url )
+    sender:sender_user_id ( nickname, profile_icon_url ),
+    questions ( title )
   `)
     .eq('receiver_user_id', userId)
     .order('created_at', { ascending: false });

@@ -24,6 +24,7 @@ export const getNotifications = async (): Promise<NotificationType[]> => {
         type: n.notification_types.name,
         senderName: n.sender.nickname,
         senderIcon: n.sender.profile_icon_url,
+        questionTitle: n.questions?.title || null,
     }));
 };
 /**

@@ -89,7 +89,7 @@ export default function Login() {
                     <button
                         onClick={handleGoogleLoginClick}
                         disabled={isLoading}
-                        className="flex items-center justify-center gap-[var(--spacing-12)] w-[450px] h-[60px] py-[var(--spacing-12)] px-[var(--spacing-16)] bg-white border border-[var(--light-gray)] rounded-[var(--radius-small)] text-[length:var(--font-size-normal)] text-[var(--text-color-black)] cursor-pointer transition-opacity duration-200 ease-in-out hover:opacity-80 disabled:opacity-60 disabled:cursor-not-allowed"
+                        className="flex items-center justify-center gap-[var(--spacing-12)] w-[450px] h-[60px] py-[var(--spacing-12)] px-[var(--spacing-16)] bg-white border border-[var(--light-gray)] rounded-[var(--radius-small)] text-[length:var(--font-size-normal)] text-[var(--text-color-black)] cursor-pointer ease-in-out hover:bg-[var(--hover-color)] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                     >
                         <GoogleIcon />
                         {isLoading ? "処理中..." : "Googleでログイン"}
