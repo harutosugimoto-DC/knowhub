@@ -221,7 +221,7 @@ export default function CreateQuestion() {
                     <div className="flex flex-col gap-4 px-[var(--spacing-16)]">
                         {tagLoadError
                             ? <ErrorMessages message={tagLoadError} />
-                            : <TagSelector selectedTagIds={selectedTagIds} setSelectedTagIds={setSelectedTagIds} allTagData={allTags} />
+                            : <TagSelector selectedTagIds={selectedTagIds} setSelectedTagIds={setSelectedTagIds} allTagData={allTags} setErrors={setErrors}/>
                         }
                         {errors.tags && <ErrorMessages message={errors.tags} />}
                     </div>
