@@ -101,7 +101,7 @@ export default function Top() {
     }, [currentPage, currentSortOption, activeKeyword, selectedStatusIds, selectedTagIds, selectedMyActionIds]);
 
     return (
-        <div className="px-[var(--spacing-64)]">
+        <div className="px-[var(--spacing-64)] h-[calc(100vh-64px)] overflow-y-auto">
             <div className="flex justify-center m-[var(--spacing-64)]">
                 <Button text="質問作成" onClick={() => navigate("/create-question")} />
             </div>
