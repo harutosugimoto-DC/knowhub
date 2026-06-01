@@ -184,7 +184,7 @@ router.get('/me/recently-solved', requireAuth, async (req, res) => {
     `)
     .eq('user_id', userId)
     .not('best_answer_at', 'is', null)
-    .is('deleted_at', null)
+    .is('questions.deleted_at', null)
     .order('best_answer_at', { ascending: false })
     .limit(2);
 
@@ -192,7 +192,7 @@ router.get('/me/recently-solved', requireAuth, async (req, res) => {
     return res.status(500).json({ error: answerError.message });
   }
 
-  const formatted = (bestAnswers ?? []).map((a: any) => {
+  const formatted = (bestAnswers ?? []).filter((a: any) => a.questions !== null).map((a: any) => {
     const q = a.questions;
     return {
       id: q.id,
