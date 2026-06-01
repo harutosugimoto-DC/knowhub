@@ -13,6 +13,7 @@ import { HiMiniPencilSquare } from "react-icons/hi2";
 import { useUser } from "@/contexts/UserContext";
 import { getNotifications, type NotificationType } from "@/api/notificationService";
 import { supabase } from "@/lib/supabase";
+import { toast } from "@/utils/toast";
 
 export default function Header() {
     const navigate = useNavigate();
@@ -83,8 +84,13 @@ export default function Header() {
     }, [isLoggedIn, user?.id]);
 
     const handleLogout = async () => {
-        await logout();
-        navigate("/");
+        try {
+            await logout();
+            toast.success('ログアウトしました。');
+            navigate("/");
+        } catch {
+            toast.error('ログアウトに失敗しました。時間をおいて再度お試しください。');
+        }
     };
 
     const toggleNotification = () => {

@@ -29,6 +29,7 @@ import { getQuestionById, getQuestionAnswers, postAnswer, deleteQuestion } from 
 import { acceptAnswer, deleteAnswer } from '@/api/answerService';
 import { useUser } from '@/contexts/UserContext';
 import { useNavigate } from 'react-router';
+import { toast } from '@/utils/toast';
 
 import EmojiEventsOutlinedIcon from '@mui/icons-material/EmojiEventsOutlined';
 import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
@@ -388,13 +389,12 @@ export default function QuestionPage() {
     try {
       await postAnswer({ questionId: id, content: answerContent });
       await refreshAnswers();
-      const updatedQuestion = await getQuestionById(id);
-      setQuestion(updatedQuestion);
+
       setIsAnswerModalOpen(false);
       setAnswerContent('');
       setAnswerError('');
     } catch {
-      setAnswerError('回答の投稿に失敗しました');
+      // axiosClientがエラートーストを自動表示
     } finally {
       setIsAnswerSubmitting(false);
     }

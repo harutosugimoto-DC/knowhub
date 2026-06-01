@@ -3,6 +3,7 @@ import { supabase } from "@/lib/supabase";
 import logo from "../assets/logo.webp";
 import { useNavigate } from "react-router";
 import { useUser } from "@/contexts/UserContext";
+import { toast } from "@/utils/toast";
 
 // GoogleブランドロゴのインラインSVG
 const GoogleIcon = () => (
@@ -19,7 +20,6 @@ export default function Login() {
     const { user } = useUser();
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         // user情報が存在し、かつ nickname が設定されている場合
@@ -38,7 +38,6 @@ export default function Login() {
 
     const handleGoogleLoginClick = async () => {
         setIsLoading(true);
-        setError(null);
 
         try {
             const { error: authError } = await supabase.auth.signInWithOAuth({
@@ -53,7 +52,7 @@ export default function Login() {
 
         } catch (err: any) {
             console.error("Googleログインエラー:", err);
-            setError(err.message || "ログインに失敗しました。もう一度お試しください。");
+            toast.error('Googleログインに失敗しました。');
             setIsLoading(false);
         }
     };
@@ -87,14 +86,6 @@ export default function Login() {
                         </p>
                     </div>
 
-                    {error && (
-                        <p
-                            className="text-sm text-[var(--danger-color)] text-center w-full"
-                            role="alert"
-                        >
-                            {error}
-                        </p>
-                    )}
                     <button
                         onClick={handleGoogleLoginClick}
                         disabled={isLoading}

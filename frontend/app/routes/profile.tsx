@@ -14,6 +14,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import { useUser } from "@/contexts/UserContext";
 import { getMyData, getRecentlySolved, getTopTags, getActivity, updateProfileIcon } from "@/api/userService";
 import { authService } from "@/api/authService";
+import { toast } from "@/utils/toast";
 import type { QuestionType } from "@/types/question";
 import type { myData } from "@/types/user";
 
@@ -84,6 +85,7 @@ export default function Profile() {
             // 成功したら Context とローカルの profileData の両方を更新
             setUser((prev) => prev ? { ...prev, iconUrl: response.profile_icon_url } : null);
             setProfileData((prev) => prev ? { ...prev, iconUrl: response.profile_icon_url } : null);
+            toast.success('プロフィールを更新しました。');
         } catch (err) {
             console.error("画像のアップロードに失敗しました:", err);
         } finally {

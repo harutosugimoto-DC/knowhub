@@ -12,6 +12,7 @@ import Modal from "@/components/common/Modal";
 
 import { detailPlaceholder, titlePlaceholder } from "@/constants/placeholder";
 import { supabase } from "@/lib/supabase";
+import { toast } from "@/utils/toast";
 
 import { LuBot } from "react-icons/lu";
 import CloseIcon from '@mui/icons-material/Close';
@@ -34,7 +35,6 @@ export default function CreateQuestion() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isAiOpen, setIsAiOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [submitError, setSubmitError] = useState<string | null>(null);
 
     const [aiInputText, setAiInputText] = useState("");
     const [aiChatMessages, setAiChatMessages] = useState<ChatMessage[]>([
@@ -102,12 +102,11 @@ export default function CreateQuestion() {
 
     const submitQuestion = async () => {
         setIsSubmitting(true);
-        setSubmitError(null);
 
         try {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) {
-                setSubmitError('ログインが必要です');
+                toast.error('ログインが必要です');
                 setIsSubmitting(false);
                 return;
             }
@@ -126,16 +125,16 @@ export default function CreateQuestion() {
             });
 
             if (!res.ok) {
-                const body = await res.json().catch(() => ({}));
-                setSubmitError((body as { error?: string }).error ?? '投稿に失敗しました');
+                toast.error('質問の投稿に失敗しました。');
                 setIsSubmitting(false);
                 return;
             }
 
+            toast.success('質問を投稿しました。');
             navigate('/top');
         } catch (err) {
             console.error('質問投稿エラー:', err);
-            setSubmitError('ネットワークエラーが発生しました');
+            toast.error('質問の投稿に失敗しました。');
             setIsSubmitting(false);
         }
     };
@@ -318,11 +317,6 @@ export default function CreateQuestion() {
                                 ))}
                             </div>
                         </div>
-                        {submitError && (
-                            <div className="px-[var(--spacing-16)] py-[var(--spacing-8)]">
-                                <ErrorMessages message={submitError} />
-                            </div>
-                        )}
                     </Card>
                     <Button
                         onClick={() => submitQuestion()}
