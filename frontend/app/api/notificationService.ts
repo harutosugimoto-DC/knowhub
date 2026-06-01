@@ -36,6 +36,10 @@ export const readNotification = async (notificationId:string): Promise<void> => 
     const response = await axiosClient.patch<void>(`/notifications/${notificationId}/read`);
 }
 
+export const allReadNotifications = async (): Promise<void> => {
+    const response = await axiosClient.patch<void>(`/notifications/read-all`);
+}
+
 const notificationService = {
     getNotifications,
 };
