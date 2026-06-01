@@ -14,11 +14,9 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Service Role キーのクライアント（RLS をバイパスしてサーバー側で DB 操作）
 // ユーザー作成など、anon キーでは権限が足りない操作に使う
-export const supabaseAdmin = supabaseServiceRoleKey
-  ? createClient(supabaseUrl, supabaseServiceRoleKey, {
+export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey!, {
       auth: { autoRefreshToken: false, persistSession: false },
     })
-  : null;
 
 // ユーザーの JWT を使った認証済みクライアント（RLS の authenticated ロールで動作）
 export function createUserClient(token: string) {

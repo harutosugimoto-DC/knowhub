@@ -1,14 +1,16 @@
-import type { ReactNode } from "react";
+import type { ReactNode, Ref } from "react";
 
 type ScrollBarProps = {
     children: ReactNode;
     className?: string; // 高さを指定したり、レイアウトを微調整できるようにします
     isAi?: boolean
+    ref?: Ref<HTMLDivElement>
 };
 
-export default function ScrollBar({ children, className = "", isAi }: ScrollBarProps) {
+export default function ScrollBar({ children, className = "", isAi, ref }: ScrollBarProps) {
     return (
         <div
+            ref={ref}
             // 配列でクラスを並べて、最後に .join(" ") で半角スペース繋ぎの1つの文字列にします
             className={[
                 "pr-[var(--spacing-8)]",

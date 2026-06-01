@@ -1,15 +1,15 @@
 import TagChip from "@/components/common/TagChip";
 import { tagPlaceholder } from "@/constants/placeholder";
 type TagSelectorProps = {
-    selectedTagIds: number[];
-    setSelectedTagIds: React.Dispatch<React.SetStateAction<number[]>>;
-    allTagData: { id: number, name: string }[];
+    selectedTagIds: string[];
+    setSelectedTagIds: React.Dispatch<React.SetStateAction<string[]>>;
+    allTagData: { id: string, name: string }[];
 };
 
 export default function TagSelector({ selectedTagIds, setSelectedTagIds, allTagData }: TagSelectorProps) {
 
     // タグの選択・解除をこれ1つで制御（トグル処理）
-    const handleToggleSelect = (tagId: number) => {
+    const handleToggleSelect = (tagId: string) => {
         setSelectedTagIds((prev) =>
             prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId]
         );
@@ -55,10 +55,10 @@ export default function TagSelector({ selectedTagIds, setSelectedTagIds, allTagD
                             className={`
                                 cursor-pointer
                                 rounded-[var(--radius-big)] px-[var(--spacing-16)] py-[var(--spacing-8)] 
-                                font-['Lora'] text-[var(--font-size-normal)] transition-all duration-200
+                                font-['Lora'] text-[var(--font-size-normal)] transition-all
                                 ${isSelected
                                     ? "bg-[var(--main-color)] text-white shadow-[var(--box-shadow)] border border-transparent"
-                                    : "bg-white !text-[var(--dark-gray)] border border-[var(--dark-gray)]"
+                                    : "bg-white !text-[var(--dark-gray)] border border-[var(--dark-gray)] hover:bg-[var(--hover-color)]"
                                 }
                             `}
                         >
