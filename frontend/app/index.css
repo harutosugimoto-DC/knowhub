@@ -59,6 +59,13 @@ html {
     white-space: pre-wrap;
 }
 
+.recharts-wrapper:focus,
+.recharts-surface:focus {
+    outline: none !important;
+}
+.recharts-wrapper *:focus {
+    outline: none !important;
+}
 body {
     font-family: "Noto Sans JP", sans-serif;
     color: var(--text-color-black);
