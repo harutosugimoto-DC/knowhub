@@ -29,10 +29,12 @@ import { getQuestionById, getQuestionAnswers, postAnswer, deleteQuestion } from 
 import { acceptAnswer, deleteAnswer } from '@/api/answerService';
 import { useUser } from '@/contexts/UserContext';
 import { useNavigate } from 'react-router';
+import { toast } from '@/utils/toast';
 
 import EmojiEventsOutlinedIcon from '@mui/icons-material/EmojiEventsOutlined';
 import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
 import KeyboardArrowUpOutlinedIcon from '@mui/icons-material/KeyboardArrowUpOutlined';
+import Button from '@/components/common/Button';
 
 
 // ═════════════════════════════════════════
@@ -60,13 +62,14 @@ function AnswererQuestionCard({ question }: AnswererQuestionCardProps) {
             : <KeyboardArrowDownOutlinedIcon className="cursor-pointer text-[var(--dark-gray)]" onClick={() => setIsContentOpen(true)} />
         )}
       </div>
-
-      <CollapsibleContent
-        content={question.content}
-        isContentOpen={isContentOpen}
-        setIsContentOpen={setIsContentOpen}
-        setIsOverflowing={setIsOverflowing}
-      />
+      <div className='!select-text'>
+        <CollapsibleContent
+          content={question.content}
+          isContentOpen={isContentOpen}
+          setIsContentOpen={setIsContentOpen}
+          setIsOverflowing={setIsOverflowing}
+        />
+      </div>
 
       <div className="px-[var(--spacing-16)] py-[var(--spacing-8)] flex items-center justify-between">
         <div className="flex flex-wrap gap-2">
@@ -75,8 +78,8 @@ function AnswererQuestionCard({ question }: AnswererQuestionCardProps) {
           ))}
         </div>
         <div className="flex items-center gap-2">
-          <Bookmark isBookmarked={question.isBookmarked ?? false} count={question.bookmarkCount} />
-          <Like isLiked={question.isLiked ?? false} count={question.likeCount} />
+          <Bookmark id={question.id} isBookmarked={question.isBookmarked ?? false} count={question.bookmarkCount} />
+          <Like id={question.id} type='question' isLiked={question.isLiked ?? false} count={question.likeCount} />
           <Comment count={question.replyCount} />
         </div>
       </div>
@@ -100,11 +103,11 @@ function AnswerPreviewCard({ answer }: AnswerPreviewCardProps) {
         <p>{answer.userName}</p>
         <Time postingTime={answer.postingTime} />
       </div>
-      <p className="px-[var(--spacing-16)] text-[length:var(--font-size-medium)] leading-relaxed max-h-[120px] overflow-auto">
+      <p className="!select-text px-[var(--spacing-16)] text-[length:var(--font-size-medium)] leading-relaxed max-h-[120px] overflow-auto">
         {answer.content}
       </p>
       <div className="flex justify-end mt-2">
-        <Like count={answer.likeCount} isLiked={answer.isLiked} />
+        <Like  id={answer.id} type='answer' count={answer.likeCount} isLiked={answer.isLiked} />
       </div>
     </Card>
   );
@@ -130,7 +133,7 @@ function ReplyPreviewCard({ reply }: ReplyPreviewCardProps) {
         <p>{reply.userName}</p>
         <Time postingTime={reply.postingTime} />
       </div>
-      <p className="px-[var(--spacing-16)] text-[length:var(--font-size-medium)] leading-relaxed max-h-[120px] overflow-auto">
+      <p className="!select-text px-[var(--spacing-16)] text-[length:var(--font-size-medium)] leading-relaxed max-h-[120px] overflow-auto">
         {reply.content}
       </p>
     </Card>
@@ -275,13 +278,16 @@ type AnswerFormProps = {
 
 function AnswerForm({ title, preview, content, onChange, error, isSubmitting, onSubmit }: AnswerFormProps) {
   return (
-    <div style={{ width: '750px', maxWidth: '90vw' }} className="px-4 sm:px-0 flex flex-col gap-[var(--spacing-16)] max-h-[80vh] overflow-y-auto">
-      <div className="max-h-[240px] overflow-auto">
+    <div style={{ width: '750px', maxWidth: '90vw' }} className="sm:px-0 flex flex-col gap-[var(--spacing-8)] max-h-[80vh] overflow-y-auto">
+      <div className="pb-4 px-4 max-h-[240px] overflow-auto">
         {preview}
       </div>
-      <div className="flex flex-col gap-[var(--spacing-8)]">
-        <label className="text-[length:var(--font-size-normal)] font-semibold">
-          {title}<span className="text-[var(--danger-color)]">*</span>
+      <div className="flex flex-col gap-[var(--spacing-16)] px-4 pb-4 items-center">
+        <label className="w-full flex py-[var(--spacing-8)] justify-between items-center border-b border-[var(--main-color)]">
+          <p className="text-[length:var(--font-size-big)]">
+            {title}
+            <span className="text-[var(--danger-color)]">*</span>
+          </p>
         </label>
         <TextArea
           placeholder="例：setStateによる更新は非同期で行われるため、同じレンダーサイクル内では古い値を参照してしまうからです。"
@@ -290,22 +296,9 @@ function AnswerForm({ title, preview, content, onChange, error, isSubmitting, on
           rows={5}
         />
         {error && <ErrorMessages message={error} />}
+        <Button className='w-[344px]' onClick={onSubmit} text={isSubmitting ? '送信中...' : '回答送信'} disabled={isSubmitting} />
       </div>
-      <button
-        onClick={onSubmit}
-        disabled={isSubmitting}
-        className={[
-          'w-[250px] max-w-full h-[80px] mx-auto',
-          'rounded-[var(--radius-small)] shadow-[var(--box-shadow)]',
-          'text-white text-[length:var(--font-size-medium)] font-semibold',
-          'transition-all duration-200',
-          isSubmitting
-            ? 'bg-[var(--light-gray)] cursor-not-allowed'
-            : 'bg-[image:var(--gradation-green)] cursor-pointer hover:opacity-90',
-        ].join(' ')}
-      >
-        {isSubmitting ? '送信中...' : '回答送信'}
-      </button>
+
     </div>
   );
 }
@@ -382,8 +375,12 @@ export default function QuestionPage() {
 
   const refreshAnswers = async () => {
     if (!id) return;
-    const updated = await getQuestionAnswers(id);
+    const [updated, updatedQuestion] = await Promise.all([
+      getQuestionAnswers(id),
+      getQuestionById(id),
+    ]);
     setAnswers(updated);
+    setQuestion(updatedQuestion);
   };
 
 
@@ -396,13 +393,12 @@ export default function QuestionPage() {
     try {
       await postAnswer({ questionId: id, content: answerContent });
       await refreshAnswers();
-      const updatedQuestion = await getQuestionById(id);
-      setQuestion(updatedQuestion);
+
       setIsAnswerModalOpen(false);
       setAnswerContent('');
       setAnswerError('');
     } catch {
-      setAnswerError('回答の投稿に失敗しました');
+      // axiosClientがエラートーストを自動表示
     } finally {
       setIsAnswerSubmitting(false);
     }
@@ -519,7 +515,7 @@ export default function QuestionPage() {
               <h2 className="text-[length:var(--font-size-big)]">回答一覧</h2>
             </div>
 
-            <ScrollBar className="flex flex-col gap-[var(--spacing-16)] max-h-[calc(100vh-300px)]">
+            <ScrollBar className="py-4 flex flex-col gap-[var(--spacing-16)] max-h-[calc(100vh-300px)]">
               {answers.length === 0 ? (
                 <p className="text-center text-[var(--dark-gray)] py-[var(--spacing-32)]">
                   まだ回答がありません
@@ -543,15 +539,19 @@ export default function QuestionPage() {
             </ScrollBar>
 
             {!isOwner && question.statusId !== '解決済み' && (
-              <button
-                onClick={() => setIsAnswerModalOpen(true)}
-                className="w-[410px] h-[80px] bg-[image:var(--gradation-green)]
-                text-white text-[length:var(--font-size-medium)] font-semibold
-                rounded-[var(--radius-small)] shadow-[var(--box-shadow)]
-                cursor-pointer hover:opacity-90 transition-all mt-[var(--spacing-8)] mx-auto"
-              >
-                回答作成
-              </button>
+              // <button
+              //   onClick={() => setIsAnswerModalOpen(true)}
+              //   className="w-[410px] h-[80px] bg-[image:var(--gradation-green)]
+              //   text-white text-[length:var(--font-size-medium)] font-semibold
+              //   rounded-[var(--radius-small)] shadow-[var(--box-shadow)]
+              //   cursor-pointer hover:opacity-90 transition-all mt-[var(--spacing-8)] mx-auto"
+              // >
+              //   回答作成
+              // </button>]
+              <div className='w-full flex items-center justify-center'>
+
+                <Button onClick={() => setIsAnswerModalOpen(true)} text='回答作成' className='w-[410px]' />
+              </div>
             )}
           </section>
         </div>
