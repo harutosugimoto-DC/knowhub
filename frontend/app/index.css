@@ -55,6 +55,8 @@ html {
     font-size: 16px;
     line-height: 1.6;
     user-select: none;
+    word-break: break-all;
+    white-space: pre-wrap;
 }
 
 body {
