@@ -221,7 +221,7 @@ export default function CreateQuestion() {
                     <div className="flex flex-col gap-4 px-[var(--spacing-16)]">
                         {tagLoadError
                             ? <ErrorMessages message={tagLoadError} />
-                            : <TagSelector selectedTagIds={selectedTagIds} setSelectedTagIds={setSelectedTagIds} allTagData={allTags} setErrors={setErrors}/>
+                            : <TagSelector selectedTagIds={selectedTagIds} setSelectedTagIds={setSelectedTagIds} allTagData={allTags} setErrors={setErrors} />
                         }
                         {errors.tags && <ErrorMessages message={errors.tags} />}
                     </div>
@@ -295,33 +295,38 @@ export default function CreateQuestion() {
 
             {isModalOpen && (
                 <Modal onClose={() => setIsModalOpen(false)}>
-                    <Card className="max-w-[1000px] min-w-[400px]">
-                        <div className="flex items-center justify-between py-[var(--spacing-16)]">
-                            <div className="flex items-center gap-4">
-                                <StatusChip name="回答募集中" />
-                                <h2 className="text-[length:var(--font-size-big)]">
-                                    {titleText}
-                                </h2>
+                    <div style={{ width: '750px', maxWidth: '90vw' }} className="p-4 gap-4 sm:px-0 flex flex-col max-h-[85vh] rounded-[var(--radius-big)] overflow-hidden">
+                        <Card className="max-w-[1000px] min-w-[400px]">
+                            <div className="flex items-center justify-between py-[var(--spacing-16)]">
+                                <div className="flex items-center gap-4">
+                                    <StatusChip name="回答募集中" />
+                                    <h2 className="text-[length:var(--font-size-big)]">
+                                        {titleText}
+                                    </h2>
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="px-[var(--spacing-16)] py-[var(--spacing-8)]">
-                            <ScrollBar className="max-h-[300px]">
-                                <p className="whitespace-pre-wrap break-words">{detailText}</p>
-                            </ScrollBar>
-                        </div>
-                        <div className="px-[var(--spacing-16)] py-[var(--spacing-8)] flex items-center justify-between">
-                            <div className="flex flex-wrap gap-2">
-                                {selectedTagIds.map((tagId, index) => (
-                                    <TagChip key={index} text={allTags.find((t) => t.id === tagId)?.name ?? tagId} />
-                                ))}
+                            <div className="px-[var(--spacing-16)] py-[var(--spacing-8)]">
+                                <ScrollBar className="max-h-[64px]">
+                                    <p className="whitespace-pre-wrap break-words">{detailText}</p>
+                                </ScrollBar>
                             </div>
+                            <div className="px-[var(--spacing-16)] py-[var(--spacing-8)] flex items-center justify-between">
+                                <div className="flex flex-wrap gap-2">
+                                    {selectedTagIds.map((tagId, index) => (
+                                        <TagChip key={index} text={allTags.find((t) => t.id === tagId)?.name ?? tagId} />
+                                    ))}
+                                </div>
+                            </div>
+                        </Card>
+                        <div className="w-full flex justify-center">
+                            <Button
+                                onClick={() => submitQuestion()}
+                                text={isSubmitting ? "投稿中..." : "質問投稿"}
+                                className="w-[344px]"
+                            />
                         </div>
-                    </Card>
-                    <Button
-                        onClick={() => submitQuestion()}
-                        text={isSubmitting ? "投稿中..." : "質問投稿"}
-                    />
+                    </div>
                 </Modal>
             )}
         </div>
