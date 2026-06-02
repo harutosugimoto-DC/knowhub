@@ -116,6 +116,7 @@ export default function Profile() {
     // ─── 💡 ニックネーム更新処理 (Enterで発火) ───
     const handleNicknameChange = async () => {
         if (!nickname.trim()) {
+            setNicknameError("ニックネームを入力してください。");
             return;
         }
         if (nickname.length > 10) {
