@@ -35,6 +35,7 @@ import EmojiEventsOutlinedIcon from '@mui/icons-material/EmojiEventsOutlined';
 import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
 import KeyboardArrowUpOutlinedIcon from '@mui/icons-material/KeyboardArrowUpOutlined';
 import Button from '@/components/common/Button';
+import Loading from '@/components/common/Loading';
 
 
 // ═════════════════════════════════════════
@@ -86,7 +87,52 @@ function AnswererQuestionCard({ question }: AnswererQuestionCardProps) {
     </Card>
   );
 }
+type AnswererQuestionPreviewCardProps = {
+  question: QuestionDetail;
+};
+//回答作成時の質問プレビュー専用
+function AnswererQuestionPreviewCard({ question }: AnswererQuestionPreviewCardProps) {
+  return (
+    // 💡 修正1: Card 自体を縦方向の Flexbox（flex flex-col）にします。
+    // 外側から指定された高さを受け取れるよう、基本として h-full をつけておきます。
+    <Card className="w-full px-4 py-2 flex flex-col h-full">
 
+      {/* 💡 修正2: ヘッダーが潰れないように shrink-0 を指定 */}
+      <div className="flex items-center justify-between pb-[var(--spacing-16)] shrink-0">
+        <div className="flex items-center gap-4">
+          <StatusChip name={question.statusId} />
+          <h2 className="text-[length:var(--font-size-big)]">{question.title}</h2>
+        </div>
+      </div>
+
+      {/* 💡 修正3 【ここが最重要！】 */}
+      {/* flex-1 で残りの高さをすべてこのエリアに割り当て、min-h-0 で「中身の長さに引っ張られて親を突き破る現象」を完全に防ぎます */}
+      <div className='!select-text flex-1 min-h-0'>
+        {/* 💡 修正4: 上の div（flex-1）が確保した高さに100%フィットさせるため、max-h ではなく h-full にします */}
+        {/* 前回の改行・ローマ字対策（whitespace-pre-wrap break-all）も一緒に p タグへ仕込んであります */}
+        <ScrollBar className='h-full overflow-auto px-[var(--spacing-16)]'>
+          <p className="!select-text text-[length:var(--font-size-medium)] leading-relaxed whitespace-pre-wrap break-all">
+            {question.content}
+          </p>
+        </ScrollBar>
+      </div>
+
+      {/* 💡 修正5: フッターもヘッダー同様に潰れないよう shrink-0 を指定 */}
+      <div className="px-[var(--spacing-16)] py-[var(--spacing-8)] flex items-center justify-between shrink-0">
+        <div className="flex flex-wrap gap-2">
+          {question.tagNames?.map((tag, index) => (
+            <TagChip key={index} text={tag} />
+          ))}
+        </div>
+        <div className="flex items-center gap-2">
+          <Bookmark id={question.id} isBookmarked={question.isBookmarked ?? false} count={question.bookmarkCount} />
+          <Like id={question.id} type='question' isLiked={question.isLiked ?? false} count={question.likeCount} />
+          <Comment count={question.replyCount} />
+        </div>
+      </div>
+    </Card>
+  );
+}
 
 // ═════════════════════════════════════════
 // AnswerPreviewCard（回答返信モーダル内のプレビューカード）
@@ -103,11 +149,13 @@ function AnswerPreviewCard({ answer }: AnswerPreviewCardProps) {
         <p>{answer.userName}</p>
         <Time postingTime={answer.postingTime} />
       </div>
-      <p className="!select-text px-[var(--spacing-16)] text-[length:var(--font-size-medium)] leading-relaxed max-h-[120px] overflow-auto">
-        {answer.content}
-      </p>
+      <ScrollBar className='max-h-[100px] overflow-auto px-[var(--spacing-16)]'>
+        <p className="!select-text text-[length:var(--font-size-medium)] leading-relaxed ">
+          {answer.content}
+        </p>
+      </ScrollBar>
       <div className="flex justify-end mt-2">
-        <Like  id={answer.id} type='answer' count={answer.likeCount} isLiked={answer.isLiked} />
+        <Like id={answer.id} type='answer' count={answer.likeCount} isLiked={answer.isLiked} />
       </div>
     </Card>
   );
@@ -278,25 +326,34 @@ type AnswerFormProps = {
 
 function AnswerForm({ title, preview, content, onChange, error, isSubmitting, onSubmit }: AnswerFormProps) {
   return (
-    <div style={{ width: '750px', maxWidth: '90vw' }} className="sm:px-0 flex flex-col gap-[var(--spacing-8)] max-h-[80vh] overflow-y-auto">
-      <div className="pb-4 px-4 max-h-[240px] overflow-auto">
+    // 💡 画面全体の破綻を防ぐため、全体に bg-white と rounded を明示しています
+    <div style={{ width: '750px', maxWidth: '90vw' }} className="sm:px-0 flex flex-col max-h-[85vh] bg-white rounded-[var(--radius-big)] overflow-hidden">
+      
+      {/* 💡 【超重要】max-h から「h-[220px]」の固定値に変更し、shrink-0 を追加 */}
+      {/* これにより、カード側が「220pxの100%」を正しく認識して内部スクロールが100%発動し、下の要素の侵入も物理的に防ぎます */}
+      <div className="pt-4 px-4 h-[220px] shrink-0">
         {preview}
       </div>
-      <div className="flex flex-col gap-[var(--spacing-16)] px-4 pb-4 items-center">
-        <label className="w-full flex py-[var(--spacing-8)] justify-between items-center border-b border-[var(--main-color)]">
+      
+      {/* 💡 下半分の入力エリア：ここを flex-1 overflow-y-auto にすることで、ノートPCなどの狭い画面でもここだけが綺麗にスクロールして画面から溢れなくなります */}
+      <div className="flex flex-col gap-[var(--spacing-16)] px-4 pb-4 pt-2 items-center flex-1 overflow-y-auto">
+        <label className="w-full flex py-[var(--spacing-8)] justify-between items-center border-b border-[var(--main-color)] shrink-0">
           <p className="text-[length:var(--font-size-big)]">
             {title}
             <span className="text-[var(--danger-color)]">*</span>
           </p>
         </label>
+        
         <TextArea
           placeholder="例：setStateによる更新は非同期で行われるため、同じレンダーサイクル内では古い値を参照してしまうからです。"
           value={content}
           onChange={onChange}
           rows={5}
         />
+        
         {error && <ErrorMessages message={error} />}
-        <Button className='w-[344px]' onClick={onSubmit} text={isSubmitting ? '送信中...' : '回答送信'} disabled={isSubmitting} />
+        
+        <Button className='w-[344px] shrink-0' onClick={onSubmit} text={isSubmitting ? '送信中...' : '回答送信'} disabled={isSubmitting} />
       </div>
 
     </div>
@@ -474,9 +531,8 @@ export default function QuestionPage() {
   if (isLoading) {
     return (
       <>
-        <Header />
         <div className="min-h-screen bg-[var(--base-color)] pt-[64px] flex items-center justify-center">
-          <p className="text-[var(--dark-gray)]">読み込み中...</p>
+          <Loading />
         </div>
       </>
     );
@@ -485,7 +541,6 @@ export default function QuestionPage() {
   if (!question) {
     return (
       <>
-        <Header />
         <div className="min-h-screen bg-[var(--base-color)] pt-[64px] flex items-center justify-center">
           <p className="text-[var(--dark-gray)]">質問が見つかりません</p>
         </div>
@@ -496,8 +551,6 @@ export default function QuestionPage() {
 
   return (
     <>
-      <Header />
-
       <div className="min-h-screen bg-[var(--base-color)] pt-[64px]">
         <div className="max-w-[1440px] mx-auto px-[var(--spacing-32)] py-[var(--spacing-24)] flex flex-col gap-[var(--spacing-24)]">
 
@@ -558,7 +611,7 @@ export default function QuestionPage() {
         <Modal onClose={() => { setIsAnswerModalOpen(false); setAnswerContent(''); setAnswerError(''); }}>
           <AnswerForm
             title="回答を入力してください"
-            preview={<AnswererQuestionCard question={question} />}
+            preview={<AnswererQuestionPreviewCard question={question} />}
             content={answerContent}
             onChange={setAnswerContent}
             error={answerError}
