@@ -5,9 +5,11 @@ import { useEffect } from "react"; // 💡 修正1: useEffect をインポート
 type ModalProps = {
     children: React.ReactNode;
     onClose: () => void;
+    confirmOnClose?: boolean;
+    confirmCloseMessage?: string;
 }
 
-export default function Modal({ children, onClose }: ModalProps) {
+export default function Modal({ children, onClose, confirmOnClose = false, confirmCloseMessage }: ModalProps) {
     
     // 💡 修正2: 背景のスクロールを完全に止めるロジックを追加
     useEffect(() => {
@@ -24,9 +26,13 @@ export default function Modal({ children, onClose }: ModalProps) {
     }, []); // 💡 初回表示時のみ実行
 
     const handleClose = () => {
-        if (confirm("本当に閉じますか？")) {
-            onClose();
+        if (confirmOnClose) {
+            if (!confirm(confirmCloseMessage ?? "本当に閉じますか？")) {
+                return;
+            }
         }
+
+        onClose();
     }
 
     return (

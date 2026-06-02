@@ -588,7 +588,7 @@ export default function QuestionPage() {
 
       {/* 回答投稿モーダル */}
       {isAnswerModalOpen && (
-        <Modal onClose={() => { setIsAnswerModalOpen(false); setAnswerContent(''); setAnswerError(''); }}>
+        <Modal confirmOnClose onClose={() => { setIsAnswerModalOpen(false); setAnswerContent(''); setAnswerError(''); }}>
           <AnswerForm
             title="回答を入力してください"
             preview={<AnswererQuestionPreviewCard question={question} />}
@@ -603,7 +603,7 @@ export default function QuestionPage() {
 
       {/* 回答への返信モーダル */}
       {replyTargetAnswerId !== null && replyTargetAnswer && (
-        <Modal onClose={() => { setReplyTargetAnswerId(null); setReplyContent(''); setReplyError(''); }}>
+        <Modal confirmOnClose onClose={() => { setReplyTargetAnswerId(null); setReplyContent(''); setReplyError(''); }}>
           <AnswerForm
             title="返信を入力してください"
             preview={<AnswerPreviewCard answer={replyTargetAnswer} />}
@@ -618,7 +618,7 @@ export default function QuestionPage() {
 
       {/* ThreadReply への返信モーダル */}
       {replyTargetReply !== null && (
-        <Modal onClose={() => { setReplyTargetReply(null); setReplyContent(''); setReplyError(''); }}>
+        <Modal confirmOnClose onClose={() => { setReplyTargetReply(null); setReplyContent(''); setReplyError(''); }}>
           <AnswerForm
             title="返信を入力してください"
             preview={<ReplyPreviewCard reply={replyTargetReply} />}
