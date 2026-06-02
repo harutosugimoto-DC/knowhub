@@ -24,9 +24,7 @@ export default function Modal({ children, onClose }: ModalProps) {
     }, []); // 💡 初回表示時のみ実行
 
     const handleClose = () => {
-        if (confirm("本当に閉じますか？")) {
-            onClose();
-        }
+        onClose();
     }
 
     return (
