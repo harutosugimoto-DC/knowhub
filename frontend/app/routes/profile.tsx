@@ -216,9 +216,9 @@ export default function Profile() {
             <Card className="px-4 pt-0 flex flex-col gap-4 lg:order-3">
                 <SectionTitle title="よく回答しているタグ" />
                 {isLoading ? <Loading /> :
-                    <div className="flex-1 flex flex-col gap-4 min-h-[150px]">
+                    <div className={`flex-1 flex flex-col ${topTags.length === 4 ? "justify-between" : "gap-5"} min-h-[150px]`}>
                         {topTags.length === 0 ? (
-                            <p className="text-sm text-[var(--dark-gray)] text-center py-4">データがありません</p>
+                            <p className="text-sm text-[var(--dark-gray)] text-center py-4 m-auto">データがありません</p>
                         ) : (
                             topTags.map((tag, index) => {
 
