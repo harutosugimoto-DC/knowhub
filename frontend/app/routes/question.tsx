@@ -507,7 +507,6 @@ export default function QuestionPage() {
             <div className="flex items-center justify-between border-b border-[var(--main-color)] py-[var(--spacing-16)]">
               <h2 className="text-[length:var(--font-size-big)]">回答一覧</h2>
             </div>
-            <Loading />
 
             <ScrollBar className="py-4 flex flex-col gap-[var(--spacing-16)] max-h-[calc(100vh-300px)]">
               {answers.length === 0 ? (
