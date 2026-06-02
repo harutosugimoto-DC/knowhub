@@ -4,7 +4,7 @@ const Loading = () => {
     const { isLoading } = useLoading()
     if (!isLoading) return null
     return (
-        <div className="w-full h-full flex flex-col items-center justify-center gap-4 bg-[var(--base-color)] bg-opacity-70 backdrop-blur-sm animate-in fade-in duration-300">
+        <div className="w-full h-full flex flex-col items-center justify-center gap-4 backdrop-blur-sm animate-in fade-in duration-300">
 
             <svg
                 className="animate-spin h-10 w-10 text-[var(--main-color)]"
