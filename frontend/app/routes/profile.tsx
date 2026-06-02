@@ -14,12 +14,15 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import { useUser } from "@/contexts/UserContext";
 import { getMyData, getRecentlySolved, getTopTags, getActivity, updateProfileIcon } from "@/api/userService";
 import { authService } from "@/api/authService";
+import { toast } from "@/utils/toast";
 import type { QuestionType } from "@/types/question";
 import type { myData } from "@/types/user";
+import Loading from "@/components/common/Loading";
+import { useLoading } from "@/contexts/LoadingContext";
 
 export default function Profile() {
     const { user, setUser } = useUser();
-
+    const { isLoading } = useLoading()
     // ─── 💡 Hooks (State) の定義：エラー回避のため必ずコンポーネントの最上部に並べる ───
     const [profileData, setProfileData] = useState<myData | null>(null);
     const [questions, setQuestions] = useState<QuestionType[]>([]);
@@ -36,11 +39,20 @@ export default function Profile() {
 
         const fetchProfileData = async () => {
             try {
-                // 404エラー対策： getTopTags や getActivity のURLタイポが直るまでは個別取得にしてあります
+                const toDate = new Date();
+                const fromDate = new Date();
+                fromDate.setMonth(fromDate.getMonth() - 5); // 今月を含めて6ヶ月にするため「-5」
+
+                // YYYY-MM 形式に変換するヘルパー関数
+                const formatDate = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+
+                const from = formatDate(fromDate); // 例: "2026-01"
+                const to = formatDate(toDate);     // 例: "2026-06"
+
                 const myDetails = await getMyData();
                 const recentlySolved = await getRecentlySolved();
                 const tagsData = await getTopTags();
-                const activityData = await getActivity();
+                const activityData = await getActivity(from, to);
 
                 setProfileData(myDetails);
                 setQuestions(recentlySolved);
@@ -75,6 +87,7 @@ export default function Profile() {
             // 成功したら Context とローカルの profileData の両方を更新
             setUser((prev) => prev ? { ...prev, iconUrl: response.profile_icon_url } : null);
             setProfileData((prev) => prev ? { ...prev, iconUrl: response.profile_icon_url } : null);
+            toast.success('プロフィールを更新しました。');
         } catch (err) {
             console.error("画像のアップロードに失敗しました:", err);
         } finally {
@@ -113,106 +126,124 @@ export default function Profile() {
     const ceilMax = maxCount === 0 ? 15 : Math.ceil(maxCount / 5) * 5;
     const yTicks = Array.from({ length: 6 }, (_, i) => (ceilMax / 5) * i);
 
+    const maxTagCount = Math.max(...topTags.map((tag) => tag.count), 0);
+
     return (
         <div className="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-4 px-[var(--spacing-64)] py-[var(--spacing-32)] h-[calc(100vh-64px)] overflow-y-auto bg-[#FAF9F5]">
 
             {/* ─── 1. プロフィールカード ─── */}
             <Card className="px-4 pt-0 flex flex-col gap-4 lg:order-1">
                 <SectionTitle title="プロフィール" />
+                {isLoading ? <Loading /> :
+                    <div className="flex flex-col gap-4">
 
-                <div className="flex-1 flex flex-col items-center justify-center gap-4 py-2 min-h-[120px]">
-                    <div className="relative w-full max-w-[140px] aspect-square text-[var(--main-color)] flex items-center justify-center rounded-full border">
-                        <Avatar src={profileData?.iconUrl || user?.iconUrl || "/images/default-avatar.png"} className="w-full h-full" />
-                        <label className="absolute bottom-0 right-0 w-7 h-7 bg-white text-[var(--dark-gray)] border border-[var(--dark-gray)] rounded-full flex items-center justify-center cursor-pointer">
-                            <input
-                                type="file"
-                                onChange={handleFileChange}
-                                accept="image/*"
-                                className="hidden"
-                            />
-                            <CameraAltIcon className="!text-[16px] pointer-events-none" />
-                        </label>
-                    </div>
 
-                    <div className="flex items-center gap-2">
-                        {isEditing ? (
-                            <input
-                                type="text"
-                                value={nickname}
-                                onChange={(e) => setNickname(e.target.value)}
-                                onKeyDown={handleKeyDown}
-                                autoFocus
-                                maxLength={20}
-                                className="border border-[var(--dark-gray)] rounded px-2 py-0.5 text-[length:var(--font-size-normal)] focus:outline-none focus:border-[var(--main-color)] bg-white text-black"
-                            />
-                        ) : (
-                            <>
-                                <span>{nickname || "未設定"}</span>
-                                <EditIcon
-                                    onClick={() => setIsEditing(true)}
-                                    className="!text-[length:var(--font-size-normal)] !text-[var(--dark-gray)] cursor-pointer hover:text-[var(--main-color)] transition-colors"
-                                />
-                            </>
-                        )}
-                    </div>
-                </div>
+                        <div className="flex-1 flex flex-col items-center justify-center gap-4 py-2 min-h-[120px]">
+                            <div className="relative w-full max-w-[140px] aspect-square text-[var(--main-color)] flex items-center justify-center rounded-full border">
+                                <Avatar src={profileData?.iconUrl || user?.iconUrl || "/images/default-avatar.png"} className="w-full h-full" />
+                                <label className=" transition-all hover:text-[var(--main-color)] hover:border-[var(--main-color)] hover:scale-110 absolute bottom-0 right-0 w-7 h-7 bg-white text-[var(--dark-gray)] border border-[var(--dark-gray)] rounded-full flex items-center justify-center cursor-pointer">
+                                    <input
+                                        type="file"
+                                        onChange={handleFileChange}
+                                        accept="image/*"
+                                        className="hidden"
+                                    />
+                                    <CameraAltIcon className="!text-[16px] pointer-events-none " />
+                                </label>
+                            </div>
 
-                {/* 実績数値グリッド */}
-                <div className="grid grid-cols-2 gap-4 shrink-0 pb-4">
-                    {[
-                        { label: "質問回答数", value: profileData?.answerCount ?? 0 },
-                        { label: "ベストアンサー数", value: profileData?.bestAnswerCount ?? 0 },
-                        { label: "いいね総数", value: profileData?.totalLikeCount ?? 0 },
-                        { label: "質問数", value: profileData?.questionCount ?? 0 },
-                    ].map((item, i) => (
-                        <div key={i} className="border border-[var(--light-gray)] bg-white rounded-[16px] flex flex-col gap-2 items-center justify-center min-h-[100px]">
-                            <span>{item.value}</span>
-                            <span>{item.label}</span>
+                            <div className="flex items-center gap-2">
+                                {isEditing ? (
+                                    <input
+                                        type="text"
+                                        value={nickname}
+                                        onChange={(e) => setNickname(e.target.value)}
+                                        onKeyDown={handleKeyDown}
+                                        autoFocus
+                                        maxLength={20}
+                                        className="border border-[var(--dark-gray)] rounded px-2 py-0.5 text-[length:var(--font-size-normal)] focus:outline-none focus:border-[var(--main-color)] bg-white text-black"
+                                    />
+                                ) : (
+                                    <>
+                                        <span>{nickname || "未設定"}</span>
+                                        <span
+                                            onClick={() => setIsEditing(true)}
+                                            className="inline-flex items-center justify-center text-[var(--dark-gray)] hover:text-[var(--main-color)] transition-all  hover:scale-130 cursor-pointer"
+                                        >
+                                            {/* 💡 アイコン自体は形とサイズだけを担当させ、ホバーやアニメーションは外側の器に任せる */}
+                                            <EditIcon className="!text-[length:var(--font-size-normal)] pointer-events-none" />
+                                        </span>
+                                    </>
+                                )}
+                            </div>
                         </div>
-                    ))}
-                </div>
+
+                        {/* 実績数値グリッド */}
+                        <div className="grid grid-cols-2 gap-4 shrink-0 pb-4">
+                            {[
+                                { label: "質問回答数", value: profileData?.answerCount ?? 0 },
+                                { label: "ベストアンサー数", value: profileData?.bestAnswerCount ?? 0 },
+                                { label: "いいね総数", value: profileData?.totalLikeCount ?? 0 },
+                                { label: "質問数", value: profileData?.questionCount ?? 0 },
+                            ].map((item, i) => (
+                                <div key={i} className="border border-[var(--light-gray)] bg-white rounded-[16px] flex flex-col gap-2 items-center justify-center min-h-[100px]">
+                                    <span>{item.value}</span>
+                                    <span>{item.label}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                }
             </Card>
 
             {/* ─── 2. 最近解決した質問 ─── */}
             <Card className="px-4 pt-0 flex flex-col gap-4 lg:order-2">
                 <SectionTitle title="最近解決した質問" />
-                <div className="flex flex-col gap-2 px-4">
-                    {questions.length === 0 ? (
-                        <p className="text-sm text-[var(--dark-gray)] text-center py-4">最近解決した質問はありません</p>
-                    ) : (
-                        questions.map((question) => (
-                            <QuestionCard key={question.id} isProfile question={question} />
-                        ))
-                    )}
-                </div>
+                {isLoading ? <Loading /> :
+                    <div className="flex flex-col gap-2 px-4">
+                        {questions.length === 0 ? (
+                            <p className="text-sm text-[var(--dark-gray)] text-center py-4">最近解決した質問はありません</p>
+                        ) : (
+                            questions.map((question) => (
+                                <QuestionCard key={question.id} isProfile question={question} />
+                            ))
+                        )}
+                    </div>
+                }
             </Card>
 
             {/* ─── 3. よく回答しているタグ ─── */}
             <Card className="px-4 pt-0 flex flex-col gap-4 lg:order-3">
                 <SectionTitle title="よく回答しているタグ" />
-                <div className="flex-1 flex flex-col justify-around min-h-[150px]">
-                    {topTags.length === 0 ? (
-                        <p className="text-sm text-[var(--dark-gray)] text-center py-4">データがありません</p>
-                    ) : (
-                        topTags.map((tag, index) => (
-                            <div key={index} className="flex flex-col gap-2 p-1">
-                                <div className="flex justify-between text-sm">
-                                    <span>{tag.name}</span>
-                                    <span className="text-[var(--dark-gray)]">{tag.count}件</span>
-                                </div>
-                                <ProgressBar percentage={tag.count} />
-                            </div>
-                        ))
-                    )}
-                </div>
+                {isLoading ? <Loading /> :
+                    <div className="flex-1 flex flex-col gap-4 min-h-[150px]">
+                        {topTags.length === 0 ? (
+                            <p className="text-sm text-[var(--dark-gray)] text-center py-4">データがありません</p>
+                        ) : (
+                            topTags.map((tag, index) => {
+
+                                const percentage = maxTagCount > 0 ? (tag.count / maxTagCount) * 100 : 0;
+
+                                return (
+
+                                    <div key={index} className="flex flex-col gap-2 p-1">
+                                        <div className="flex justify-between text-sm">
+                                            <span>{tag.name}</span>
+                                            <span className="text-[var(--dark-gray)]">{tag.count}件</span>
+                                        </div>
+                                        <ProgressBar percentage={percentage} />
+                                    </div>
+                                )
+                            })
+                        )}
+                    </div>
+                }
             </Card>
 
             {/* ─── 4. 活動推移グラフ ─── */}
             <Card className="px-4 pt-0 flex flex-col gap-4 lg:order-4">
                 <SectionTitle title="活動推移" />
-
-                {/* 💡 Recharts潰れ警告対策： min-h-[256px] を追加 */}
-                <div className="w-full h-64 min-h-[256px] mt-4 select-none [&_.recharts-wrapper]:focus:outline-none">
+                {isLoading ? <Loading /> : <div className="w-full h-64 min-h-[256px] mt-4 select-none [&_.recharts-wrapper]:focus:outline-none">
                     <ResponsiveContainer width="100%" height="100%">
                         <BarChart
                             data={graphData}
@@ -262,8 +293,9 @@ export default function Profile() {
                         </BarChart>
                     </ResponsiveContainer>
                 </div>
-            </Card>
+                }
+            </Card >
 
-        </div>
+        </div >
     );
 }

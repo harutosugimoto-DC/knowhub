@@ -20,9 +20,12 @@ import { getQuestions } from "@/api/questionService";
 import { useMasterData } from "@/contexts/MasterDataContext";
 import type { QuestionType } from "@/types/question";
 import { DROP_DOWN_OPTIONS, MY_ACTIONS } from "@/constants/Filter"
+import Loading from "@/components/common/Loading";
+import { useLoading } from "@/contexts/LoadingContext";
 
 export default function Top() {
     const navigate = useNavigate();
+    const { isLoading } = useLoading()
 
     // --- ステート定義 ---
     const [questions, setQuestions] = useState<QuestionType[]>([]);
@@ -41,6 +44,13 @@ export default function Top() {
 
     const [searchWord, setSearchWord] = useState(""); // 入力中の文字列
     const [activeKeyword, setActiveKeyword] = useState("");
+
+    const handleFilterClear = () => {
+        setSelectedMyActionIds([])
+        setSelectedStatusIds([])
+        setSelectedTagIds([])
+        setSearchWord("")
+    }
 
     // 💡 修正: どんなリテラル型の配列ステートでも安全にトグルできるように型を抽象化
     const handleToggleId = <T extends string>(id: string, setIds: React.Dispatch<React.SetStateAction<T[]>>) => {
@@ -101,17 +111,21 @@ export default function Top() {
     }, [currentPage, currentSortOption, activeKeyword, selectedStatusIds, selectedTagIds, selectedMyActionIds]);
 
     return (
-        <div className="px-[var(--spacing-64)]">
+        <div className="px-[var(--spacing-64)] h-[calc(100vh-64px)] overflow-y-auto">
             <div className="flex justify-center m-[var(--spacing-64)]">
                 <Button text="質問作成" onClick={() => navigate("/create-question")} />
             </div>
-            <Card className="flex flex-col">
-                <div className={`flex items-center justify-between border-b transition-all ${isFilterOpen ? "border-[var(--main-color)] mb-[var(--spacing16)]" : "border-transparent mb-0"}`}>
+            <Card className="flex flex-col cursor-pointer" onClick={(e: React.MouseEvent<HTMLDivElement>) => {
+                if (e.target === e.currentTarget) {
+                    setIsFilterOpen(true);
+                }
+            }}>
+                <div className={`flex items-center justify-between border-b transition-all ${isFilterOpen ? "border-[var(--main-color)] mb-[var(--spacing16)]" : "border-transparent mb-0"}`} onClick={() => setIsFilterOpen(!isFilterOpen)}>
                     <div className="flex items-center">
                         <FilterAltOutlinedIcon className="text-[var(--main-color)]" />
                         <p className="text-[length:var(--font-size-big)]">フィルター</p>
                     </div>
-                    <div className="cursor-pointer !text-[var(--dark-gray)] text-[length:var(--font-size-normal)]" onClick={() => setIsFilterOpen(!isFilterOpen)}>
+                    <div className="cursor-pointer !text-[var(--dark-gray)] text-[length:var(--font-size-normal)]" >
                         {isFilterOpen ? <KeyboardArrowUpOutlinedIcon /> : <KeyboardArrowDownOutlinedIcon />}
                     </div>
                 </div>
@@ -120,8 +134,9 @@ export default function Top() {
                         {/* マイアクション */}
                         <div className="flex flex-col gap-2">
                             <div className="py-[var(--spacing-8)]">
-                                <div className="border-b border-[var(--light-gray)] py-[var(--spacing-8)]">
+                                <div className="border-b border-[var(--light-gray)] py-[var(--spacing-8)] flex flex-row justify-between items-end">
                                     <p>マイアクション</p>
+                                    <button className="px-4 py-1 rounded-[4px] text-white bg-[var(--main-color)] shadow-[var(--box-shadow)] hover:shadow-[var(--hover-box-shadow)] transition-all duration-200 cursor-pointer active:shadow-none" onClick={() => handleFilterClear()}>条件クリア</button>
                                 </div>
                             </div>
                             <div className="flex gap-2 px-2">
@@ -186,7 +201,7 @@ export default function Top() {
                                 </div>
                             </div>
                             <div className="flex gap-2 px-2 relative">
-                                <TextInput placeholder="検索ワードを入力してください" value={searchWord} onChange={setSearchWord} />
+                                <TextInput placeholder="検索ワードを入力してください" value={searchWord} onChange={setSearchWord} onKeyDown={(e) => { if (e.key === "Enter") handleSearch() }} />
                                 <div onClick={handleSearch} className="rounded-full p-1 cursor-pointer bg-[var(--main-color)] absolute flex justify-center items-center top-[50%] right-[var(--spacing-16)] -translate-x-1/2 -translate-y-1/2">
                                     <SearchOutlinedIcon className="!text-[length:var(--font-size-normal)] text-white" />
                                 </div>
@@ -202,7 +217,7 @@ export default function Top() {
             </div>
             <ScrollBar className="w-full max-h-[1000px]">
                 <div className="flex flex-col gap-2 px-[var(--spacing-16)] pb-[var(--spacing-8)]">
-                    {questions.map((question) => (
+                    {isLoading ? <Loading /> : questions.map((question) => (
                         <QuestionCard key={question.id} question={question} />
                     ))}
                 </div>

@@ -1,18 +1,34 @@
 import TagChip from "@/components/common/TagChip";
 import { tagPlaceholder } from "@/constants/placeholder";
 type TagSelectorProps = {
-    selectedTagIds: number[];
-    setSelectedTagIds: React.Dispatch<React.SetStateAction<number[]>>;
-    allTagData: { id: number, name: string }[];
+    selectedTagIds: string[];
+    setSelectedTagIds: React.Dispatch<React.SetStateAction<string[]>>;
+    allTagData: { id: string, name: string }[];
+    setErrors: React.Dispatch<React.SetStateAction<{ title?: string; detail?: string; tags?: string }>>;
 };
 
-export default function TagSelector({ selectedTagIds, setSelectedTagIds, allTagData }: TagSelectorProps) {
+export default function TagSelector({ selectedTagIds, setSelectedTagIds, allTagData, setErrors }: TagSelectorProps) {
 
     // タグの選択・解除をこれ1つで制御（トグル処理）
-    const handleToggleSelect = (tagId: number) => {
-        setSelectedTagIds((prev) =>
-            prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId]
-        );
+    const handleToggleSelect = (tagId: string) => {
+        setSelectedTagIds((prev) => {
+            const isSelected = prev.includes(tagId);
+            if (!isSelected && prev.length >= 5) {
+                setErrors((current) => ({
+                    ...current,
+                    tags: "タグは最大5つまでしか選択できません。"
+                }));
+                return prev;
+            }
+            setErrors((current) => ({
+                ...current,
+                tags: undefined
+            }));
+
+            return isSelected 
+                ? prev.filter((id) => id !== tagId) 
+                : [...prev, tagId];
+        });
     };
 
     return (
@@ -21,16 +37,13 @@ export default function TagSelector({ selectedTagIds, setSelectedTagIds, allTagD
             {/* 上部：選択済みのタグを表示するエリア */}
             <div className={`p-[var(--spacing-8)] flex flex-wrap gap-[var(--spacing-8)] ${selectedTagIds.length === 0 ? 'h-[43px] items-center' : ''}`}>
                 {selectedTagIds.map(tagId => {
-                    // 1. findを使って該当するタグオブジェクトを1件取得
                     const currentTag = allTagData.find(tag => tag.id === tagId);
-
                     return (
                         <TagChip
                             key={tagId}
-                            // 安全のためにオプショナルチェーニング（?.）とフォールバックを設定
                             text={currentTag?.name || ""}
                             isButton={true}
-                            onClick={() => handleToggleSelect(tagId)} // ここも共通の関数で解除可能
+                            onClick={() => handleToggleSelect(tagId)}
                         />
                     );
                 })}
@@ -44,7 +57,6 @@ export default function TagSelector({ selectedTagIds, setSelectedTagIds, allTagD
 
             {/* 下部：選択可能なタグの一覧エリア */}
             <div className="p-[var(--spacing-16)] flex flex-wrap gap-x-[var(--spacing-8)] gap-y-[var(--spacing-12)]">
-                {/* 2. 修正：allTagData をそのまま map で回す */}
                 {allTagData.map(tag => {
                     const isSelected = selectedTagIds.includes(tag.id);
 
@@ -55,14 +67,13 @@ export default function TagSelector({ selectedTagIds, setSelectedTagIds, allTagD
                             className={`
                                 cursor-pointer
                                 rounded-[var(--radius-big)] px-[var(--spacing-16)] py-[var(--spacing-8)] 
-                                font-['Lora'] text-[var(--font-size-normal)] transition-all duration-200
+                                font-['Lora'] text-[var(--font-size-normal)] transition-all
                                 ${isSelected
                                     ? "bg-[var(--main-color)] text-white shadow-[var(--box-shadow)] border border-transparent"
-                                    : "bg-white !text-[var(--dark-gray)] border border-[var(--dark-gray)]"
+                                    : "bg-white !text-[var(--dark-gray)] border border-[var(--dark-gray)] hover:bg-[var(--hover-color)]"
                                 }
                             `}
                         >
-                            {/* 3. tag.name を直接描画できるのでシンプル */}
                             <span className="flex items-center h-[var(--spacing-12)]">{tag.name}</span>
                         </button>
                     );

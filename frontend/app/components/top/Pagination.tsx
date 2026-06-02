@@ -24,27 +24,73 @@ export default function Pagination({ max, current, onPageChange }: PaginationPro
     })();
 
     return (
-        <div className="flex items-center justify-center gap-[var(--spacing-32)] p-[var(--spacing-8)]">
-            <div className='w-[50px] h-[50px] p-[4px] ' onClick={() => onPageChange(Math.max(current - 1, 1))} >
-                <KeyboardArrowLeftOutlinedIcon className={`${current === 1 ? "!text-[var(--light-gray)] !border-[var(--light-gray)] !cursor-auto" : ""} cursor-pointer !text-[42px] text-[var(--main-color)] border border-[var(--main-color)] rounded-full`} />
+        <div className="flex items-center justify-center gap-[var(--spacing-16)] p-[var(--spacing-8)] select-none">
+            
+            {/* ─── ◀ 左の戻るボタン ─── */}
+            <button
+                disabled={current === 1}
+                onClick={() => onPageChange(Math.max(current - 1, 1))}
+                className={`
+                    flex items-center justify-center w-[44px] h-[44px] border rounded-full transition-all duration-200
+                    ${current === 1
+                        ? "text-[var(--light-gray)] border-[var(--light-gray)] cursor-auto bg-transparent"
+                        : "text-[var(--main-color)] border-[var(--main-color)] cursor-pointer hover:text-white hover:border-white hover:bg-[var(--main-color)]"
+                    }
+                `}
+            >
+                <KeyboardArrowLeftOutlinedIcon className="!text-[32px] pointer-events-none" />
+            </button>
+
+            {/* ─── 🔢 ページ数字エリア ─── */}
+            <div className="flex items-center gap-1">
+                {pages.map((page, index) => {
+                    // 三点リーダー '...' の場合は、ボタンではなくただのテキスト(span)として描画する
+                    if (typeof page !== 'number') {
+                        return (
+                            <span 
+                                key={index} 
+                                className="w-[44px] h-[44px] flex items-center justify-center text-[var(--dark-gray)] font-bold"
+                            >
+                                {page}
+                            </span>
+                        );
+                    }
+
+                    // 通常の数字ボタン
+                    const isActive = page === current;
+                    return (
+                        <button
+                            key={index}
+                            onClick={() => onPageChange(page)}
+                            className={`
+                                w-[44px] h-[44px] flex items-center justify-center rounded-full text-sm font-medium transition-all duration-200 cursor-pointer
+                                ${isActive
+                                    ? "bg-[var(--main-color)] text-white font-bold shadow-sm"
+                                    : "text-[var(--text-color-black)] hover:bg-[var(--hover-color)] hover:text-[var(--main-color)]"
+                                }
+                            `}
+                        >
+                            {page}
+                        </button>
+                    );
+                })}
             </div>
-            <div className='flex'>
-                {pages.map((page, index) => (
-                    <button
-                        key={index}
-                        className={`${typeof page === 'number' ? 'cursor-pointer' : ''} w-[50px] h-[50px] flex items-center justify-center rounded-full ${page === current
-                            ? "bg-[var(--main-color)] text-white"
-                            : ""
-                            }`}
-                        onClick={() => typeof page === 'number' && onPageChange(page)}
-                    >
-                        {page}
-                    </button>
-                ))}
-            </div>
-            <div className='w-[50px] h-[50px] p-[4px]' onClick={() => onPageChange(Math.min(current + 1, max))}>
-                <KeyboardArrowRightOutlinedIcon className={`${current === max ? "!text-[var(--light-gray)] !border-[var(--light-gray)] !cursor-auto" : ""}cursor-pointer !text-[42px] text-[var(--main-color)] border border-[var(--main-color)] rounded-full`} />
-            </div>
+
+            {/* ─── ▶ 右の進むボタン ─── */}
+            <button
+                disabled={current === max}
+                onClick={() => onPageChange(Math.min(current + 1, max))}
+                className={`
+                    flex items-center justify-center w-[44px] h-[44px] border rounded-full transition-all duration-200
+                    ${current === max
+                        ? "text-[var(--light-gray)] border-[var(--light-gray)] cursor-auto bg-transparent"
+                        : "text-[var(--main-color)] border-[var(--main-color)] cursor-pointer hover:text-white hover:border-white hover:bg-[var(--main-color)]"
+                    }
+                `}
+            >
+                <KeyboardArrowRightOutlinedIcon className="!text-[32px] pointer-events-none" />
+            </button>
+
         </div>
     );
 }

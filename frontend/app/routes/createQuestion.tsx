@@ -12,6 +12,7 @@ import Modal from "@/components/common/Modal";
 
 import { detailPlaceholder, titlePlaceholder } from "@/constants/placeholder";
 import { supabase } from "@/lib/supabase";
+import { toast } from "@/utils/toast";
 
 import { LuBot } from "react-icons/lu";
 import CloseIcon from '@mui/icons-material/Close';
@@ -34,7 +35,6 @@ export default function CreateQuestion() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isAiOpen, setIsAiOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [submitError, setSubmitError] = useState<string | null>(null);
 
     const [aiInputText, setAiInputText] = useState("");
     const [aiChatMessages, setAiChatMessages] = useState<ChatMessage[]>([
@@ -102,12 +102,11 @@ export default function CreateQuestion() {
 
     const submitQuestion = async () => {
         setIsSubmitting(true);
-        setSubmitError(null);
 
         try {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) {
-                setSubmitError('ログインが必要です');
+                toast.error('ログインが必要です');
                 setIsSubmitting(false);
                 return;
             }
@@ -126,16 +125,16 @@ export default function CreateQuestion() {
             });
 
             if (!res.ok) {
-                const body = await res.json().catch(() => ({}));
-                setSubmitError((body as { error?: string }).error ?? '投稿に失敗しました');
+                toast.error('質問の投稿に失敗しました。');
                 setIsSubmitting(false);
                 return;
             }
 
+            toast.success('質問を投稿しました。');
             navigate('/top');
         } catch (err) {
             console.error('質問投稿エラー:', err);
-            setSubmitError('ネットワークエラーが発生しました');
+            toast.error('質問の投稿に失敗しました。');
             setIsSubmitting(false);
         }
     };
@@ -196,7 +195,7 @@ export default function CreateQuestion() {
                 <div>
                     <div className="py-[var(--spacing-16)]">
                         <SectionTitle title="質問タイトル" isRequired>
-                            <button onClick={() => setIsAiOpen(!isAiOpen)} className="shadow-[var(--box-shadow)] cursor-pointer rounded-[16px] text-white bg-[image:var(--ai-color)] px-[var(--spacing-32)] py-[var(--spacing-16)]">
+                            <button onClick={() => setIsAiOpen(!isAiOpen)} className="transition-all hover:shadow-[var(--hover-box-shadow)] shadow-[var(--box-shadow)] cursor-pointer rounded-[16px] text-white bg-[image:var(--ai-color)] px-[var(--spacing-32)] py-[var(--spacing-16)]">
                                 AIに相談する
                             </button>
                         </SectionTitle>
@@ -222,7 +221,7 @@ export default function CreateQuestion() {
                     <div className="flex flex-col gap-4 px-[var(--spacing-16)]">
                         {tagLoadError
                             ? <ErrorMessages message={tagLoadError} />
-                            : <TagSelector selectedTagIds={selectedTagIds} setSelectedTagIds={setSelectedTagIds} allTagData={allTags} />
+                            : <TagSelector selectedTagIds={selectedTagIds} setSelectedTagIds={setSelectedTagIds} allTagData={allTags} setErrors={setErrors}/>
                         }
                         {errors.tags && <ErrorMessages message={errors.tags} />}
                     </div>
@@ -241,7 +240,10 @@ export default function CreateQuestion() {
                         </div>
                         <p>AI サポートアシスタント</p>
                     </div>
-                    <CloseIcon className="cursor-pointer" onClick={() => setIsAiOpen(false)} />
+                    <div className="transition-all hover:text-[var(--dark-gray)]">
+                        <CloseIcon className="cursor-pointer " onClick={() => setIsAiOpen(false)} />
+
+                    </div>
                 </div>
 
                 {/* メッセージエリア */}
@@ -251,7 +253,7 @@ export default function CreateQuestion() {
                             const isAi = msg.role === "model";
                             return (
                                 <div key={msg.id} className={`flex w-full ${isAi ? "justify-start" : "justify-end"}`}>
-                                    <div className={`max-w-[80%] p-3 text-sm leading-relaxed whitespace-pre-wrap rounded-lg shadow-sm border ${isAi ? "bg-[#FDF3E7] border-[#FFEBD0] text-[#444]" : "bg-white border-gray-200 text-[#333]"}`}>
+                                    <div className={`!select-text max-w-[80%] p-3 text-sm leading-relaxed whitespace-pre-wrap rounded-lg shadow-sm border ${isAi ? "bg-[#FDF3E7] border-[#FFEBD0] text-[#444]" : "bg-white border-gray-200 text-[#333]"}`}>
                                         {msg.text}
                                     </div>
                                 </div>
@@ -269,16 +271,17 @@ export default function CreateQuestion() {
 
                 {/* 入力エリア */}
                 <div className="px-4 pt-3 pb-4 border-t border-[var(--light-gray)] bg-white flex flex-col gap-1">
-                    <div className="flex gap-2 items-center">
-                        <input
-                            type="text"
+                    <div className="flex gap-2 items-end">
+                        <textarea
                             value={aiInputText}
                             onChange={(e) => setAiInputText(e.target.value)}
                             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submitAiChat(); } }}
                             placeholder="質問したい内容を入力..."
                             maxLength={AI_INPUT_MAX}
-                            className={`px-[var(--spacing-16)] flex-1 h-[44px] border rounded-[16px] focus:outline-none ${aiInputText.length > AI_INPUT_MAX ? 'border-[var(--danger-color)]' : 'border-[var(--light-gray)] focus:border-[#FF9500]'}`}
+                            rows={1}
+                            className={`px-[var(--spacing-16)] py-[10px] flex-1 min-h-[44px] max-h-[160px] border rounded-[16px] focus:outline-none resize-none overflow-y-auto ${aiInputText.length > AI_INPUT_MAX ? 'border-[var(--danger-color)]' : 'border-[var(--light-gray)] focus:border-[#FF9500]'}`}
                             disabled={isAiLoading}
+                            style={{ fieldSizing: 'content' } as React.CSSProperties}
                         />
                         <button onClick={() => submitAiChat()} disabled={isAiLoading || aiInputText.trim().length === 0 || aiInputText.length > AI_INPUT_MAX} className="w-[44px] h-[44px] rounded-full bg-[image:var(--ai-color)] text-white flex items-center justify-center cursor-pointer disabled:opacity-50">
                             <ArrowUpwardIcon className="!text-[16px]" />
@@ -314,11 +317,6 @@ export default function CreateQuestion() {
                                 ))}
                             </div>
                         </div>
-                        {submitError && (
-                            <div className="px-[var(--spacing-16)] py-[var(--spacing-8)]">
-                                <ErrorMessages message={submitError} />
-                            </div>
-                        )}
                     </Card>
                     <Button
                         onClick={() => submitQuestion()}

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { toast } from '@/utils/toast';
 
 // axiosのリクエスト設定に独自のプロパティを追加するための型宣言
 declare module 'axios' {
@@ -38,7 +39,11 @@ const axiosClient = axios.create({
 // リクエストインターセプター
 axiosClient.interceptors.request.use(
     (config) => {
-        startLoading();
+        const isSilentRequest = config.url?.endsWith('/like') || config.url?.endsWith('/bookmark');
+
+        if (!isSilentRequest) {
+            startLoading();
+        }
 
         // localStorageからトークンを取得してヘッダーにセット
         const token = localStorage.getItem('token');
@@ -67,7 +72,7 @@ axiosClient.interceptors.response.use(
             !response.config.skipSuccessToast &&
             response.data?.message
         ) {
-            window.dispatchEvent(new CustomEvent('global-success', { detail: response.data.message }));
+            toast.success(response.data.message);
         }
 
         return response;
@@ -83,7 +88,7 @@ axiosClient.interceptors.response.use(
         // 401以外のエラーはエラートーストを発火
         // .message はAPI設計書の共通レスポンス形式に合わせている
         const errorMessage = error.response?.data?.message || '通信エラーが発生しました';
-        window.dispatchEvent(new CustomEvent('global-error', { detail: errorMessage }));
+        toast.error(errorMessage);
 
         return Promise.reject(error);
     }

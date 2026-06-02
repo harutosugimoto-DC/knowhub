@@ -6,9 +6,10 @@ type TextInputProps = {
     onSearch?: () => void;
     value: string;
     onChange: (text: string) => void;
+    onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 };
 
-export default function TextInput({ placeholder, isSearch, onSearch, value, onChange }: TextInputProps) {
+export default function TextInput({ placeholder, isSearch, onSearch, value, onChange, onKeyDown }: TextInputProps) {
     return (
         <div className="relative w-full">
             <input
@@ -16,6 +17,7 @@ export default function TextInput({ placeholder, isSearch, onSearch, value, onCh
                 placeholder={placeholder}
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
+                onKeyDown={onKeyDown}
                 className={`
                     w-full bg-white 
                     border border-[var(--light-gray)] rounded-[var(--radius-small)] 

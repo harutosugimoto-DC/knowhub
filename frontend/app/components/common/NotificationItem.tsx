@@ -1,3 +1,4 @@
+import { readNotification } from '@/api/notificationService';
 import Time from './Time';
 import { useNavigate } from 'react-router';
 
@@ -9,11 +10,21 @@ export type NotificationItemProps = {
     senderIcon: string,
     senderName: string,
     type: string;
-    questionTitle:string
+    questionTitle?: string
 };
 export default function NotificationItem({ linkUrl, type, createdAt, isRead, id, senderIcon, senderName, questionTitle }: NotificationItemProps) {
     const navigate = useNavigate()
+    const handleClick = async () => {
+        try {
+            await readNotification(id);
+        } catch (error) {
+            console.error("❌ 通知の既読処理に失敗しました:", error);
+        }
 
+        if (linkUrl) {
+            navigate(linkUrl);
+        }
+    };
     const choiceMessage = () => {
         switch (type) {
             case "answer_posted":
@@ -31,7 +42,7 @@ export default function NotificationItem({ linkUrl, type, createdAt, isRead, id,
         }
     }
     return (
-        <div className="w-full flex items-top p-[var(--spacing-16)] pl-[var(--spacing-8)] gap-2 cursor-pointer hover:bg-[var(--hover-color)] transition-colors" onClick={() => navigate(linkUrl)}>
+        <div className="w-full flex items-top p-[var(--spacing-16)] pl-[var(--spacing-8)] gap-2 cursor-pointer hover:bg-[var(--hover-color)] transition-colors" onClick={() => handleClick()}>
             <div className='flex flex-col items-end gap-1 flex-grow'>
                 <div className='flex items-start gap-2 w-full'>
                     {

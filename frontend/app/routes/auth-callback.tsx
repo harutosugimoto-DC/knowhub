@@ -32,9 +32,24 @@ export default function AuthCallback() {
 
     useEffect(() => {
         const processLoginAndRouting = async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const hashParams = new URLSearchParams(window.location.hash.replace("#", ""));
+            const errorCode = urlParams.get("error_code") || hashParams.get("error_code");
+            if (errorCode) {
+                window.location.href = "/?error=unauthorized_domain";
+                return;
+            }
+
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) {
                 navigate("/");
+                return;
+            }
+
+            const email = session.user.email ?? "";
+            if (!email.endsWith("@g.dreamcareer.co.jp")) {
+                await supabase.auth.signOut();
+                window.location.href = "/?error=unauthorized_domain";
                 return;
             }
 

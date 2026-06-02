@@ -56,6 +56,7 @@ const DropdownMenu = ({ options, value, onChange }: Props) => {
       <button
         onClick={() => setIsOpen((prev) => !prev)}
         className="
+          transition-all hover:bg-[var(--hover-color)]
           cursor-pointer
           flex items-center justify-between
           w-[168px] h-[40px]
@@ -96,13 +97,12 @@ const DropdownMenu = ({ options, value, onChange }: Props) => {
               <button
                 onClick={() => handleSelect(option.value)}
                 className="
+                transition-all hover:bg-[var(--hover-color)]
                   cursor-pointer
                   w-full h-[40px]
                   flex items-center
                   px-3
                   text-base leading-[1.6] text-[var(--text-color-black)]
-                  hover:bg-gray-50
-                  transition-colors duration-200
                 "
               >
                 {option.label}

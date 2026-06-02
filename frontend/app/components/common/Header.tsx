@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 
 import Avatar from "@/components/common/Avatar";
 import Notification from "@/components/common/Notification";
@@ -13,14 +13,36 @@ import { HiMiniPencilSquare } from "react-icons/hi2";
 import { useUser } from "@/contexts/UserContext";
 import { getNotifications, type NotificationType } from "@/api/notificationService";
 import { supabase } from "@/lib/supabase";
+import { toast } from "@/utils/toast";
 
 export default function Header() {
     const navigate = useNavigate();
+    const location = useLocation()
     const { user, logout } = useUser();
     const isLoggedIn = !!user;
 
     const [showNotification, setShowNotification] = useState<boolean>(false);
     const [notifications, setNotifications] = useState<NotificationType[]>([]);
+
+    
+    useEffect(()=>{
+        //通知部分以外をクリックしたときに通知を閉じる
+        const handleClickOutside = (event: MouseEvent) => {
+            const target = event.target as HTMLElement;
+            if (!target.closest('.notification-container') && !target.closest('.notification-icon')) {
+                setShowNotification(false);
+            }
+        };
+        
+        document.addEventListener('click', handleClickOutside);
+
+        return () => {
+            document.removeEventListener('click', handleClickOutside);
+        };
+    },[])
+    useEffect(() => {
+        setShowNotification(false);
+    }, [location.pathname]);
 
     const unreadCount = useMemo(() => {
         return notifications.filter(n => !n.isRead).length;
@@ -78,8 +100,13 @@ export default function Header() {
     }, [isLoggedIn, user?.id]);
 
     const handleLogout = async () => {
-        await logout();
-        navigate("/");
+        try {
+            await logout();
+            toast.success('ログアウトしました。');
+            navigate("/");
+        } catch {
+            toast.error('ログアウトに失敗しました。時間をおいて再度お試しください。');
+        }
     };
 
     const toggleNotification = () => {
@@ -102,7 +129,7 @@ export default function Header() {
                     <div className="w-[60px] h-full flex justify-center items-center cursor-pointer transition-all hover:bg-[var(--hover-color)] hover:border-b-[3px] hover:border-[var(--main-color)]" onClick={() => navigate("/create-question")}>
                         <HiMiniPencilSquare className="text-[24px]" />
                     </div>
-                    <div className="w-[60px] h-full flex justify-center items-center cursor-pointer transition-all hover:bg-[var(--hover-color)] hover:border-b-[3px] hover:border-[var(--main-color)]" onClick={toggleNotification}>
+                    <div className="notification-icon w-[60px] h-full flex justify-center items-center cursor-pointer transition-all hover:bg-[var(--hover-color)] hover:border-b-[3px] hover:border-[var(--main-color)]" onClick={toggleNotification}>
                         <div className="relative inline-block">
                             <NotificationsIcon />
                             {unreadCount > 0 && (
@@ -123,7 +150,7 @@ export default function Header() {
                 </div>
             )}
             {isLoggedIn && showNotification && (
-                <div className="absolute top-[64px] right-[var(--spacing-16)] shadow-[var(--box-shadow)] rounded-[var(--radius-big)] overflow-hidden bg-white animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="notification-container absolute top-[64px] right-[var(--spacing-16)] shadow-[var(--box-shadow)] rounded-[var(--radius-big)] overflow-hidden bg-white animate-in fade-in slide-in-from-top-2 duration-200">
                     <Notification notifications={notifications} />
                 </div>
             )}

@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import logo from "../assets/logo.webp";
+import { useNavigate } from "react-router";
+import { useUser } from "@/contexts/UserContext";
 
 // GoogleブランドロゴのインラインSVG
 const GoogleIcon = () => (
@@ -13,8 +15,32 @@ const GoogleIcon = () => (
 );
 
 export default function Login() {
+    const navigate = useNavigate();
+    const { user } = useUser();
+
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [error, setError] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(() => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get("error") === "unauthorized_domain") {
+            return "このアカウントではログインできません。会社のGoogleアカウントでログインしてください。";
+        }
+        return null;
+    });
+
+    useEffect(() => {
+        // user情報が存在し、かつ nickname が設定されている場合
+        if (user && user.nickname) {
+            // `{ replace: true }` を入れることで、戻るボタンを押したときの無限ループを防ぎます
+            navigate("/top", { replace: true });
+        }
+        else if (user) {
+            navigate("/nickname", { replace: true })
+        }
+    }, [user, navigate]);
+
+    if (user && user.nickname) {
+        return null;
+    }
 
     const handleGoogleLoginClick = async () => {
         setIsLoading(true);
@@ -30,10 +56,10 @@ export default function Login() {
             });
 
             if (authError) throw authError;
-            
+
         } catch (err: any) {
             console.error("Googleログインエラー:", err);
-            setError(err.message || "ログインに失敗しました。もう一度お試しください。");
+            setError("ログインに失敗しました。もう一度お試しください。");
             setIsLoading(false);
         }
     };
@@ -41,7 +67,7 @@ export default function Login() {
     return (
         <div className="min-h-[calc(100vh-64px)] flex items-center justify-center bg-[var(--base-color)] p-[var(--spacing-16)]">
             <main className="w-full flex justify-center">
-                <div className="bg-white rounded-[var(--radius-big)] 
+                <div className="bg-white rounded-[var(--radius-big)]
                 shadow-[var(--box-shadow)] px-[var(--spacing-32)]
                  py-[var(--spacing-48)] w-[600px] h-[400px]
                  flex flex-col items-center gap-[var(--spacing-24)]">
@@ -58,7 +84,7 @@ export default function Login() {
                             Know Hub
                         </h1>
                         {/* サブテキスト2行 */}
-                        <p className="text-[length:var(--font-size-normal)] 
+                        <p className="text-[length:var(--font-size-normal)]
                         text-[var(--text-color-black)] leading-[1.6]">
                             社内の「わからない」を解決する
                         </p>
@@ -78,7 +104,7 @@ export default function Login() {
                     <button
                         onClick={handleGoogleLoginClick}
                         disabled={isLoading}
-                        className="flex items-center justify-center gap-[var(--spacing-12)] w-[450px] h-[60px] py-[var(--spacing-12)] px-[var(--spacing-16)] bg-white border border-[var(--light-gray)] rounded-[var(--radius-small)] text-[length:var(--font-size-normal)] text-[var(--text-color-black)] cursor-pointer transition-opacity duration-200 ease-in-out hover:opacity-80 disabled:opacity-60 disabled:cursor-not-allowed"
+                        className="flex items-center justify-center gap-[var(--spacing-12)] w-[450px] h-[60px] py-[var(--spacing-12)] px-[var(--spacing-16)] bg-white border border-[var(--light-gray)] rounded-[var(--radius-small)] text-[length:var(--font-size-normal)] text-[var(--text-color-black)] cursor-pointer ease-in-out hover:bg-[var(--hover-color)] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                     >
                         <GoogleIcon />
                         {isLoading ? "処理中..." : "Googleでログイン"}

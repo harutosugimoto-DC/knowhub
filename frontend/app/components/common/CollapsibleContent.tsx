@@ -1,5 +1,6 @@
 import { checkIsTextOverflowing } from "@/utils/textUtils";
 import { useEffect, useRef } from "react";
+
 type CollapsibleContentProps = {
     content: string;
     isContentOpen: boolean;
@@ -17,8 +18,17 @@ export default function CollapsibleContent({
 
     useEffect(() => {
         const checkLines = () => {
-            // utilsを使って、3行を超えているか(true/false)を取得
+            if (!textRef.current) return;
+
+            // 💡 修正点1: 判定の瞬間だけ maxHeight の制限を一時的に解除する
+            const originalMaxHeight = textRef.current.style.maxHeight;
+            textRef.current.style.maxHeight = "none";
+
+            // 制限がない本来のフルサイズ状態で、3行を超えているかを取得
             const overflowing = checkIsTextOverflowing(textRef.current, 3);
+
+            // 💡 修正点2: 判定が終わったら即座にスタイルを元に戻す（描画のガタつきは起きません）
+            textRef.current.style.maxHeight = originalMaxHeight;
 
             // 親コンポーネントに状態を通知
             setIsOverflowing(overflowing);
@@ -27,29 +37,32 @@ export default function CollapsibleContent({
             if (!overflowing) {
                 setIsContentOpen(true);
             } else if (!isContentOpen) {
-                // はじめてあふれた判定になった時は閉じておく（要件に合わせて調整可）
                 setIsContentOpen(false);
             }
         };
 
-        // 初回マウント時と content 変更時に実行
+        // 初回マウント時と状態変更時に実行
         checkLines();
 
         const handleResize = () => {
-            if (isContentOpen) return; // コンテンツが開いている場合は高さの再計算は不要
             checkLines();
         };
 
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
 
-    }, [content]); // contentが変更された時のみ高さを再計算する
+    }, [content, isContentOpen]);
 
     return (
         <div className="relative">
             <p
                 ref={textRef}
-                className={`px-[var(--spacing-16)] text-[length:var(--font-size-medium)] transition-all duration-300 ${!isContentOpen ? "max-h-[calc(3em*1.6+var(--spacing-16))] overflow-hidden" : ""}`}
+                className="!select-text whitespace-pre-wrap break-all px-[var(--spacing-16)] text-[length:var(--font-size-medium)] transition-all overflow-hidden"
+                style={{
+                    maxHeight: isContentOpen
+                        ? `${textRef.current?.scrollHeight ?? 1000}px` // 開いている時は実際の全高(px)
+                        : "calc(3em * 1.6 + var(--spacing-16))"       // 閉じている時は元の3行分の高さ
+                }}
             >
                 {content}{isContentOpen ? '' : '・・・'}
             </p>
