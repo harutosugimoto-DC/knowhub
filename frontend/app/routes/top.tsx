@@ -50,6 +50,7 @@ export default function Top() {
         setSelectedStatusIds([])
         setSelectedTagIds([])
         setSearchWord("")
+        setActiveKeyword("")
     }
 
     // 💡 修正: どんなリテラル型の配列ステートでも安全にトグルできるように型を抽象化
