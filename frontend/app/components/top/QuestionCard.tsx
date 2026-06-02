@@ -8,7 +8,7 @@ import Time from '../common/Time';
 import Avatar from '../common/Avatar';
 import { type QuestionType } from "@/types/question";
 import { useNavigate } from 'react-router';
-
+import { MY_ACTIONS } from "@/constants/Filter";
 
 type QuestionCardProps = {
     question: QuestionType;
@@ -30,6 +30,7 @@ export default function QuestionCard({ question, isProfile }: QuestionCardProps)
         bookmarkCount,
         replyCount,
         tagNames,
+        myActions,
     } = question;
     return (
         <div className="rounded-4 cursor-pointer" onClick={() => navigate(`/question/${id}`)}>
@@ -38,6 +39,16 @@ export default function QuestionCard({ question, isProfile }: QuestionCardProps)
                     {/* 一段目 */}
                     <div className="flex items-center gap-[var(--spacing-16)]">
                         <StatusChip name={statusId} />
+                        {
+                            myActions.map((myAction) => {
+                                const targetAction = MY_ACTIONS.find((action) => action.id === myAction);
+                                return (
+                                    <div className={`bg-white border border-[var(--main-color)] rounded-[var(--radius-big)] inline-flex items-center justify-center text-[var(--main-color)] px-[var(--spacing-16)] py-[var(--spacing-12)]`}>
+                                        <div className="flex items-center h-[12px]">{targetAction ? targetAction.name : ""}</div>
+                                    </div>
+                                )
+                            })
+                        }
                     </div>
 
                     {/* 二段目 */}
