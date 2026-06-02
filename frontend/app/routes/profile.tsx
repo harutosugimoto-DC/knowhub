@@ -5,6 +5,7 @@ import SectionTitle from "@/components/common/SectionTitle";
 import ProgressBar from "@/components/profile/ProgressBar";
 import QuestionCard from "@/components/top/QuestionCard";
 import Avatar from "@/components/common/Avatar";
+import ErrorMessages from "@/components/common/ErrorMessages";
 
 import EditIcon from "@mui/icons-material/Edit";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
@@ -32,6 +33,10 @@ export default function Profile() {
     // ニックネーム編集用のState
     const [isEditing, setIsEditing] = useState(false);
     const [nickname, setNickname] = useState(user?.nickname ?? "");
+    const [nicknameError, setNicknameError] = useState("");
+
+    // 画像アップロード用のState
+    const [iconError, setIconError] = useState("");
 
     // ─── 💡 useEffect でデータの一括取得 ───
     useEffect(() => {
@@ -78,9 +83,22 @@ export default function Profile() {
         if (!files || files.length === 0) return;
 
         const selectedFile = files[0];
-        if (!selectedFile.type.startsWith("image/")) {
+
+        const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
+        if (!allowedTypes.includes(selectedFile.type)) {
+            setIconError("アップロードできる画像形式はjpg,png,gifです。");
+            e.target.value = "";
             return;
         }
+
+        const maxSize = 5 * 1024 * 1024;
+        if (selectedFile.size > maxSize) {
+            setIconError("画像サイズ制限を超えています。5MB以内にしてください。");
+            e.target.value = "";
+            return;
+        }
+
+        setIconError("");
 
         try {
             const response = await updateProfileIcon(selectedFile);
@@ -100,6 +118,11 @@ export default function Profile() {
         if (!nickname.trim()) {
             return;
         }
+        if (nickname.length > 10) {
+            setNicknameError("文字数が制限を超えています。10文字以内で入力してください。");
+            return;
+        }
+        setNicknameError("");
         try {
             await authService.updateNickname(nickname);
             setUser((prev) => prev ? { ...prev, nickname: nickname } : null);
@@ -117,6 +140,7 @@ export default function Profile() {
         }
         if (e.key === "Escape") {
             setNickname(profileData?.nickname || user?.nickname || "");
+            setNicknameError("");
             setIsEditing(false);
         }
     };
@@ -139,41 +163,48 @@ export default function Profile() {
 
 
                         <div className="flex-1 flex flex-col items-center justify-center gap-4 py-2 min-h-[120px]">
-                            <div className="relative w-full max-w-[140px] aspect-square text-[var(--main-color)] flex items-center justify-center rounded-full border">
-                                <Avatar src={profileData?.iconUrl || user?.iconUrl || "/images/default-avatar.png"} className="w-full h-full" />
-                                <label className=" transition-all hover:text-[var(--main-color)] hover:border-[var(--main-color)] hover:scale-110 absolute bottom-0 right-0 w-7 h-7 bg-white text-[var(--dark-gray)] border border-[var(--dark-gray)] rounded-full flex items-center justify-center cursor-pointer">
-                                    <input
-                                        type="file"
-                                        onChange={handleFileChange}
-                                        accept="image/*"
-                                        className="hidden"
-                                    />
-                                    <CameraAltIcon className="!text-[16px] pointer-events-none " />
-                                </label>
+                            <div className="flex flex-col items-center gap-2">
+                                <div className="relative w-full max-w-[140px] aspect-square text-[var(--main-color)] flex items-center justify-center rounded-full border">
+                                    <Avatar src={profileData?.iconUrl || user?.iconUrl || "/images/default-avatar.png"} className="w-full h-full" />
+                                    <label className=" transition-all hover:text-[var(--main-color)] hover:border-[var(--main-color)] hover:scale-110 absolute bottom-0 right-0 w-7 h-7 bg-white text-[var(--dark-gray)] border border-[var(--dark-gray)] rounded-full flex items-center justify-center cursor-pointer">
+                                        <input
+                                            type="file"
+                                            onChange={handleFileChange}
+                                            accept="image/jpeg,image/png,image/gif"
+                                            className="hidden"
+                                        />
+                                        <CameraAltIcon className="!text-[16px] pointer-events-none " />
+                                    </label>
+                                </div>
+                                {iconError && <ErrorMessages message={iconError} />}
                             </div>
 
-                            <div className="flex items-center gap-2">
-                                {isEditing ? (
-                                    <input
-                                        type="text"
-                                        value={nickname}
-                                        onChange={(e) => setNickname(e.target.value)}
-                                        onKeyDown={handleKeyDown}
-                                        autoFocus
-                                        maxLength={20}
-                                        className="border border-[var(--dark-gray)] rounded px-2 py-0.5 text-[length:var(--font-size-normal)] focus:outline-none focus:border-[var(--main-color)] bg-white text-black"
-                                    />
-                                ) : (
-                                    <>
-                                        <span>{nickname || "未設定"}</span>
-                                        <span
-                                            onClick={() => setIsEditing(true)}
-                                            className="inline-flex items-center justify-center text-[var(--dark-gray)] hover:text-[var(--main-color)] transition-all  hover:scale-130 cursor-pointer"
-                                        >
-                                            {/* 💡 アイコン自体は形とサイズだけを担当させ、ホバーやアニメーションは外側の器に任せる */}
-                                            <EditIcon className="!text-[length:var(--font-size-normal)] pointer-events-none" />
-                                        </span>
-                                    </>
+                            <div className="flex flex-col items-center gap-1">
+                                <div className="flex items-center gap-2">
+                                    {isEditing ? (
+                                        <input
+                                            type="text"
+                                            value={nickname}
+                                            onChange={(e) => setNickname(e.target.value)}
+                                            onKeyDown={handleKeyDown}
+                                            autoFocus
+                                            maxLength={20}
+                                            className="border border-[var(--dark-gray)] rounded px-2 py-0.5 text-[length:var(--font-size-normal)] focus:outline-none focus:border-[var(--main-color)] bg-white text-black"
+                                        />
+                                    ) : (
+                                        <>
+                                            <span>{nickname || "未設定"}</span>
+                                            <span
+                                                onClick={() => setIsEditing(true)}
+                                                className="inline-flex items-center justify-center text-[var(--dark-gray)] hover:text-[var(--main-color)] transition-all  hover:scale-130 cursor-pointer"
+                                            >
+                                                <EditIcon className="!text-[length:var(--font-size-normal)] pointer-events-none" />
+                                            </span>
+                                        </>
+                                    )}
+                                </div>
+                                {isEditing && nicknameError && (
+                                    <ErrorMessages message={nicknameError} />
                                 )}
                             </div>
                         </div>
