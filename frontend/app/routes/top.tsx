@@ -42,6 +42,13 @@ export default function Top() {
     const [searchWord, setSearchWord] = useState(""); // 入力中の文字列
     const [activeKeyword, setActiveKeyword] = useState("");
 
+    const handleFilterClear = () => {
+        setSelectedMyActionIds([])
+        setSelectedStatusIds([])
+        setSelectedTagIds([])
+        setSearchWord("")
+    }
+
     // 💡 修正: どんなリテラル型の配列ステートでも安全にトグルできるように型を抽象化
     const handleToggleId = <T extends string>(id: string, setIds: React.Dispatch<React.SetStateAction<T[]>>) => {
         setIds((prev) =>
@@ -110,7 +117,7 @@ export default function Top() {
                     setIsFilterOpen(true);
                 }
             }}>
-                <div className={`flex items-center justify-between border-b transition-all ${isFilterOpen ? "border-[var(--main-color)] mb-[var(--spacing16)]" : "border-transparent mb-0"}`}  onClick={()=> setIsFilterOpen(!isFilterOpen)}>
+                <div className={`flex items-center justify-between border-b transition-all ${isFilterOpen ? "border-[var(--main-color)] mb-[var(--spacing16)]" : "border-transparent mb-0"}`} onClick={() => setIsFilterOpen(!isFilterOpen)}>
                     <div className="flex items-center">
                         <FilterAltOutlinedIcon className="text-[var(--main-color)]" />
                         <p className="text-[length:var(--font-size-big)]">フィルター</p>
@@ -124,8 +131,9 @@ export default function Top() {
                         {/* マイアクション */}
                         <div className="flex flex-col gap-2">
                             <div className="py-[var(--spacing-8)]">
-                                <div className="border-b border-[var(--light-gray)] py-[var(--spacing-8)]">
+                                <div className="border-b border-[var(--light-gray)] py-[var(--spacing-8)] flex flex-row justify-between items-end">
                                     <p>マイアクション</p>
+                                    <button className="px-4 py-1 rounded-[4px] text-white bg-[var(--main-color)] shadow-[var(--box-shadow)] hover:shadow-[var(--hover-box-shadow)] transition-all duration-200 cursor-pointer active:shadow-none" onClick={() => handleFilterClear()}>条件クリア</button>
                                 </div>
                             </div>
                             <div className="flex gap-2 px-2">
