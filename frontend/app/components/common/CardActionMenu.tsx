@@ -37,7 +37,7 @@ export default function CardActionMenu({
 
                 {isDropDownOpen && (
                     <div
-                        className="transition-all hover:bg-[var(--hover-color)] cursor-pointer flex items-center justify-center bg-white rounded-[var(--spacing-4)] absolute left-0 translate-x-[-50%] shadow-[var(--box-shadow)] border border-[var(--light-gray)] w-[128px] h-[40px] z-10"
+                        className="transition-all hover:bg-[var(--hover-color)] cursor-pointer flex items-center justify-center bg-white rounded-[var(--spacing-4)] absolute left-[100%] translate-x-[-100%] shadow-[var(--box-shadow)] border border-[var(--light-gray)] w-[128px] h-[40px] z-10"
                         // onClick={handleRemove()} だとレンダリング時に即時実行されてしまうため、関数を渡す形に修正
                         onClick={handleRemoveClick}
                     >
@@ -52,12 +52,12 @@ export default function CardActionMenu({
             {/* 開閉トグル（矢印アイコン） */}
             {isOverflowing && (
                 isContentOpen ? (
-                    <KeyboardArrowDownOutlinedIcon
+                    <KeyboardArrowUpOutlinedIcon
                         className="cursor-pointer"
                         onClick={() => setIsContentOpen(false)}
                     />
                 ) : (
-                    <KeyboardArrowUpOutlinedIcon
+                    <KeyboardArrowDownOutlinedIcon
                         className="cursor-pointer"
                         onClick={() => setIsContentOpen(true)}
                     />
