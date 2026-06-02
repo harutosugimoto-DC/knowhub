@@ -3,6 +3,8 @@ import Card from "./Card";
 import type { NotificationItemProps } from "./NotificationItem";
 import NotificationItem from "./NotificationItem";
 import ScrollBar from "./ScrollBar";
+import Loading from "./Loading";
+import { useLoading } from "@/contexts/LoadingContext";
 
 
 
@@ -19,7 +21,7 @@ const calculateUnreadCount = (notifications: NotificationItemProps[]) => {
     return count;
 }
 export default function Notification({ notifications }: NotificationProps) {
-
+    const { isLoading } = useLoading()
     const handleAllRead = async () => {
         const response = await allReadNotifications();
     }
@@ -39,7 +41,8 @@ export default function Notification({ notifications }: NotificationProps) {
                 </div>
             </div>
             <ScrollBar>
-                {notifications.map((notification, i) => (
+
+                {isLoading ? <Loading /> : notifications.map((notification, i) => (
                     <NotificationItem
                         key={i}
                         createdAt={notification.createdAt}

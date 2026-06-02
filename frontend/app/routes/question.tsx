@@ -35,6 +35,7 @@ import EmojiEventsOutlinedIcon from '@mui/icons-material/EmojiEventsOutlined';
 import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
 import KeyboardArrowUpOutlinedIcon from '@mui/icons-material/KeyboardArrowUpOutlined';
 import Button from '@/components/common/Button';
+import Loading from '@/components/common/Loading';
 
 
 // ═════════════════════════════════════════
@@ -107,7 +108,7 @@ function AnswerPreviewCard({ answer }: AnswerPreviewCardProps) {
         {answer.content}
       </p>
       <div className="flex justify-end mt-2">
-        <Like  id={answer.id} type='answer' count={answer.likeCount} isLiked={answer.isLiked} />
+        <Like id={answer.id} type='answer' count={answer.likeCount} isLiked={answer.isLiked} />
       </div>
     </Card>
   );
@@ -474,9 +475,8 @@ export default function QuestionPage() {
   if (isLoading) {
     return (
       <>
-        <Header />
         <div className="min-h-screen bg-[var(--base-color)] pt-[64px] flex items-center justify-center">
-          <p className="text-[var(--dark-gray)]">読み込み中...</p>
+          <Loading />
         </div>
       </>
     );
@@ -485,7 +485,6 @@ export default function QuestionPage() {
   if (!question) {
     return (
       <>
-        <Header />
         <div className="min-h-screen bg-[var(--base-color)] pt-[64px] flex items-center justify-center">
           <p className="text-[var(--dark-gray)]">質問が見つかりません</p>
         </div>
@@ -496,8 +495,6 @@ export default function QuestionPage() {
 
   return (
     <>
-      <Header />
-
       <div className="min-h-screen bg-[var(--base-color)] pt-[64px]">
         <div className="max-w-[1440px] mx-auto px-[var(--spacing-32)] py-[var(--spacing-24)] flex flex-col gap-[var(--spacing-24)]">
 
@@ -510,6 +507,7 @@ export default function QuestionPage() {
             <div className="flex items-center justify-between border-b border-[var(--main-color)] py-[var(--spacing-16)]">
               <h2 className="text-[length:var(--font-size-big)]">回答一覧</h2>
             </div>
+            <Loading />
 
             <ScrollBar className="py-4 flex flex-col gap-[var(--spacing-16)] max-h-[calc(100vh-300px)]">
               {answers.length === 0 ? (
