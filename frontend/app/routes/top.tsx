@@ -217,8 +217,8 @@ export default function Top() {
             </div>
             <ScrollBar className="w-full max-h-[1000px]">
                 <div className="flex flex-col gap-2 px-[var(--spacing-16)] pb-[var(--spacing-8)]">
-                    {questions.length === 0 ? (
-                        <p className="text-sm text-[var(--dark-gray)] text-center py-4">一致する質問はありません</p>
+                   {isLoading ? <Loading /> : questions.length === 0 ? (
+                    <p className="text-sm text-[var(--dark-gray)] text-center py-4">一致する質問はありません</p>
                     ) : (
                         questions.map((question) => (
                             <QuestionCard key={question.id} question={question} />
