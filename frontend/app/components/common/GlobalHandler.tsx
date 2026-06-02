@@ -2,8 +2,6 @@ import { useEffect, useState } from 'react';
 import Toast from './Toast';
 
 export default function GlobalHandler() {
-    // ローディング状態を管理するstate
-    const [isLoading, setIsLoading] = useState(false);
 
     // エラートースト（赤）の配列
     const [errorToasts, setErrorToasts] = useState<{ id: number; message: string }[]>([]);
@@ -12,11 +10,7 @@ export default function GlobalHandler() {
     const [successToasts, setSuccessToasts] = useState<{ id: number; message: string }[]>([]);
 
     useEffect(() => {
-        // ローディングイベントを受け取る
-        const handleLoading = (e: Event) => {
-            const customEvent = e as CustomEvent<boolean>;
-            setIsLoading(customEvent.detail);
-        };
+        
 
         // axiosClientが投げたエラーイベントを受け取る
         const handleApiError = (e: Event) => {
@@ -47,13 +41,11 @@ export default function GlobalHandler() {
         };
 
         // イベントリスナーを登録
-        window.addEventListener('global-loading', handleLoading);
         window.addEventListener('global-error', handleApiError);
         window.addEventListener('global-success', handleApiSuccess); // 成功イベントを追加
 
         // コンポーネントがアンマウントされたときにリスナーを削除
         return () => {
-            window.removeEventListener('global-loading', handleLoading);
             window.removeEventListener('global-error', handleApiError);
             window.removeEventListener('global-success', handleApiSuccess);
         };
@@ -61,9 +53,6 @@ export default function GlobalHandler() {
 
     return (
         <>
-            {/* ローディングUIは現在コメントアウト中 */}
-            {/* {isLoading && (...)} */}
-
             {/* トースト表示エリア：ヘッダー直下・右上に固定 */}
             <div style={{
                 position: 'fixed',
