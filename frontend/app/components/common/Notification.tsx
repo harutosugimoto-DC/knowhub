@@ -22,8 +22,12 @@ const calculateUnreadCount = (notifications: NotificationItemProps[]) => {
 }
 export default function Notification({ notifications }: NotificationProps) {
     const { isLoading } = useLoading()
+    const unreadCount = calculateUnreadCount(notifications);
+
     const handleAllRead = async () => {
-        const response = await allReadNotifications();
+        const confirmed = window.confirm("全件既読にしますか？");
+        if (!confirmed) return;
+        await allReadNotifications();
     }
     return (
         <Card className="w-[400px] max-h-[400px] flex flex-col gap-2">
@@ -33,11 +37,13 @@ export default function Notification({ notifications }: NotificationProps) {
                 <div className="flex items-center gap-4">
 
                     <p className="text-[var(--dark-gray)] flex items-center">
-                        {calculateUnreadCount(notifications)}件の未読
+                        {unreadCount}件の未読
                     </p>
-                    <p onClick={() => handleAllRead()} className="text-[var(--main-color)] cursor-pointer">
-                        すべて既読
-                    </p>
+                    {unreadCount > 0 && (
+                        <p onClick={() => handleAllRead()} className="text-[var(--main-color)] cursor-pointer">
+                            すべて既読
+                        </p>
+                    )}
                 </div>
             </div>
             <ScrollBar>

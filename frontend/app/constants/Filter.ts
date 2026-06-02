@@ -16,8 +16,8 @@ export const MY_ACTIONS: ({ id: ('my_questions' | 'my_answers' | 'my_solved' | '
         name: "ブックマーク"
     }]
 export const DROP_DOWN_OPTIONS = [
-    { label: "投稿日降順", value: "newDesc" },
-    { label: "投稿日昇順", value: "newAsc" },
-    { label: "いいね数降順", value: "likesDesc" },
-    { label: "いいね数昇順", value: "likesAsc" }
+    { label: "新着順", value: "newDesc" },
+    { label: "古い順", value: "newAsc" },
+    { label: "いいね多い順", value: "likesDesc" },
+    { label: "いいね少ない順", value: "likesAsc" }
 ];
