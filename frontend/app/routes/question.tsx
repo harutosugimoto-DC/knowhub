@@ -142,7 +142,7 @@ function AnswerPreviewCard({ answer }: AnswerPreviewCardProps) {
         <p>{answer.userName}</p>
         <Time postingTime={answer.postingTime} />
       </div>
-      <ScrollBar className='max-h-[100px] overflow-auto px-[var(--spacing-16)]'>
+      <ScrollBar className='max-h-[64px] overflow-auto px-[var(--spacing-16)]'>
         <p className="!select-text text-[length:var(--font-size-medium)] leading-relaxed ">
           {answer.content}
         </p>
@@ -319,8 +319,8 @@ type AnswerFormProps = {
 
 function AnswerForm({ title, preview, content, onChange, error, isSubmitting, onSubmit }: AnswerFormProps) {
   return (
-    <div style={{ width: '750px', maxWidth: '90vw' }} className="sm:px-0 flex flex-col max-h-[85vh] bg-white rounded-[var(--radius-big)] overflow-hidden">
-      <div className="pt-4 px-4 h-[220px] shrink-0">
+    <div style={{ width: '750px', maxWidth: '90vw' }} className="sm:px-0 flex flex-col max-h-[85vh] rounded-[var(--radius-big)] overflow-hidden">
+      <div className="pt-4 px-4 max-h-[220px] shrink-0">
         {preview}
       </div>
       <div className="flex flex-col gap-[var(--spacing-16)] px-4 pb-4 pt-2 items-center flex-1 overflow-y-auto">
