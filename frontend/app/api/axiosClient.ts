@@ -39,7 +39,11 @@ const axiosClient = axios.create({
 // リクエストインターセプター
 axiosClient.interceptors.request.use(
     (config) => {
-        startLoading();
+        const isSilentRequest = config.url?.endsWith('/like') || config.url?.endsWith('/bookmark');
+
+        if (!isSilentRequest) {
+            startLoading();
+        }
 
         // localStorageからトークンを取得してヘッダーにセット
         const token = localStorage.getItem('token');

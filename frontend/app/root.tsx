@@ -9,6 +9,7 @@ import "@fontsource/lora/400.css";
 import GlobalHandler from "./components/common/GlobalHandler";
 import { UserProvider } from "./contexts/UserContext";
 import { MasterDataProvider } from "./contexts/MasterDataContext";
+import { LoadingProvider } from "./contexts/LoadingContext";
 
 export default function App() {
     return (
@@ -20,18 +21,20 @@ export default function App() {
                 <Links />
             </head>
             <body>
-                <UserProvider>
-                    <MasterDataProvider>
-                        <GlobalHandler />
-                        <Header />
-                        {/* Headerの高さだけpadding-topを付与（Headerに隠れないようにするってこと） */}
-                        <div className="pt-[64px]">
-                            <Outlet />
-                        </div>
-                        <ScrollRestoration />
-                        <Scripts />
-                    </MasterDataProvider>
-                </UserProvider>
+                <LoadingProvider>
+                    <UserProvider>
+                        <MasterDataProvider>
+                            <GlobalHandler />
+                            <Header />
+                            {/* Headerの高さだけpadding-topを付与（Headerに隠れないようにするってこと） */}
+                            <div className="pt-[64px]">
+                                <Outlet />
+                            </div>
+                            <ScrollRestoration />
+                            <Scripts />
+                        </MasterDataProvider>
+                    </UserProvider>
+                </LoadingProvider>
             </body>
         </html>
     );

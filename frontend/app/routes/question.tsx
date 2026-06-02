@@ -35,6 +35,7 @@ import EmojiEventsOutlinedIcon from '@mui/icons-material/EmojiEventsOutlined';
 import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
 import KeyboardArrowUpOutlinedIcon from '@mui/icons-material/KeyboardArrowUpOutlined';
 import Button from '@/components/common/Button';
+import Loading from '@/components/common/Loading';
 
 
 // ═════════════════════════════════════════
@@ -530,9 +531,8 @@ export default function QuestionPage() {
   if (isLoading) {
     return (
       <>
-        <Header />
         <div className="min-h-screen bg-[var(--base-color)] pt-[64px] flex items-center justify-center">
-          <p className="text-[var(--dark-gray)]">読み込み中...</p>
+          <Loading />
         </div>
       </>
     );
@@ -541,7 +541,6 @@ export default function QuestionPage() {
   if (!question) {
     return (
       <>
-        <Header />
         <div className="min-h-screen bg-[var(--base-color)] pt-[64px] flex items-center justify-center">
           <p className="text-[var(--dark-gray)]">質問が見つかりません</p>
         </div>
@@ -552,8 +551,6 @@ export default function QuestionPage() {
 
   return (
     <>
-      <Header />
-
       <div className="min-h-screen bg-[var(--base-color)] pt-[64px]">
         <div className="max-w-[1440px] mx-auto px-[var(--spacing-32)] py-[var(--spacing-24)] flex flex-col gap-[var(--spacing-24)]">
 

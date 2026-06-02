@@ -20,9 +20,12 @@ import { getQuestions } from "@/api/questionService";
 import { useMasterData } from "@/contexts/MasterDataContext";
 import type { QuestionType } from "@/types/question";
 import { DROP_DOWN_OPTIONS, MY_ACTIONS } from "@/constants/Filter"
+import Loading from "@/components/common/Loading";
+import { useLoading } from "@/contexts/LoadingContext";
 
 export default function Top() {
     const navigate = useNavigate();
+    const { isLoading } = useLoading()
 
     // --- ステート定義 ---
     const [questions, setQuestions] = useState<QuestionType[]>([]);
@@ -214,7 +217,7 @@ export default function Top() {
             </div>
             <ScrollBar className="w-full max-h-[1000px]">
                 <div className="flex flex-col gap-2 px-[var(--spacing-16)] pb-[var(--spacing-8)]">
-                    {questions.map((question) => (
+                    {isLoading ? <Loading /> : questions.map((question) => (
                         <QuestionCard key={question.id} question={question} />
                     ))}
                 </div>
