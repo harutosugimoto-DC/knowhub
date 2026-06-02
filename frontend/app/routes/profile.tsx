@@ -176,9 +176,9 @@ export default function Profile() {
                 {/* 実績数値グリッド */}
                 <div className="grid grid-cols-2 gap-4 shrink-0 pb-4">
                     {[
-                        { label: "質問回答数", value: profileData?.answerCount ?? 0 },
+                        { label: "回答投稿数", value: profileData?.answerCount ?? 0 },
                         { label: "ベストアンサー数", value: profileData?.bestAnswerCount ?? 0 },
-                        { label: "いいね総数", value: profileData?.totalLikeCount ?? 0 },
+                        { label: "いいね獲得数", value: profileData?.totalLikeCount ?? 0 },
                         { label: "質問数", value: profileData?.questionCount ?? 0 },
                     ].map((item, i) => (
                         <div key={i} className="border border-[var(--light-gray)] bg-white rounded-[16px] flex flex-col gap-2 items-center justify-center min-h-[100px]">
