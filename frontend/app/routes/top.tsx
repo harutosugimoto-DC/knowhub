@@ -139,7 +139,7 @@ export default function Top() {
                                     <button className="px-4 py-1 rounded-[4px] text-white bg-[var(--main-color)] shadow-[var(--box-shadow)] hover:shadow-[var(--hover-box-shadow)] transition-all duration-200 cursor-pointer active:shadow-none" onClick={() => handleFilterClear()}>条件クリア</button>
                                 </div>
                             </div>
-                            <div className="flex gap-2 px-2">
+                            <div className="flex gap-2 px-2 flex-wrap">
                                 {MY_ACTIONS.map((myAction) => (
                                     <FilterChip
                                         key={myAction.id}
