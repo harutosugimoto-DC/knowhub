@@ -295,23 +295,25 @@ export default function CreateQuestion() {
 
             {isModalOpen && (
                 <Modal onClose={() => setIsModalOpen(false)}>
-                    <div style={{ width: '750px', maxWidth: '90vw' }} className="flex flex-col gap-[var(--spacing-8)] max-h-[80vh]">
-                        <div className="px-4">
+                    <div style={{ width: '750px', maxWidth: '90vw' }} className="flex flex-col gap-[var(--spacing-8)] max-h-[80vh] overflow-hidden">
+                        <div className="px-4 flex-1 min-h-0 overflow-y-auto">
                             <Card>
-                                <div className="flex items-center justify-between py-[var(--spacing-16)]">
-                                    <div className="flex items-center gap-4">
-                                        <StatusChip name="回答募集中" />
-                                        <h2 className="text-[length:var(--font-size-big)]">
+                                <div className="shrink-0 flex items-start justify-between py-[var(--spacing-16)]">
+                                    <div className="flex items-start gap-4 min-w-0">
+                                        <div className="shrink-0">
+                                            <StatusChip name="回答募集中" />
+                                        </div>
+                                        <h2 className="text-[length:var(--font-size-big)] min-w-0 break-words">
                                             {titleText}
                                         </h2>
                                     </div>
                                 </div>
-                                <div className="px-[var(--spacing-16)] py-[var(--spacing-8)]">
+                                <div className="shrink-0 px-[var(--spacing-16)] py-[var(--spacing-8)]">
                                     <ScrollBar className="min-h-[150px] max-h-[300px]">
                                         <p className="whitespace-pre-wrap break-words">{detailText}</p>
                                     </ScrollBar>
                                 </div>
-                                <div className="px-[var(--spacing-16)] py-[var(--spacing-8)] flex items-center justify-between">
+                                <div className="shrink-0 px-[var(--spacing-16)] py-[var(--spacing-8)] flex items-center justify-between">
                                     <div className="flex flex-wrap gap-2">
                                         {selectedTagIds.map((tagId, index) => (
                                             <TagChip key={index} text={allTags.find((t) => t.id === tagId)?.name ?? tagId} />

@@ -13,7 +13,7 @@ export default function StatusChip({ name }: StatusChipProps) {
     const bgClass = statusStyles[name] || "bg-gray-400";
 
     return (
-        <div className={`${bgClass} rounded-[var(--radius-big)] inline-flex items-center justify-center text-white px-[var(--spacing-16)] py-[var(--spacing-12)]`}>
+        <div className={`${bgClass} rounded-[var(--radius-big)] inline-flex items-center justify-center text-white px-[var(--spacing-16)] py-[var(--spacing-12)] whitespace-nowrap shrink-0`}>
             <div className="flex items-center h-[12px]">{name}</div>
         </div>
     );
