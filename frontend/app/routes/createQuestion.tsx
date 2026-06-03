@@ -296,7 +296,7 @@ export default function CreateQuestion() {
             {isModalOpen && (
                 <Modal onClose={() => setIsModalOpen(false)}>
                     <div style={{ width: '750px', maxWidth: '90vw' }} className="flex flex-col gap-[var(--spacing-8)] max-h-[80vh] overflow-hidden">
-                        <div className="px-4">
+                        <div className="px-4 flex-1 min-h-0 overflow-y-auto">
                             <Card>
                                 <div className="shrink-0 flex items-start justify-between py-[var(--spacing-16)]">
                                     <div className="flex items-start gap-4 min-w-0">
