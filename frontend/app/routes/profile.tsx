@@ -164,7 +164,7 @@ export default function Profile() {
 
 
                         <div className="flex-1 flex flex-col items-center justify-center gap-4 py-2 min-h-[120px]">
-                            <div className="flex flex-col items-center gap-2">
+                            <div className="flex flex-col items-center gap-2 w-full">
                                 <div className="relative w-full max-w-[140px] aspect-square text-[var(--main-color)] flex items-center justify-center rounded-full border">
                                     <Avatar src={profileData?.iconUrl || user?.iconUrl || "/images/default-avatar.png"} className="w-full h-full" />
                                     <label className=" transition-all hover:text-[var(--main-color)] hover:border-[var(--main-color)] hover:scale-110 absolute bottom-0 right-0 w-7 h-7 bg-white text-[var(--dark-gray)] border border-[var(--dark-gray)] rounded-full flex items-center justify-center cursor-pointer">
