@@ -18,6 +18,7 @@ import Modal from '@/components/common/Modal';
 import TextArea from '@/components/common/Textarea';
 import ErrorMessages from '@/components/common/ErrorMessages';
 import Header from '@/components/common/Header';
+import Loading from '@/components/common/Loading';
 
 import QuestionDetailCard from '@/components/questionDetail/QuestionDetailCard';
 import ThreadReply from '@/components/questionDetail/ThreadReply';
@@ -87,6 +88,44 @@ function AnswererQuestionCard({ question }: AnswererQuestionCardProps) {
   );
 }
 
+type AnswererQuestionPreviewCardProps = {
+  question: QuestionDetail;
+};
+
+//回答作成時の質問プレビュー専用
+function AnswererQuestionPreviewCard({ question }: AnswererQuestionPreviewCardProps) {
+  return (
+    <Card className="w-full px-4 py-2 flex flex-col h-full max-h-[200px] overflow-hidden">
+      <div className="flex items-center justify-between pb-[var(--spacing-16)] shrink-0">
+        <div className="flex items-center gap-4">
+          <StatusChip name={question.statusId} />
+          <h2 className="text-[length:var(--font-size-big)]">{question.title}</h2>
+        </div>
+      </div>
+
+      <div className='!select-text flex-1 min-h-0 flex flex-col max-h-[64px]'>
+        <ScrollBar className='h-full overflow-auto px-[var(--spacing-16)]'>
+          <p className="!select-text text-[length:var(--font-size-medium)] leading-relaxed whitespace-pre-wrap break-all">
+            {question.content}
+          </p>
+        </ScrollBar>
+      </div>
+
+      <div className="px-[var(--spacing-16)] py-[var(--spacing-8)] flex items-center justify-between shrink-0">
+        <div className="flex flex-wrap gap-2">
+          {question.tagNames?.map((tag, index) => (
+            <TagChip key={index} text={tag} />
+          ))}
+        </div>
+        <div className="flex items-center gap-2">
+          <Bookmark id={question.id} isBookmarked={question.isBookmarked ?? false} count={question.bookmarkCount} />
+          <Like id={question.id} type='question' isLiked={question.isLiked ?? false} count={question.likeCount} />
+          <Comment count={question.replyCount} />
+        </div>
+      </div>
+    </Card>
+  );
+}
 
 // ═════════════════════════════════════════
 // AnswerPreviewCard（回答返信モーダル内のプレビューカード）
@@ -103,11 +142,13 @@ function AnswerPreviewCard({ answer }: AnswerPreviewCardProps) {
         <p>{answer.userName}</p>
         <Time postingTime={answer.postingTime} />
       </div>
-      <p className="!select-text px-[var(--spacing-16)] text-[length:var(--font-size-medium)] leading-relaxed max-h-[120px] overflow-auto">
-        {answer.content}
-      </p>
+      <ScrollBar className='max-h-[64px] overflow-auto px-[var(--spacing-16)]'>
+        <p className="!select-text text-[length:var(--font-size-medium)] leading-relaxed ">
+          {answer.content}
+        </p>
+      </ScrollBar>
       <div className="flex justify-end mt-2">
-        <Like  id={answer.id} type='answer' count={answer.likeCount} isLiked={answer.isLiked} />
+        <Like id={answer.id} type='answer' count={answer.likeCount} isLiked={answer.isLiked} />
       </div>
     </Card>
   );
@@ -278,27 +319,29 @@ type AnswerFormProps = {
 
 function AnswerForm({ title, preview, content, onChange, error, isSubmitting, onSubmit }: AnswerFormProps) {
   return (
-    <div style={{ width: '750px', maxWidth: '90vw' }} className="sm:px-0 flex flex-col gap-[var(--spacing-8)] max-h-[80vh] overflow-y-auto">
-      <div className="pb-4 px-4 max-h-[240px] overflow-auto">
+    <div style={{ width: '750px', maxWidth: '90vw' }} className="sm:px-0 flex flex-col max-h-[80vh] rounded-[var(--radius-big)] overflow-hidden">
+      <div className="pt-4 px-4 shrink-0">
         {preview}
       </div>
-      <div className="flex flex-col gap-[var(--spacing-16)] px-4 pb-4 items-center">
-        <label className="w-full flex py-[var(--spacing-8)] justify-between items-center border-b border-[var(--main-color)]">
+      <div className="flex flex-col gap-[var(--spacing-16)] px-4 pb-4 pt-2 items-center flex-1 overflow-y-auto">
+        <label className="w-full flex py-[var(--spacing-8)] justify-between items-center border-b border-[var(--main-color)] shrink-0">
           <p className="text-[length:var(--font-size-big)]">
             {title}
             <span className="text-[var(--danger-color)]">*</span>
           </p>
         </label>
+
         <TextArea
           placeholder="例：setStateによる更新は非同期で行われるため、同じレンダーサイクル内では古い値を参照してしまうからです。"
           value={content}
           onChange={onChange}
           rows={5}
         />
-        {error && <ErrorMessages message={error} />}
-        <Button className='w-[344px]' onClick={onSubmit} text={isSubmitting ? '送信中...' : '回答送信'} disabled={isSubmitting} />
-      </div>
 
+        {error && <ErrorMessages message={error} />}
+
+        <Button className='w-[344px] shrink-0' onClick={onSubmit} text={isSubmitting ? '送信中...' : '回答送信'} disabled={isSubmitting} />
+      </div>
     </div>
   );
 }
@@ -375,8 +418,12 @@ export default function QuestionPage() {
 
   const refreshAnswers = async () => {
     if (!id) return;
-    const updated = await getQuestionAnswers(id);
+    const [updated, updatedQuestion] = await Promise.all([
+      getQuestionAnswers(id),
+      getQuestionById(id),
+    ]);
     setAnswers(updated);
+    setQuestion(updatedQuestion);
   };
 
 
@@ -474,9 +521,8 @@ export default function QuestionPage() {
   if (isLoading) {
     return (
       <>
-        <Header />
         <div className="min-h-screen bg-[var(--base-color)] pt-[64px] flex items-center justify-center">
-          <p className="text-[var(--dark-gray)]">読み込み中...</p>
+          <Loading />
         </div>
       </>
     );
@@ -485,7 +531,6 @@ export default function QuestionPage() {
   if (!question) {
     return (
       <>
-        <Header />
         <div className="min-h-screen bg-[var(--base-color)] pt-[64px] flex items-center justify-center">
           <p className="text-[var(--dark-gray)]">質問が見つかりません</p>
         </div>
@@ -496,8 +541,6 @@ export default function QuestionPage() {
 
   return (
     <>
-      <Header />
-
       <div className="min-h-screen bg-[var(--base-color)] pt-[64px]">
         <div className="max-w-[1440px] mx-auto px-[var(--spacing-32)] py-[var(--spacing-24)] flex flex-col gap-[var(--spacing-24)]">
 
@@ -535,17 +578,7 @@ export default function QuestionPage() {
             </ScrollBar>
 
             {!isOwner && question.statusId !== '解決済み' && (
-              // <button
-              //   onClick={() => setIsAnswerModalOpen(true)}
-              //   className="w-[410px] h-[80px] bg-[image:var(--gradation-green)]
-              //   text-white text-[length:var(--font-size-medium)] font-semibold
-              //   rounded-[var(--radius-small)] shadow-[var(--box-shadow)]
-              //   cursor-pointer hover:opacity-90 transition-all mt-[var(--spacing-8)] mx-auto"
-              // >
-              //   回答作成
-              // </button>]
               <div className='w-full flex items-center justify-center'>
-
                 <Button onClick={() => setIsAnswerModalOpen(true)} text='回答作成' className='w-[410px]' />
               </div>
             )}
@@ -555,10 +588,10 @@ export default function QuestionPage() {
 
       {/* 回答投稿モーダル */}
       {isAnswerModalOpen && (
-        <Modal onClose={() => { setIsAnswerModalOpen(false); setAnswerContent(''); setAnswerError(''); }}>
+        <Modal confirmOnClose onClose={() => { setIsAnswerModalOpen(false); setAnswerContent(''); setAnswerError(''); }}>
           <AnswerForm
             title="回答を入力してください"
-            preview={<AnswererQuestionCard question={question} />}
+            preview={<AnswererQuestionPreviewCard question={question} />}
             content={answerContent}
             onChange={setAnswerContent}
             error={answerError}
@@ -570,7 +603,7 @@ export default function QuestionPage() {
 
       {/* 回答への返信モーダル */}
       {replyTargetAnswerId !== null && replyTargetAnswer && (
-        <Modal onClose={() => { setReplyTargetAnswerId(null); setReplyContent(''); setReplyError(''); }}>
+        <Modal confirmOnClose onClose={() => { setReplyTargetAnswerId(null); setReplyContent(''); setReplyError(''); }}>
           <AnswerForm
             title="返信を入力してください"
             preview={<AnswerPreviewCard answer={replyTargetAnswer} />}
@@ -585,7 +618,7 @@ export default function QuestionPage() {
 
       {/* ThreadReply への返信モーダル */}
       {replyTargetReply !== null && (
-        <Modal onClose={() => { setReplyTargetReply(null); setReplyContent(''); setReplyError(''); }}>
+        <Modal confirmOnClose onClose={() => { setReplyTargetReply(null); setReplyContent(''); setReplyError(''); }}>
           <AnswerForm
             title="返信を入力してください"
             preview={<ReplyPreviewCard reply={replyTargetReply} />}

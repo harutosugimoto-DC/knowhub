@@ -11,6 +11,7 @@ export interface QuestionType {
     bookmarkCount: number;
     replyCount: number;
     tagNames: string[];
+    myActions: ('my_questions' | 'my_answers' | 'my_solved' | 'bookmarked')[];
 };
 
 export interface QuestionDetail extends QuestionType {
@@ -29,7 +30,7 @@ export interface GetQuestionsParams {
 
 export interface GetQuestionsResponse {
     currentPage: number,
-    iconUrl:string,
+    iconUrl: string,
     totalPages: number,
     order: 'likesAsc' | 'likesDesc' | 'newAsc' | 'newDesc',
     keyword: string | null,
