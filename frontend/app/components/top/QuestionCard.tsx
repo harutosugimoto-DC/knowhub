@@ -37,13 +37,13 @@ export default function QuestionCard({ question, isProfile }: QuestionCardProps)
             <Card className={`${isProfile ? "border border-[var(--light-gray)]" : ""}  transition-all hover:shadow-[var(--hover-box-shadow)] hover:bg-[var(--hover-color)] flex justify-between`}>
                 <div className='flex flex-col justify-space-around gap-[var(--spacing-16)]'>
                     {/* 一段目 */}
-                    <div className="flex items-center gap-[var(--spacing-16)]">
+                    <div className="flex items-center gap-[var(--spacing-16)] flex-wrap">
                         <StatusChip name={statusId} />
                         {
                             myActions.map((myAction) => {
                                 const targetAction = MY_ACTIONS.find((action) => action.id === myAction);
                                 return (
-                                    <div className={`bg-white border border-[var(--main-color)] rounded-[var(--radius-big)] inline-flex items-center justify-center text-[var(--main-color)] px-[var(--spacing-16)] py-[var(--spacing-12)]`}>
+                                    <div className={`bg-white border border-[var(--main-color)] rounded-[var(--radius-big)] inline-flex items-center justify-center text-[var(--main-color)] px-[var(--spacing-16)] py-[var(--spacing-12)]  shrink-0`}>
                                         <div className="flex items-center h-[12px]">{targetAction ? targetAction.name : ""}</div>
                                     </div>
                                 )
