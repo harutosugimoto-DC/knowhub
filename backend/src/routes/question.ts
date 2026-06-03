@@ -248,7 +248,7 @@ router.get('/', requireAuth, async (req, res) => {
   if (q.user_id === userId) actions.push('my_questions');
   if (q.answers?.some((a: any) => a.user_id === userId && a.deleted_at === null)) actions.push('my_answers');
   if (q.user_id === userId && q.answers?.some((a: any) => a.best_answer_at !== null)) actions.push('my_solved');
-  if (q.bookmarks?.some((b: any) => b.user_id === userId)) actions.push('bookmarked');
+
 
   return {
     id: q.id,
