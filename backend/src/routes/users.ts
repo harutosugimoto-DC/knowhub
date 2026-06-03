@@ -192,26 +192,25 @@ router.get('/me/recently-solved', requireAuth, async (req, res) => {
     return res.status(500).json({ error: answerError.message });
   }
 
-  const formatted = (bestAnswers ?? []).filter((a: any) => a.questions !== null).map((a: any) => {
-    const q = a.questions;
-    return {
-      id: q.id,
-      title: q.title,
-      statusId: q.statuses?.name,
-      myAction: 'my_answers',
-      userName: q.users?.nickname,
-      iconUrl: q.users?.profile_icon_url ?? null,
-      postingTime: q.created_at,
-      likeCount: q.question_likes?.length ?? 0,
-      bookmarkCount: q.bookmarks?.length ?? 0,
-      replyCount: q.answers?.filter((a: any) => a.parent_answer_id === null && a.deleted_at === null).length ?? 0,
-      tagNames: q.question_tags?.map((qt: any) => qt.tags?.name) ?? [],
-      isLiked: q.question_likes?.some((l: any) => l.user_id === userId) ?? false,
-      isBookmarked: q.bookmarks?.some((b: any) => b.user_id === userId) ?? false,
-    };
-  });
-
-  return res.json(formatted);
+ const formatted = (bestAnswers ?? []).filter((a: any) => a.questions !== null).map((a: any) => {
+  const q = a.questions;
+  return {
+    id: q.id,
+    title: q.title,
+    statusId: q.statuses?.name,
+    myActions: ['my_solved', 'my_answers'],
+    userName: q.users?.nickname,
+    iconUrl: q.users?.profile_icon_url ?? '',
+    postingTime: q.created_at,
+    likeCount: q.question_likes?.length ?? 0,
+    bookmarkCount: q.bookmarks?.length ?? 0,
+    replyCount: q.answers?.filter((a: any) => a.parent_answer_id === null && a.deleted_at === null).length ?? 0,
+    tagNames: q.question_tags?.map((qt: any) => qt.tags?.name) ?? [],
+    isLiked: q.question_likes?.some((l: any) => l.user_id === userId) ?? false,
+    isBookmarked: q.bookmarks?.some((b: any) => b.user_id === userId) ?? false,
+  };
+});
+return res.json(formatted);
 });
 
 // 1ヶ月ごとの回答件数取得
