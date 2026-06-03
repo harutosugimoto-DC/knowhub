@@ -80,14 +80,29 @@ axiosClient.interceptors.response.use(
     (error) => {
         stopLoading();
 
-        // 401エラー（認証切れ）の処理
-        if (error.response?.status === 401) {
-            return Promise.reject(error);
+        let errorMessage = error.response?.data?.message;
+
+        switch (error.response?.status) {
+            case 400:
+                errorMessage = "リクエストエラーが発生しました。";
+                break
+            case 401:
+                errorMessage = "認証に失敗しました。";
+                break
+            case 404:
+                errorMessage = "対象のデータが見つかりません。";
+                break
+            case 409:
+                errorMessage = "すでに登録されています。";
+                break
+            case 500:
+                errorMessage = "サーバー内部でエラーが発生しました。";
+                break
+            default:
+                errorMessage = "通信エラーが発生しました。";
+                break
         }
 
-        // 401以外のエラーはエラートーストを発火
-        // .message はAPI設計書の共通レスポンス形式に合わせている
-        const errorMessage = error.response?.data?.message || '通信エラーが発生しました';
         toast.error(errorMessage);
 
         return Promise.reject(error);
