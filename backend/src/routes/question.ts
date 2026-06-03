@@ -242,20 +242,30 @@ router.get('/', requireAuth, async (req, res) => {
   );
 }
 
-  const formatted = filtered.map((q: any) => ({
+ const formatted = filtered.map((q: any) => {
+  const actions: string[] = [];
+
+  if (q.user_id === userId) actions.push('my_questions');
+  if (q.answers?.some((a: any) => a.user_id === userId && a.deleted_at === null)) actions.push('my_answers');
+  if (q.user_id === userId && q.answers?.some((a: any) => a.best_answer_at !== null)) actions.push('my_solved');
+  if (q.bookmarks?.some((b: any) => b.user_id === userId)) actions.push('bookmarked');
+
+  return {
     id: q.id,
     title: q.title,
-    iconUrl: q.users?.profile_icon_url ?? null,
+    iconUrl: q.users?.profile_icon_url ?? '',
     statusId: q.statuses?.name,
     userName: q.users?.nickname,
     postingTime: q.created_at,
     likeCount: q.question_likes?.length ?? 0,
     bookmarkCount: q.bookmarks?.length ?? 0,
-    replyCount: q.answers?.filter((a: any) => a.parent_answer_id === null && a.deleted_at === null).length ?? 0,
+    replyCount: q.answers?.length ?? 0,
     tagNames: q.question_tags?.map((qt: any) => qt.tags?.name) ?? [],
     isLiked: q.question_likes?.some((l: any) => l.user_id === userId) ?? false,
     isBookmarked: q.bookmarks?.some((b: any) => b.user_id === userId) ?? false,
-  }));
+    myActions: actions,
+  };
+});
 
   // いいね順の場合はアプリ側でソート
   if (order === 'likesDesc') {
