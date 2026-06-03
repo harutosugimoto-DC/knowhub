@@ -265,7 +265,11 @@ function AnswerCard({ answer, statusId, isOwner, currentUserId, onBestAnswer, on
         <div className="h-[40px] flex gap-8 items-center">
           {showBestAnswerButton && (
             <button
-              onClick={() => onBestAnswer(answer.id)}
+              onClick={() => {
+                const confirmed = window.confirm("この回答をベストアンサーに設定しますか？");
+                if (!confirmed) return;
+                onBestAnswer(answer.id)
+              }}
               className="transition-all hover:bg-[var(--main-color)] hover:text-white cursor-pointer flex items-center gap-1 text-[var(--main-color)] px-[var(--spacing-16)] py-[var(--spacing-8)] rounded-[4px] border border-[var(--main-color)]"
             >
               <EmojiEventsOutlinedIcon />
