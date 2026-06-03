@@ -46,9 +46,9 @@ export default function Notification({ notifications }: NotificationProps) {
                     )}
                 </div>
             </div>
-            <ScrollBar>
+            <ScrollBar className="flex flex-col items-center">
 
-                {isLoading ? <Loading /> : notifications.map((notification, i) => (
+                {isLoading ? <Loading /> : notifications.length === 0 ? <p className="text-[var(--dark-gray)]">新しい通知はありません。</p> : notifications.map((notification, i) => (
                     <NotificationItem
                         key={i}
                         createdAt={notification.createdAt}
