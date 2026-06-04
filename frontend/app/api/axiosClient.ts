@@ -80,27 +80,31 @@ axiosClient.interceptors.response.use(
     (error) => {
         stopLoading();
 
-        let errorMessage = error.response?.data?.message;
+        let errorMessage: string;
 
-        switch (error.response?.status) {
-            case 400:
-                errorMessage = "リクエストエラーが発生しました。";
-                break
-            case 401:
-                errorMessage = "認証に失敗しました。";
-                break
-            case 404:
-                errorMessage = "対象のデータが見つかりません。";
-                break
-            case 409:
-                errorMessage = "すでに登録されています。";
-                break
-            case 500:
-                errorMessage = "サーバー内部でエラーが発生しました。";
-                break
-            default:
-                errorMessage = "通信エラーが発生しました。";
-                break
+        if (!error.response) {
+            errorMessage = "サーバーとの通信に失敗しました。ネットワーク環境を確認してください。";
+        } else {
+            switch (error.response.status) {
+                case 400:
+                    errorMessage = "リクエストエラーが発生しました。";
+                    break;
+                case 401:
+                    errorMessage = "認証に失敗しました。";
+                    break;
+                case 404:
+                    errorMessage = "対象のデータが見つかりません。";
+                    break;
+                case 409:
+                    errorMessage = "すでに登録されています。";
+                    break;
+                case 500:
+                    errorMessage = "サーバー内部でエラーが発生しました。";
+                    break;
+                default:
+                    errorMessage = "予期しないエラーが発生しました。時間をおいて再度お試しください。";
+                    break;
+            }
         }
 
         toast.error(errorMessage);
