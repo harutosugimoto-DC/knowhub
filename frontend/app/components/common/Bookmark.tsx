@@ -1,6 +1,7 @@
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import { addBookmark, removeBookmark } from '@/api/questionService';
 import { useEffect, useState } from 'react';
+import { toast } from '@/utils/toast';
 
 type BookmarkProps = {
     isBookmarked: boolean;
@@ -42,6 +43,7 @@ export default function Bookmark({ isBookmarked, count, id }: BookmarkProps) {
             // APIが失敗した場合は、ステートを元の状態に巻き戻す
             setBookmarkedState(bookmarkedState);
             setCountState(countState);
+            toast.error(nextBookmarked ? 'ブックマークの追加に失敗しました。' : 'ブックマークの解除に失敗しました。');
         } finally {
             setIsPending(false);
         }
