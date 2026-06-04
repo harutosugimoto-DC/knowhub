@@ -24,7 +24,8 @@ export const deleteAnswer = async (answerId:string): Promise<CommonResponse> => 
  * @returns 
  */
 export const acceptAnswer = async (answerId:string): Promise<CommonResponse> => {
-    const response = await axiosClient.patch<CommonResponse>(`/answers/${answerId}/accept`);
+    // フロント側で任意の文言を表示できるように、自動成功トーストを抑止するフラグを渡す
+    const response = await axiosClient.patch<CommonResponse>(`/answers/${answerId}/accept`, undefined, { skipSuccessToast: true });
     return response.data;
 };
 

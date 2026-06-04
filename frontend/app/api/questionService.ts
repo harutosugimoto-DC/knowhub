@@ -40,7 +40,7 @@ export const postAnswer = async (params: postAnswerType): Promise<CommonResponse
     const response = await axiosClient.post<CommonResponse>(`/questions/${params.questionId}/answers`, {
         content: params.content,
         parentAnswerId: params.parentAnswerId,
-    });
+    }, { skipSuccessToast: true });
     return response.data;
 };
 
