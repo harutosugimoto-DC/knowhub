@@ -440,6 +440,7 @@ export default function QuestionPage() {
     try {
       await postAnswer({ questionId: id, content: answerContent });
       await refreshAnswers();
+      toast.success('回答を投稿しました');
 
       setIsAnswerModalOpen(false);
       setAnswerContent('');
@@ -461,6 +462,7 @@ export default function QuestionPage() {
     try {
       await postAnswer({ questionId: id, content: replyContent, parentAnswerId: replyTargetAnswerId });
       await refreshAnswers();
+      toast.success('回答を投稿しました');
       setReplyTargetAnswerId(null);
       setReplyContent('');
       setReplyError('');
@@ -481,6 +483,7 @@ export default function QuestionPage() {
     try {
       await postAnswer({ questionId: id, content: replyContent, parentAnswerId: replyTargetReply.id });
       await refreshAnswers();
+      toast.success('回答を投稿しました');
       setReplyTargetReply(null);
       setReplyContent('');
       setReplyError('');
@@ -495,26 +498,37 @@ export default function QuestionPage() {
   // 質問を削除してトップへ戻る
   const handleDeleteQuestion = async () => {
     if (!id) return;
-    await deleteQuestion(id);
-    navigate('/top');
+    try {
+      await deleteQuestion(id);
+      navigate('/top');
+    } catch {
+      toast.error('質問の削除に失敗しました。');
+    }
   };
 
   // 回答・返信を削除
   const handleDeleteAnswer = async (answerId: string) => {
-    await deleteAnswer(answerId);
-    await refreshAnswers();
+    try {
+      await deleteAnswer(answerId);
+      await refreshAnswers();
+    } catch {
+      toast.error('削除に失敗しました。');
+    }
   };
 
   // ベストアンサーを採用
   const handleBestAnswer = async (answerId: string) => {
     try {
-      await acceptAnswer(answerId);
+      const res = await acceptAnswer(answerId);
       setAnswers((prev) =>
         prev.map((a) => ({ ...a, isBestAnswer: a.id === answerId }))
       );
       setQuestion((prev) => prev ? { ...prev, statusId: '解決済み' } : prev);
+      // バックエンドが返す message を表示（バックエンドで文言を調整済み）
+      toast.success(res?.message || 'ベストアンサーに選びました');
     } catch (err) {
       console.error('ベストアンサー設定エラー:', err);
+      toast.error('ベストアンサーの設定に失敗しました');
     }
   };
 

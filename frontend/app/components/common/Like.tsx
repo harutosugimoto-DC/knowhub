@@ -2,6 +2,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import { useEffect, useState } from 'react';
 import { addLike, removeLike } from '@/api/questionService';
 import answerService from '@/api/answerService';
+import { toast } from '@/utils/toast';
 
 type LikeProps = {
     isLiked: boolean;
@@ -51,6 +52,7 @@ export default function Like({ isLiked, count, id, type }: LikeProps) {
             // APIが失敗した場合は、ステートを元の状態に巻き戻す
             setLikedState(likedState);
             setCountState(countState);
+            toast.error(nextLiked ? '質問へのいいねに失敗しました。' : '質問のいいね解除に失敗しました。');
         } finally {
             setIsPending(false);
         }
