@@ -259,7 +259,7 @@ router.get('/', requireAuth, async (req, res) => {
     postingTime: q.created_at,
     likeCount: q.question_likes?.length ?? 0,
     bookmarkCount: q.bookmarks?.length ?? 0,
-    replyCount: q.answers?.length ?? 0,
+    replyCount: q.answers?.filter((a: any) => a.parent_answer_id === null && a.deleted_at === null).length ?? 0,
     tagNames: q.question_tags?.map((qt: any) => qt.tags?.name) ?? [],
     isLiked: q.question_likes?.some((l: any) => l.user_id === userId) ?? false,
     isBookmarked: q.bookmarks?.some((b: any) => b.user_id === userId) ?? false,
