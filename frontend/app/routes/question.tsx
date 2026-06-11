@@ -219,19 +219,20 @@ function AnswerCard({ answer, statusId, isOwner, currentUserId, onBestAnswer, on
           <Time postingTime={answer.postingTime} />
         </div>
 
-        {answer.isBestAnswer ? (
-          <div className="flex items-center gap-2 text-[var(--main-color)]">
-            <EmojiEventsOutlinedIcon />
-            <p>ベストアンサー</p>
-          </div>
-        ) : answer.userId === currentUserId ? (
+        <div className="flex items-center gap-2">
+          {answer.isBestAnswer && (
+            <div className="flex items-center gap-2 text-[var(--main-color)]">
+              <EmojiEventsOutlinedIcon />
+              <p>ベストアンサー</p>
+            </div>
+          )}
           <CardActionMenu
             isContentOpen={isContentOpen}
             setIsContentOpen={setIsContentOpen}
-            onRemove={() => onDeleteAnswer(answer.id)}
+            onRemove={answer.userId === currentUserId && !answer.isBestAnswer ? () => onDeleteAnswer(answer.id) : undefined}
             isOverflowing={isOverflowing}
           />
-        ) : null}
+        </div>
       </div>
 
       <CollapsibleContent
