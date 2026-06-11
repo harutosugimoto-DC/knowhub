@@ -20,10 +20,10 @@ export default function CardActionMenu({
     // ドロップダウンの開閉状態は、このコンポーネント内に閉じた状態(Local State)として管理します
     const [isDropDownOpen, setIsDropdownOpen] = useState(false);
 
-    // 削除処理のハンドラー
     const handleRemoveClick = () => {
-        onRemove(); // 親から渡された削除処理を実行
-        setIsDropdownOpen(false); // メニューを閉じる
+        if (!onRemove) return;
+        onRemove();
+        setIsDropdownOpen(false);
     };
 
     return (
