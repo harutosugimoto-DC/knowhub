@@ -66,14 +66,12 @@ export default function ThreadReply({
                         <p>{userName}</p>
                         <Time postingTime={postingTime} />
                     </div>
-                    {userId === currentUserId && (
-                        <CardActionMenu
-                            isContentOpen={isContentOpen}
-                            setIsContentOpen={setIsContentOpen}
-                            onRemove={() => onDeleteReply?.(id)}
-                            isOverflowing={isOverflowing}
-                        />
-                    )}
+                    <CardActionMenu
+                        isContentOpen={isContentOpen}
+                        setIsContentOpen={setIsContentOpen}
+                        onRemove={userId === currentUserId ? () => onDeleteReply?.(id) : undefined}
+                        isOverflowing={isOverflowing}
+                    />
                 </div>
 
                 <CollapsibleContent

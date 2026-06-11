@@ -224,14 +224,14 @@ function AnswerCard({ answer, statusId, isOwner, currentUserId, onBestAnswer, on
             <EmojiEventsOutlinedIcon />
             <p>ベストアンサー</p>
           </div>
-        ) : answer.userId === currentUserId ? (
+        ) : (
           <CardActionMenu
             isContentOpen={isContentOpen}
             setIsContentOpen={setIsContentOpen}
-            onRemove={() => onDeleteAnswer(answer.id)}
+            onRemove={answer.userId === currentUserId ? () => onDeleteAnswer(answer.id) : undefined}
             isOverflowing={isOverflowing}
           />
-        ) : null}
+        )}
       </div>
 
       <CollapsibleContent
