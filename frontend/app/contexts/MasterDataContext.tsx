@@ -32,7 +32,11 @@ export function MasterDataProvider({ children }: { children: React.ReactNode }) 
                 // 💡 Promise.all で同時に取得すると効率的です
                 const [statusData, tagData] = await Promise.all([getStatuses(), getTags()]);
                 setStatuses(statusData);
-                setTags(tagData);
+
+                const sortedTagData = [...tagData].sort((a, b) => {
+                    return a.name.localeCompare(b.name, "ja")
+                })
+                setTags(sortedTagData);
             } catch (err) {
                 console.error("マスタデータの取得に失敗:", err);
             } finally {

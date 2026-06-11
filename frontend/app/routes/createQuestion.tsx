@@ -59,7 +59,10 @@ export default function CreateQuestion() {
             })
             .then((data: unknown) => {
                 if (Array.isArray(data) && data.length > 0) {
-                    setAllTags(data as Tag[]);
+                    const sortedTagData = [...data as Tag[]].sort((a, b) => {
+                        return a.name.localeCompare(b.name, "ja")
+                    })
+                    setAllTags(sortedTagData);
                 } else if (Array.isArray(data) && data.length === 0) {
                     setTagLoadError('タグが0件です。Supabase の tags テーブルの RLS ポリシーを確認してください。');
                 }
