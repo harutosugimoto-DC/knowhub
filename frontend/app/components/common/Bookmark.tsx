@@ -48,9 +48,6 @@ export default function Bookmark({ isBookmarked, count, id }: BookmarkProps) {
             setIsPending(false);
         }
     }
-    useEffect(() => {
-
-    }, [])
     return (
         <div className='inline-flex items-center gap-1'>
             <BookmarkIcon

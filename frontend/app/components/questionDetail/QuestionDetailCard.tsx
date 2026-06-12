@@ -50,7 +50,7 @@ export default function QuestionDetailCard({ question, onDelete, isOwner }: Ques
                 <CardActionMenu
                     isContentOpen={isContentOpen}
                     setIsContentOpen={setIsContentOpen}
-                    onRemove={isOwner ? handleRemove : undefined}
+
                     isOverflowing={isOverflowing}
                 />
             </div>
