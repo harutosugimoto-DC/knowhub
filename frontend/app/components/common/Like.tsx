@@ -52,7 +52,8 @@ export default function Like({ isLiked, count, id, type }: LikeProps) {
             // APIが失敗した場合は、ステートを元の状態に巻き戻す
             setLikedState(likedState);
             setCountState(countState);
-            toast.error(nextLiked ? '質問へのいいねに失敗しました。' : '質問のいいね解除に失敗しました。');
+            const itemType = type === 'question' ? '質問' : '回答';
+            toast.error(nextLiked ? `${itemType}へのいいねに失敗しました。` : `${itemType}のいいね解除に失敗しました。`);
         } finally {
             setIsPending(false);
         }
@@ -62,7 +63,7 @@ export default function Like({ isLiked, count, id, type }: LikeProps) {
         <div className='inline-flex items-center gap-1'>
             <FavoriteIcon
                 className={`cursor-pointer transition-colors ${likedState ? 'text-[var(--like-color)]' : 'text-[var(--light-gray)]'
-                    } ${isPending ? 'opacity-50 Fpointer-events-none' : ''}`}
+                    } ${isPending ? 'opacity-50 pointer-events-none' : ''}`}
                 onClick={handleClick}
             />
             <span>{countState}</span>
