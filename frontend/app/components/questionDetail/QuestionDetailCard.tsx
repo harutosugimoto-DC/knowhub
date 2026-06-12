@@ -13,9 +13,10 @@ import { type QuestionType } from "@/types/question.ts";
 type QuestionDetailCardProps = {
     question: QuestionType & { content?: string };
     onDelete?: () => void;
+    isOwner?: boolean
 }
 
-export default function QuestionDetailCard({ question, onDelete }: QuestionDetailCardProps) {
+export default function QuestionDetailCard({ question, onDelete, isOwner }: QuestionDetailCardProps) {
     const {
         id,
         title,
@@ -49,7 +50,7 @@ export default function QuestionDetailCard({ question, onDelete }: QuestionDetai
                 <CardActionMenu
                     isContentOpen={isContentOpen}
                     setIsContentOpen={setIsContentOpen}
-                    onRemove={handleRemove}
+                    onRemove={isOwner ? handleRemove : undefined}
                     isOverflowing={isOverflowing}
                 />
             </div>
