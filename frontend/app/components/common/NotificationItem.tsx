@@ -7,12 +7,11 @@ export type NotificationItemProps = {
     id: string,
     isRead: boolean;
     linkUrl: string;
-    senderIcon: string,
     senderName: string,
     type: string;
     questionTitle?: string
 };
-export default function NotificationItem({ linkUrl, type, createdAt, isRead, id, senderIcon, senderName, questionTitle }: NotificationItemProps) {
+export default function NotificationItem({ linkUrl, type, createdAt, isRead, id, senderName, questionTitle }: NotificationItemProps) {
     const navigate = useNavigate()
     const handleClick = async () => {
         try {

@@ -88,7 +88,7 @@ export default function Header() {
                     }
                 }
             )
-            .subscribe((status, error) => {
+            .subscribe((_, error) => {
                 if (error) {
                     console.error("❌ [Realtime接続エラー詳細]:", error);
                 }

@@ -3,10 +3,8 @@ import Toast from './Toast';
 
 export default function GlobalHandler() {
 
-    // エラートースト（赤）の配列
     const [errorToasts, setErrorToasts] = useState<{ id: number; message: string }[]>([]);
 
-    // 成功トースト（緑）の配列
     const [successToasts, setSuccessToasts] = useState<{ id: number; message: string }[]>([]);
 
     useEffect(() => {
@@ -17,10 +15,8 @@ export default function GlobalHandler() {
             const customEvent = e as CustomEvent<string>;
             const id = Date.now();
 
-            // エラートースト配列に追加
             setErrorToasts(prev => [...prev, { id, message: customEvent.detail }]);
 
-            // 3秒後にそのIDのトーストだけ削除
             setTimeout(() => {
                 setErrorToasts(prev => prev.filter(t => t.id !== id));
             }, 3000);
@@ -31,20 +27,16 @@ export default function GlobalHandler() {
             const customEvent = e as CustomEvent<string>;
             const id = Date.now();
 
-            // 成功トースト配列に追加
             setSuccessToasts(prev => [...prev, { id, message: customEvent.detail }]);
 
-            // 3秒後にそのIDのトーストだけ削除
             setTimeout(() => {
                 setSuccessToasts(prev => prev.filter(t => t.id !== id));
             }, 3000);
         };
 
-        // イベントリスナーを登録
         window.addEventListener('global-error', handleApiError);
-        window.addEventListener('global-success', handleApiSuccess); // 成功イベントを追加
+        window.addEventListener('global-success', handleApiSuccess);
 
-        // コンポーネントがアンマウントされたときにリスナーを削除
         return () => {
             window.removeEventListener('global-error', handleApiError);
             window.removeEventListener('global-success', handleApiSuccess);

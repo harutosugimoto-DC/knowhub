@@ -24,7 +24,6 @@ import { useLoading } from "@/contexts/LoadingContext";
 export default function Profile() {
     const { user, setUser } = useUser();
     const { isLoading } = useLoading()
-    // ─── 💡 Hooks (State) の定義：エラー回避のため必ずコンポーネントの最上部に並べる ───
     const [profileData, setProfileData] = useState<myData | null>(null);
     const [questions, setQuestions] = useState<QuestionType[]>([]);
     const [topTags, setTopTags] = useState<{ name: string; count: number }[]>([]);
@@ -38,7 +37,6 @@ export default function Profile() {
     // 画像アップロード用のState
     const [iconError, setIconError] = useState("");
 
-    // ─── 💡 useEffect でデータの一括取得 ───
     useEffect(() => {
         if (!user?.id) return;
 
@@ -75,7 +73,7 @@ export default function Profile() {
         fetchProfileData();
     }, [user?.id]);
 
-    // ─── 💡 画像アップロード処理 (Multerの 'icon' キーと完全連動) ───
+    // ─── 💡 画像アップロード処理 ───
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!user?.id) return;
 

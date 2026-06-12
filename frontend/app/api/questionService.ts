@@ -1,4 +1,4 @@
-import type { GetQuestionsParams, GetQuestionsResponse, QuestionDetail, QuestionType } from "@/types/question";
+import type { GetQuestionsParams, GetQuestionsResponse, QuestionDetail } from "@/types/question";
 import axiosClient from "./axiosClient";
 import type { AnswerType, postAnswerType } from "@/types/answer";
 

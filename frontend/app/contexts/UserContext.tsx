@@ -41,8 +41,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
             } catch (err) {
                 console.error("グローバルセッション復旧エラー:", err);
-                // ネットワークエラーなどで取得失敗した場合は安全のため一度ログアウト状態にする
-                // (401エラー等の場合は axiosClient の共通処理で自動ログアウトさせるのもアリです)
             }
         };
 
