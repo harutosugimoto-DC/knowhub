@@ -1,6 +1,5 @@
-import axiosClient from './axiosClient'; // パスは環境に合わせて調整してください
+import axiosClient from './axiosClient';
 
-// タグデータの型定義
 export interface TagType {
     id: string;
     name: string;

@@ -1,6 +1,5 @@
 import axiosClient from './axiosClient';
 
-// APIのレスポンス型定義
 export interface UserProfileResponse {
     id: string;
     nickname: string | null;

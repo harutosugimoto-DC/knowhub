@@ -55,7 +55,6 @@ export default function Notification({ notifications }: NotificationProps) {
                         id={notification.id}
                         isRead={notification.isRead}
                         linkUrl={notification.linkUrl}
-                        senderIcon={notification.senderIcon}
                         senderName={notification.senderName}
                         type={notification.type}
                         questionTitle={notification.questionTitle}

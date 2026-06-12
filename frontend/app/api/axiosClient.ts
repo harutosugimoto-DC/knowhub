@@ -3,8 +3,11 @@ import { toast } from '@/utils/toast';
 
 // axiosのリクエスト設定に独自のプロパティを追加するための型宣言
 declare module 'axios' {
+    interface AxiosRequestConfig {
+        skipSuccessToast?: boolean;
+    }
     interface InternalAxiosRequestConfig {
-        skipSuccessToast?: boolean; // trueのときは成功トーストを出さない
+        skipSuccessToast?: boolean;
     }
 }
 

@@ -2,7 +2,7 @@ import type { ReactNode, Ref } from "react";
 
 type ScrollBarProps = {
     children: ReactNode;
-    className?: string; // 高さを指定したり、レイアウトを微調整できるようにします
+    className?: string;
     isAi?: boolean
     ref?: Ref<HTMLDivElement>
 };

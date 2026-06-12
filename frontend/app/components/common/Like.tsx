@@ -1,8 +1,8 @@
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import { useEffect, useState } from 'react';
 import { addLike, removeLike } from '@/api/questionService';
-import answerService from '@/api/answerService';
 import { toast } from '@/utils/toast';
+import { addAnswerLike, removeAnswerLike } from '@/api/answerService';
 
 type LikeProps = {
     isLiked: boolean;
@@ -42,9 +42,9 @@ export default function Like({ isLiked, count, id, type }: LikeProps) {
                 }
             } else if (type === "answer") {
                 if (nextLiked) {
-                    await answerService.addAnswerLike(id);
+                    await addAnswerLike(id);
                 } else {
-                    await answerService.removeAnswerLike(id);
+                    await removeAnswerLike(id);
                 }
             }
         } catch (error) {
