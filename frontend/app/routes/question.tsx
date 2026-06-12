@@ -17,7 +17,6 @@ import ScrollBar from '@/components/common/ScrollBar';
 import Modal from '@/components/common/Modal';
 import TextArea from '@/components/common/Textarea';
 import ErrorMessages from '@/components/common/ErrorMessages';
-import Header from '@/components/common/Header';
 import Loading from '@/components/common/Loading';
 
 import QuestionDetailCard from '@/components/questionDetail/QuestionDetailCard';

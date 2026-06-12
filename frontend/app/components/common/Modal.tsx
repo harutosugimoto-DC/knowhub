@@ -1,6 +1,6 @@
 import Card from "./Card";
 import CloseIcon from '@mui/icons-material/Close';
-import { useEffect } from "react"; // 💡 修正1: useEffect をインポート
+import { useEffect } from "react";
 
 type ModalProps = {
     children: React.ReactNode;
@@ -11,7 +11,6 @@ type ModalProps = {
 
 export default function Modal({ children, onClose, confirmOnClose = false, confirmCloseMessage }: ModalProps) {
     
-    // 💡 修正2: 背景のスクロールを完全に止めるロジックを追加
     useEffect(() => {
         // 開いた時の元のスタイルを記憶しておく
         const originalStyle = window.getComputedStyle(document.body).overflow;
@@ -23,7 +22,7 @@ export default function Modal({ children, onClose, confirmOnClose = false, confi
         return () => {
             document.body.style.overflow = originalStyle;
         };
-    }, []); // 💡 初回表示時のみ実行
+    }, []);
 
     const handleClose = () => {
         if (confirmOnClose) {

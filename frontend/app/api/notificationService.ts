@@ -5,9 +5,9 @@ export interface NotificationType {
     isRead: boolean;
     createdAt: string;
     linkUrl: string;
-    type: string;       // notification_types.name をここに平坦化
-    senderName: string; // sender.nickname をここに平坦化
-    senderIcon: string; // sender.profile_icon_url をここに平坦化
+    type: string;
+    senderName: string;
+    senderIcon: string;
 }
 
 /**
@@ -32,16 +32,10 @@ export const getNotifications = async (): Promise<NotificationType[]> => {
  * @param notificationId 
  */
 
-export const readNotification = async (notificationId:string): Promise<void> => {
-    const response = await axiosClient.patch<void>(`/notifications/${notificationId}/read`);
+export const readNotification = async (notificationId: string): Promise<void> => {
+    await axiosClient.patch<void>(`/notifications/${notificationId}/read`);
 }
 
 export const allReadNotifications = async (): Promise<void> => {
-    const response = await axiosClient.patch<void>(`/notifications/read-all`);
+    await axiosClient.patch<void>(`/notifications/read-all`);
 }
-
-const notificationService = {
-    getNotifications,
-};
-
-export default notificationService;

@@ -29,7 +29,6 @@ export function MasterDataProvider({ children }: { children: React.ReactNode }) 
         const fetchMasterData = async () => {
             try {
                 setIsLoading(true);
-                // 💡 Promise.all で同時に取得すると効率的です
                 const [statusData, tagData] = await Promise.all([getStatuses(), getTags()]);
                 setStatuses(statusData);
 

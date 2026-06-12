@@ -1,6 +1,5 @@
 import axiosClient from './axiosClient';
 
-// ステータスデータの型定義
 export interface StatusType {
     id: string;
     name: string;
