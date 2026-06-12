@@ -1,11 +1,8 @@
 import axiosClient from "./axiosClient";
 
-// --- 型定義 ---
 interface CommonResponse {
     message: string;
 }
-
-// --- API呼び出し関数 ---
 
 /**
  * 回答を削除する
@@ -46,11 +43,3 @@ export const removeAnswerLike = async (answerId: string): Promise<CommonResponse
     const response = await axiosClient.delete<CommonResponse>(`/answers/${answerId}/like`);
     return response.data;
 };
-
-// オブジェクトにまとめてエクスポート
-const answerService = {
-    addAnswerLike,
-    removeAnswerLike,
-};
-
-export default answerService;

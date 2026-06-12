@@ -68,10 +68,3 @@ export const getActivity = async (
 
     return response.data;
 };
-
-
-const userService = {
-    updateProfileIcon,
-};
-
-export default userService;

@@ -17,7 +17,6 @@ export default function CardActionMenu({
     onRemove,
     isOverflowing
 }: CardActionMenuProps) {
-    // ドロップダウンの開閉状態は、このコンポーネント内に閉じた状態(Local State)として管理します
     const [isDropDownOpen, setIsDropdownOpen] = useState(false);
 
     const handleRemoveClick = () => {

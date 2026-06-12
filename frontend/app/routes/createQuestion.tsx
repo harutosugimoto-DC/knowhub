@@ -43,6 +43,11 @@ export default function CreateQuestion() {
     const [isAiLoading, setIsAiLoading] = useState(false);
     const aiScrollRef = useRef<HTMLDivElement>(null);
 
+    //エラー時のスクロール用Ref
+    const titleRef = useRef<HTMLDivElement>(null);
+    const detailRef = useRef<HTMLDivElement>(null);
+    const tagsRef = useRef<HTMLDivElement>(null);
+
     const [errors, setErrors] = useState<{ title?: string; detail?: string; tags?: string }>({});
 
     // タグ一覧をバックエンドから取得
@@ -59,7 +64,10 @@ export default function CreateQuestion() {
             })
             .then((data: unknown) => {
                 if (Array.isArray(data) && data.length > 0) {
-                    setAllTags(data as Tag[]);
+                    const sortedTagData = [...data as Tag[]].sort((a, b) => {
+                        return a.name.localeCompare(b.name, "ja")
+                    })
+                    setAllTags(sortedTagData);
                 } else if (Array.isArray(data) && data.length === 0) {
                     setTagLoadError('タグが0件です。Supabase の tags テーブルの RLS ポリシーを確認してください。');
                 }
@@ -97,7 +105,19 @@ export default function CreateQuestion() {
         }
 
         setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
+        if (Object.keys(newErrors).length > 0) {
+            // 上にある要素から順番にチェックし、最初のエラー要素へスクロール
+            if (newErrors.title) {
+                titleRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else if (newErrors.detail) {
+                detailRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else if (newErrors.tags) {
+                tagsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            return false; // エラーがある場合はfalse
+        }
+
+        return true; // エラーがない場合はtrue
     };
 
     const submitQuestion = async () => {
@@ -191,45 +211,48 @@ export default function CreateQuestion() {
 
     return (
         <div className="flex justify-center gap-4 overflow-x-hidden h-[calc(100vh-64px)]">
-            <ScrollBar className={`mr-1 flex-1 h-full overflow-y-auto flex flex-col gap-4 px-[var(--spacing-64)] py-[var(--spacing-32)] transition-all `}>
-                <div>
-                    <div className="py-[var(--spacing-16)]">
-                        <SectionTitle title="質問タイトル" isRequired>
-                            <button onClick={() => setIsAiOpen(!isAiOpen)} className="transition-all hover:shadow-[var(--hover-box-shadow)] shadow-[var(--box-shadow)] cursor-pointer rounded-[16px] text-white bg-[image:var(--ai-color)] px-[var(--spacing-32)] py-[var(--spacing-16)]">
-                                AIに相談する
-                            </button>
-                        </SectionTitle>
+            <div className="flex justify-center flex-1 overflow-x-hidden h-full py-4">
+                <ScrollBar className={`mr-1 flex-1 h-full overflow-y-auto flex flex-col gap-4 px-[var(--spacing-64)] py-[var(--spacing-16)] transition-all `}>
+                    <div>
+                        <div className="py-[var(--spacing-16)]" >
+                            <SectionTitle title="質問タイトル" isRequired>
+                                <button onClick={() => setIsAiOpen(!isAiOpen)} className="transition-all hover:shadow-[var(--hover-box-shadow)] shadow-[var(--box-shadow)] cursor-pointer rounded-[16px] text-white bg-[image:var(--ai-color)] px-[var(--spacing-32)] py-[var(--spacing-16)]">
+                                    AIに相談する
+                                </button>
+                            </SectionTitle>
+                        </div>
+                        <div className="flex flex-col gap-4 px-[var(--spacing-16)]" ref={titleRef}>
+                            <TextInput value={titleText} onChange={setTitleText} placeholder={titlePlaceholder} />
+                            {errors.title && <ErrorMessages message={errors.title} />}
+                        </div>
                     </div>
-                    <div className="flex flex-col gap-4 px-[var(--spacing-16)] ">
-                        <TextInput value={titleText} onChange={setTitleText} placeholder={titlePlaceholder} />
-                        {errors.title && <ErrorMessages message={errors.title} />}
+                    <div>
+                        <div className="py-[var(--spacing-16)]">
+                            <SectionTitle title="詳細" isRequired />
+                        </div>
+                        <div className="flex flex-col gap-4 px-[var(--spacing-16)]"  ref={detailRef}>
+                            <TextArea value={detailText} onChange={setDetailText} placeholder={detailPlaceholder} />
+                            {errors.detail && <ErrorMessages message={errors.detail} />}
+                        </div>
                     </div>
-                </div>
-                <div>
-                    <div className="py-[var(--spacing-16)]">
-                        <SectionTitle title="詳細" isRequired />
+                    <div className="relative">
+                        <div className="py-[var(--spacing-16)]" >
+                            <SectionTitle title="タグ付け" isRequired isTagSelect />
+                        </div>
+                        <div className="flex flex-col gap-4 px-[var(--spacing-16)]" ref={tagsRef}>
+                            {tagLoadError
+                                ? <ErrorMessages message={tagLoadError} />
+                                : <TagSelector selectedTagIds={selectedTagIds} setSelectedTagIds={setSelectedTagIds} allTagData={allTags} setErrors={setErrors} />
+                            }
+                            {errors.tags && <ErrorMessages message={errors.tags} />}
+                        </div>
                     </div>
-                    <div className="flex flex-col gap-4 px-[var(--spacing-16)]">
-                        <TextArea value={detailText} onChange={setDetailText} placeholder={detailPlaceholder} />
-                        {errors.detail && <ErrorMessages message={errors.detail} />}
+                    <div className="flex items-center justify-center">
+                        <Button text="内容確認" onClick={() => { if (validate()) setIsModalOpen(true); }} />
                     </div>
-                </div>
-                <div className="relative">
-                    <div className="py-[var(--spacing-16)]">
-                        <SectionTitle title="タグ付け" isRequired isTagSelect />
-                    </div>
-                    <div className="flex flex-col gap-4 px-[var(--spacing-16)]">
-                        {tagLoadError
-                            ? <ErrorMessages message={tagLoadError} />
-                            : <TagSelector selectedTagIds={selectedTagIds} setSelectedTagIds={setSelectedTagIds} allTagData={allTags} setErrors={setErrors}/>
-                        }
-                        {errors.tags && <ErrorMessages message={errors.tags} />}
-                    </div>
-                </div>
-                <div className="flex items-center justify-center">
-                    <Button text="内容確認" onClick={() => { if (validate()) setIsModalOpen(true); }} />
-                </div>
-            </ScrollBar>
+                </ScrollBar>
+            </div>
+
 
             {/* 右側：AIサポートアシスタント */}
             <div className={`${isAiOpen ? "flex-1" : "flex-0"} transition-all h-full flex flex-col rounded-l-[16px] shadow-[-4px_0px_4px_rgba(0,0,0,0.25)] overflow-hidden`}>

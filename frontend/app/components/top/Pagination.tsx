@@ -44,7 +44,6 @@ export default function Pagination({ max, current, onPageChange }: PaginationPro
             {/* ─── 🔢 ページ数字エリア ─── */}
             <div className="flex items-center gap-1">
                 {pages.map((page, index) => {
-                    // 三点リーダー '...' の場合は、ボタンではなくただのテキスト(span)として描画する
                     if (typeof page !== 'number') {
                         return (
                             <span 
@@ -56,7 +55,6 @@ export default function Pagination({ max, current, onPageChange }: PaginationPro
                         );
                     }
 
-                    // 通常の数字ボタン
                     const isActive = page === current;
                     return (
                         <button

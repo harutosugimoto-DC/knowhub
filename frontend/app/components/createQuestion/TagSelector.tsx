@@ -9,7 +9,6 @@ type TagSelectorProps = {
 
 export default function TagSelector({ selectedTagIds, setSelectedTagIds, allTagData, setErrors }: TagSelectorProps) {
 
-    // タグの選択・解除をこれ1つで制御（トグル処理）
     const handleToggleSelect = (tagId: string) => {
         setSelectedTagIds((prev) => {
             const isSelected = prev.includes(tagId);

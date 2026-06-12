@@ -6,7 +6,6 @@ import Comment from "../common/Comment";
 import TagChip from "../common/TagChip";
 import StatusChip from "../common/StatusChip";
 import CardActionMenu from "../common/CardActionMenu";
-// 新しく切り出したコンポーネントをインポート
 import CollapsibleContent from "../common/CollapsibleContent";
 
 import { type QuestionType } from "@/types/question.ts";
@@ -14,17 +13,16 @@ import { type QuestionType } from "@/types/question.ts";
 type QuestionDetailCardProps = {
     question: QuestionType & { content?: string };
     onDelete?: () => void;
+    isOwner?: boolean
 }
 
-export default function QuestionDetailCard({ question, onDelete }: QuestionDetailCardProps) {
+export default function QuestionDetailCard({ question, onDelete, isOwner }: QuestionDetailCardProps) {
     const {
         id,
         title,
         statusId,
         isLiked = false,
         isBookmarked = false,
-        userName,
-        postingTime,
         likeCount,
         bookmarkCount,
         replyCount,
@@ -52,7 +50,7 @@ export default function QuestionDetailCard({ question, onDelete }: QuestionDetai
                 <CardActionMenu
                     isContentOpen={isContentOpen}
                     setIsContentOpen={setIsContentOpen}
-                    onRemove={onDelete ? handleRemove : undefined}
+
                     isOverflowing={isOverflowing}
                 />
             </div>

@@ -24,3 +24,4 @@ dist-ssr
 *.sw?
 # React Router auto-generated files
 .react-router/
+*build/

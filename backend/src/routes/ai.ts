@@ -4,7 +4,7 @@ import { requireAuth } from '../middleware/auth.js';
 const router = Router();
 
 const GEMINI_URL =
-  'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
+  'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent';
 
 const SYSTEM_INSTRUCTION = `あなたは質問作成を支援するAIアシスタントです。エンジニアがより良い質問を作成できるよう、具体的で再現性のある質問にするためのアドバイスをします。日本語で返答してください。
 
