@@ -122,6 +122,19 @@ router.delete('/users/:userId', requireAdmin, async (req, res) => {
     return res.status(400).json({ error: '自分自身は削除できません' });
   }
 
+  // auth.admin.deleteUser は auth.users を削除し public.users へのカスケードを
+  // 引き起こすが、notifications / likes / bookmarks が users.id を NOT NULL FK で
+  // 参照しているため先にそれらを削除する必要がある。
+  // 質問・回答は user_id を null にして "(退会済み)" として残す。
+  await supabaseAdmin.from('notifications').delete().eq('receiver_user_id', userId);
+  await supabaseAdmin.from('notifications').delete().eq('sender_user_id', userId);
+  await supabaseAdmin.from('question_likes').delete().eq('user_id', userId);
+  await supabaseAdmin.from('answer_likes').delete().eq('user_id', userId);
+  await supabaseAdmin.from('bookmarks').delete().eq('user_id', userId);
+  await supabaseAdmin.from('questions').update({ user_id: null }).eq('user_id', userId);
+  await supabaseAdmin.from('answers').update({ user_id: null }).eq('user_id', userId);
+  await supabaseAdmin.from('users').delete().eq('id', userId);
+
   const { error } = await supabaseAdmin.auth.admin.deleteUser(userId);
   if (error) {
     console.error('Auth delete error:', error);
