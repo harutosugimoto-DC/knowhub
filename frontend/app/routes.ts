@@ -10,5 +10,12 @@ export default [
     route("create-question", "routes/createQuestion.tsx"),
     route("question/:id", "routes/question.tsx"),
     route("profile", "routes/profile.tsx"),
+
+    route("admin", "routes/admin/layout.tsx", [
+      index("routes/admin/index.tsx"),
+      route("users", "routes/admin/users.tsx"),
+      route("questions", "routes/admin/questions.tsx"),
+      route("tags", "routes/admin/tags.tsx"),
+    ]),
   ]),
 ] satisfies RouteConfig;
