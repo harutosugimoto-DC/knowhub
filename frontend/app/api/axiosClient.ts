@@ -99,7 +99,7 @@ axiosClient.interceptors.response.use(
                     errorMessage = "対象のデータが見つかりません。";
                     break;
                 case 409:
-                    errorMessage = "すでに登録されています。";
+                    errorMessage = error.response.data?.error || "すでに登録されています。";
                     break;
                 case 500:
                     errorMessage = "サーバー内部でエラーが発生しました。";

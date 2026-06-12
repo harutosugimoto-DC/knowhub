@@ -99,7 +99,7 @@ router.get('/me', requireAuth, async (req, res) => {
   // ユーザー基本情報取得
   const { data: user, error: userError } = await supabase
     .from('users')
-    .select('id, nickname, profile_icon_url')
+    .select('id, nickname, profile_icon_url, is_admin')
     .eq('id', userId)
     .maybeSingle();
 
@@ -151,6 +151,7 @@ router.get('/me', requireAuth, async (req, res) => {
     id: user.id,
     nickname: user.nickname,
     iconUrl: user.profile_icon_url,
+    isAdmin: (user as any).is_admin ?? false,
     questionCount: questionCount ?? 0,
     answerCount: answerCount ?? 0,
     bestAnswerCount: bestAnswerCount ?? 0,
